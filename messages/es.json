@@ -1,0 +1,32 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "services": "Servicios & Precios",
+    "gallery": "Galería",
+    "booking": "Reservar",
+    "about": "Sobre nosotras",
+    "contact": "Contacto"
+  },
+  "hero": {
+    "title": "Salon Mimi",
+    "subtitle": "African Hair Braiding",
+    "location": "Medina de Marrakech",
+    "cta_book": "Reservar",
+    "cta_services": "Nuestros servicios"
+  },
+  "booking": {
+    "title": "Reserva tu cita",
+    "name": "Nombre completo",
+    "phone": "Teléfono / WhatsApp",
+    "service": "Servicio deseado",
+    "date": "Fecha preferida",
+    "message": "Mensaje (opcional)",
+    "submit": "Enviar solicitud",
+    "success": "¡Solicitud enviada! Mimi te contactará por WhatsApp.",
+    "error": "Ha ocurrido un error. Por favor, inténtalo de nuevo."
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados",
+    "address": "Plaza Jemaa el-Fna, Medina, Marrakech 40000, Marruecos"
+  }
+}
