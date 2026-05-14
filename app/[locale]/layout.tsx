@@ -1,18 +1,14 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import localFont from "next/font/local";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 import "../globals.css";
 
-const geistSans = localFont({
-  src: "../fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "../fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+export const metadata = {
+  title: "Salon Mimi — African Hair Braiding Marrakech",
+  description:
+    "Coiffures africaines authentiques au cœur de la médina de Marrakech. Box braids, knotless, locks, soins argan.",
+};
 
 export default async function LocaleLayout({
   children,
@@ -26,11 +22,11 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body>
         <NextIntlClientProvider messages={messages}>
-          {children}
+          <Header />
+          <main>{children}</main>
+          <Footer />
         </NextIntlClientProvider>
       </body>
     </html>
