@@ -29,6 +29,7 @@ export default function ReservationsTable({
   const [reservations, setReservations] = useState(initial);
   const [filterStatut, setFilterStatut] = useState("tous");
   const [updating, setUpdating] = useState<string | null>(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
   const filtered =
     filterStatut === "tous"
@@ -37,6 +38,7 @@ export default function ReservationsTable({
 
   async function updateStatut(id: string, statut: string) {
     setUpdating(id);
+    setUpdateError(null);
     const res = await fetch(`/api/reservations/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -48,6 +50,8 @@ export default function ReservationsTable({
           r.id === id ? { ...r, statut: statut as Reservation["statut"] } : r,
         ),
       );
+    } else {
+      setUpdateError("Erreur lors de la mise à jour du statut.");
     }
     setUpdating(null);
   }
@@ -78,6 +82,10 @@ export default function ReservationsTable({
           </button>
         ))}
       </div>
+
+      {updateError && (
+        <p className="text-red-600 text-sm mb-4">{updateError}</p>
+      )}
 
       <div className="bg-white rounded-2xl border border-or/20 overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
@@ -121,6 +129,7 @@ export default function ReservationsTable({
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <select
+                      aria-label="Changer le statut"
                       disabled={updating === r.id}
                       value={r.statut}
                       onChange={(e) => updateStatut(r.id, e.target.value)}
