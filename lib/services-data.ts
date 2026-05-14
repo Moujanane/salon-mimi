@@ -243,9 +243,9 @@ export function getServiceName(
   service: Service | Package,
   locale: string,
 ): string {
-  if (locale === "en") return (service as any).nameEn;
-  if (locale === "es") return (service as any).nameEs;
-  return (service as any).nameFr;
+  if (locale === "en") return service.nameEn;
+  if (locale === "es") return service.nameEs;
+  return service.nameFr;
 }
 
 export function getServiceDuration(service: Service, locale: string): string {
