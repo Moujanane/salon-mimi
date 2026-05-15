@@ -1,529 +1,455 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 export interface ServicesCarouselProps {
   locale: string;
-  bookLabel: string;
 }
 
-interface ServiceItem {
+interface MediaItem {
+  type: "image" | "video";
+  src: string;
+}
+
+interface Category {
   id: string;
-  nameFr: string;
-  nameEn: string;
-  nameEs: string;
-  media: { type: "image" | "video"; src: string };
-  durationFr: string;
-  durationEn: string;
-  category: string;
+  icon: string;
+  labelFr: string;
+  labelEn: string;
+  labelEs: string;
+  descFr: string;
+  descEn: string;
+  descEs: string;
+  slides: MediaItem[];
 }
 
-const SERVICES: ServiceItem[] = [
-  // — TRESSES —
-  {
-    id: "box-braids-medium",
-    nameFr: "Box Braids Medium",
-    nameEn: "Box Braids Medium",
-    nameEs: "Box Braids Medianas",
-    media: { type: "video", src: "/videos/Tresses.mp4" },
-    durationFr: "3–4h",
-    durationEn: "3–4h",
-    category: "tresses",
-  },
-  {
-    id: "box-braids-xl",
-    nameFr: "Box Braids XL",
-    nameEn: "Box Braids XL",
-    nameEs: "Box Braids XL",
-    media: { type: "video", src: "/videos/Tresses2.mp4" },
-    durationFr: "2–3h",
-    durationEn: "2–3h",
-    category: "tresses",
-  },
-  {
-    id: "knotless-braids",
-    nameFr: "Knotless Braids",
-    nameEn: "Knotless Braids",
-    nameEs: "Knotless Braids",
-    media: { type: "video", src: "/videos/Tresses3.mp4" },
-    durationFr: "4–5h",
-    durationEn: "4–5h",
-    category: "tresses",
-  },
-  {
-    id: "boho-braids",
-    nameFr: "Boho Braids",
-    nameEn: "Boho Braids",
-    nameEs: "Boho Braids",
-    media: { type: "video", src: "/videos/Tresses4.mp4" },
-    durationFr: "5–6h",
-    durationEn: "5–6h",
-    category: "tresses",
-  },
-  {
-    id: "fulani-braids",
-    nameFr: "Fulani Braids",
-    nameEn: "Fulani Braids",
-    nameEs: "Fulani Braids",
-    media: { type: "video", src: "/videos/Tresses5mp4.mp4" },
-    durationFr: "4–5h",
-    durationEn: "4–5h",
-    category: "tresses",
-  },
-  {
-    id: "cornrows",
-    nameFr: "Cornrows",
-    nameEn: "Cornrows",
-    nameEs: "Cornrows",
-    media: { type: "video", src: "/videos/Mimi.mp4" },
-    durationFr: "2–3h",
-    durationEn: "2–3h",
-    category: "tresses",
-  },
-  {
-    id: "mini-braids-enfant",
-    nameFr: "Mini Braids Enfant",
-    nameEn: "Mini Braids (Child)",
-    nameEs: "Mini Braids Niña",
-    media: { type: "video", src: "/videos/Mimi2.mp4" },
-    durationFr: "1–2h",
-    durationEn: "1–2h",
-    category: "tresses",
-  },
-  // — LOCKS & TWISTS —
-  {
-    id: "depart-locks",
-    nameFr: "Départ de Locks",
-    nameEn: "Starter Locs",
-    nameEs: "Inicio de Locks",
-    media: { type: "image", src: "/images/s-depart-locks.jpg" },
-    durationFr: "3–5h",
-    durationEn: "3–5h",
-    category: "locks",
-  },
-  {
-    id: "retouche-locks",
-    nameFr: "Retouche Locks",
-    nameEn: "Loc Retouch",
-    nameEs: "Retoque Locks",
-    media: { type: "image", src: "/images/s-retouche-locks.jpg" },
-    durationFr: "2–4h",
-    durationEn: "2–4h",
-    category: "locks",
-  },
-  {
-    id: "faux-locks",
-    nameFr: "Faux Locks",
-    nameEn: "Faux Locs",
-    nameEs: "Faux Locks",
-    media: { type: "image", src: "/images/s-faux-locks.png" },
-    durationFr: "4–6h",
-    durationEn: "4–6h",
-    category: "locks",
-  },
-  {
-    id: "marley-twists",
-    nameFr: "Marley Twists",
-    nameEn: "Marley Twists",
-    nameEs: "Marley Twists",
-    media: { type: "image", src: "/images/s-marley.webp" },
-    durationFr: "3–4h",
-    durationEn: "3–4h",
-    category: "locks",
-  },
-  {
-    id: "crochet-braids",
-    nameFr: "Crochet Braids",
-    nameEn: "Crochet Braids",
-    nameEs: "Crochet Braids",
-    media: { type: "image", src: "/images/s-crochet.webp" },
-    durationFr: "2–3h",
-    durationEn: "2–3h",
-    category: "locks",
-  },
-  // — SOINS —
-  {
-    id: "brushing-argan",
-    nameFr: "Brushing Naturel Argan",
-    nameEn: "Natural Argan Blowout",
-    nameEs: "Brushing Natural Argán",
-    media: { type: "image", src: "/images/s-brushing.png" },
-    durationFr: "1–2h",
-    durationEn: "1–2h",
-    category: "soins",
-  },
-  {
-    id: "soin-argan",
-    nameFr: "Soin Argan",
-    nameEn: "Argan Treatment",
-    nameEs: "Tratamiento Argán",
-    media: { type: "image", src: "/images/2025-11-20.jpg" },
-    durationFr: "1h",
-    durationEn: "1h",
-    category: "soins",
-  },
-  // — PACKAGES —
-  {
-    id: "boho-experience",
-    nameFr: "Boho Experience",
-    nameEn: "Boho Experience",
-    nameEs: "Boho Experience",
-    media: { type: "image", src: "/images/s-boho.jpg" },
-    durationFr: "4h",
-    durationEn: "4h",
-    category: "packages",
-  },
-  {
-    id: "faux-locks-perles",
-    nameFr: "Faux Locks + Bijoux Perles",
-    nameEn: "Faux Locs + Pearl Jewelry",
-    nameEs: "Faux Locks + Bisutería Perlas",
-    media: { type: "image", src: "/images/s-faux-locks.png" },
-    durationFr: "5h",
-    durationEn: "5h",
-    category: "packages",
-  },
-];
-
-const CATEGORIES = [
+const CATEGORIES: Category[] = [
   {
     id: "tresses",
-    labelFr: "Tresses Africaines",
-    labelEn: "African Braids",
-    labelEs: "Trenzas Africanas",
+    icon: "✦",
+    labelFr: "Tresses & Nattes",
+    labelEn: "Braids & Plaits",
+    labelEs: "Trenzas & Trenzados",
+    descFr:
+      "Box Braids · Knotless · Boho Braids · Fulani · Cornrows · Mini Braids",
+    descEn:
+      "Box Braids · Knotless · Boho Braids · Fulani · Cornrows · Mini Braids",
+    descEs:
+      "Box Braids · Knotless · Boho Braids · Fulani · Cornrows · Mini Braids",
+    slides: [
+      { type: "video", src: "/videos/Tresses.mp4" },
+      { type: "video", src: "/videos/Tresses2.mp4" },
+      { type: "video", src: "/videos/Tresses3.mp4" },
+      { type: "video", src: "/videos/Tresses4.mp4" },
+      { type: "video", src: "/videos/Tresses5mp4.mp4" },
+    ],
   },
   {
     id: "locks",
+    icon: "◈",
     labelFr: "Locks & Twists",
     labelEn: "Locks & Twists",
     labelEs: "Locks & Twists",
+    descFr:
+      "Départ de Locks · Retouche Locks · Faux Locks · Marley Twists · Crochet Braids",
+    descEn:
+      "Starter Locs · Loc Retouch · Faux Locs · Marley Twists · Crochet Braids",
+    descEs:
+      "Inicio Locks · Retoque Locks · Faux Locks · Marley Twists · Crochet Braids",
+    slides: [
+      { type: "video", src: "/videos/Mimi.mp4" },
+      { type: "video", src: "/videos/Mimi2.mp4" },
+      { type: "image", src: "/images/s-depart-locks.jpg" },
+      { type: "image", src: "/images/s-retouche-locks.jpg" },
+      { type: "image", src: "/images/s-marley.webp" },
+    ],
   },
   {
     id: "soins",
+    icon: "◇",
     labelFr: "Soins Capillaires",
     labelEn: "Hair Treatments",
-    labelEs: "Tratamientos",
+    labelEs: "Tratamientos Capilares",
+    descFr: "Brushing naturel · Soin à l'huile d'argan · Masque hydratant",
+    descEn: "Natural blowout · Argan oil treatment · Moisturizing mask",
+    descEs: "Brushing natural · Tratamiento argán · Mascarilla hidratante",
+    slides: [
+      { type: "image", src: "/images/2025-11-20.jpg" },
+      { type: "image", src: "/images/s-brushing.png" },
+    ],
   },
   {
     id: "packages",
+    icon: "★",
     labelFr: "Packages Signature",
     labelEn: "Signature Packages",
     labelEs: "Paquetes Signature",
+    descFr: "Boho Experience · Faux Locks + Bijoux Perles",
+    descEn: "Boho Experience · Faux Locs + Pearl Jewelry",
+    descEs: "Boho Experience · Faux Locks + Bisutería Perlas",
+    slides: [
+      { type: "image", src: "/images/s-boho.jpg" },
+      { type: "image", src: "/images/s-faux-locks.png" },
+      { type: "image", src: "/images/s-crochet.webp" },
+    ],
   },
 ];
 
 const PAGE_LABELS: Record<
   string,
-  { title: string; sub: string; duration: string }
+  { title: string; sub: string; book: string; price: string }
 > = {
   fr: {
     title: "Nos Services",
     sub: "Tresses · Locks · Soins · Packages",
-    duration: "Durée",
+    book: "Réserver ce service",
+    price: "À partir de",
   },
   en: {
     title: "Our Services",
     sub: "Braids · Locks · Treatments · Packages",
-    duration: "Duration",
+    book: "Book this service",
+    price: "From",
   },
   es: {
     title: "Nuestros Servicios",
     sub: "Trenzas · Locks · Tratamientos · Paquetes",
-    duration: "Duración",
+    book: "Reservar este servicio",
+    price: "Desde",
   },
 };
 
-function getName(s: ServiceItem, locale: string) {
-  if (locale === "en") return s.nameEn;
-  if (locale === "es") return s.nameEs;
-  return s.nameFr;
-}
+const PRICES: Record<string, string> = {
+  tresses: "150 MAD",
+  locks: "200 MAD",
+  soins: "80 MAD",
+  packages: "300 MAD",
+};
 
-function getCatLabel(cat: (typeof CATEGORIES)[number], locale: string) {
+function getLabel(cat: Category, locale: string) {
   if (locale === "en") return cat.labelEn;
   if (locale === "es") return cat.labelEs;
   return cat.labelFr;
 }
 
-export default function ServicesCarousel({
-  locale,
-  bookLabel,
-}: ServicesCarouselProps) {
-  const [activeCat, setActiveCat] = useState("tresses");
-  const [activeId, setActiveId] = useState("box-braids-medium");
+function getDesc(cat: Category, locale: string) {
+  if (locale === "en") return cat.descEn;
+  if (locale === "es") return cat.descEs;
+  return cat.descFr;
+}
+
+function SlideMedia({ slide, active }: { slide: MediaItem; active: boolean }) {
+  if (slide.type === "video") {
+    return (
+      <video
+        src={slide.src}
+        autoPlay={active}
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+    );
+  }
+  return (
+    <Image
+      src={slide.src}
+      alt=""
+      fill
+      className="object-cover"
+      sizes="(min-width: 1024px) 55vw, 100vw"
+      priority
+    />
+  );
+}
+
+export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
+  const [activeCatIdx, setActiveCatIdx] = useState(0);
+  const [slideIdx, setSlideIdx] = useState(0);
   const [fading, setFading] = useState(false);
 
   const labels = PAGE_LABELS[locale] ?? PAGE_LABELS.fr;
-  const filtered = SERVICES.filter((s) => s.category === activeCat);
-  const active = SERVICES.find((s) => s.id === activeId) ?? filtered[0];
+  const cat = CATEGORIES[activeCatIdx];
 
-  function selectService(id: string) {
-    if (id === activeId) return;
-    setFading(true);
-    setTimeout(() => {
-      setActiveId(id);
-      setFading(false);
-    }, 220);
-  }
+  // Auto-avance toutes les 4s
+  useEffect(() => {
+    const t = setInterval(() => {
+      setSlideIdx((prev) => (prev + 1) % cat.slides.length);
+    }, 4000);
+    return () => clearInterval(t);
+  }, [activeCatIdx, cat.slides.length]);
 
-  function selectCat(id: string) {
-    const first = SERVICES.find((s) => s.category === id);
-    if (!first) return;
-    setActiveCat(id);
-    setFading(true);
-    setTimeout(() => {
-      setActiveId(first.id);
-      setFading(false);
-    }, 220);
-  }
+  const selectCat = useCallback(
+    (idx: number) => {
+      if (idx === activeCatIdx) return;
+      setFading(true);
+      setTimeout(() => {
+        setActiveCatIdx(idx);
+        setSlideIdx(0);
+        setFading(false);
+      }, 250);
+    },
+    [activeCatIdx],
+  );
+
+  const goSlide = useCallback((idx: number) => {
+    setSlideIdx(idx);
+  }, []);
+
+  const prevSlide = useCallback(() => {
+    setSlideIdx((prev) => (prev - 1 + cat.slides.length) % cat.slides.length);
+  }, [cat.slides.length]);
+
+  const nextSlide = useCallback(() => {
+    setSlideIdx((prev) => (prev + 1) % cat.slides.length);
+  }, [cat.slides.length]);
 
   return (
     <>
-      {/* ═══════════════ DESKTOP ═══════════════ */}
-      <div className="hidden lg:flex" style={{ height: "calc(100vh - 64px)" }}>
-        {/* ── GAUCHE : fond ocre, liste des services ── */}
-        <div
-          className="w-[42%] flex flex-col overflow-hidden"
-          style={{
-            background: "linear-gradient(160deg, #B8722E 0%, #8C4F1A 100%)",
-          }}
-        >
-          {/* En-tête */}
-          <div className="px-10 pt-10 pb-6 flex-shrink-0">
-            <p className="text-white/50 text-[10px] uppercase tracking-[0.3em] mb-2 font-inter">
-              {labels.sub}
-            </p>
-            <h1 className="font-playfair text-5xl text-white leading-tight">
-              {labels.title}
-            </h1>
-            <div className="mt-4 w-10 h-px bg-white/30" />
-          </div>
+      {/* ═══════════ DESKTOP ═══════════ */}
+      <section className="hidden lg:block bg-[#F5EDE0] py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex gap-8 items-stretch min-h-[520px]">
+            {/* ── GAUCHE : panneau ocre ── */}
+            <div
+              className="w-[42%] flex-shrink-0 rounded-3xl flex flex-col justify-center px-10 py-12"
+              style={{
+                background: "linear-gradient(150deg, #C17B3F 0%, #8C4F1A 100%)",
+              }}
+            >
+              {/* Titre */}
+              <p className="text-white/50 text-[10px] uppercase tracking-[0.3em] mb-2 font-inter">
+                {labels.sub}
+              </p>
+              <h2 className="font-playfair text-5xl text-white leading-tight mb-8">
+                {labels.title}
+              </h2>
 
-          {/* Onglets catégories */}
-          <div className="flex gap-2 px-10 pb-5 flex-shrink-0 flex-wrap">
-            {CATEGORIES.map((cat) => {
-              const isActive = cat.id === activeCat;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => selectCat(cat.id)}
-                  className={`text-[11px] font-medium uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-200 ${
-                    isActive
-                      ? "bg-white text-ocre shadow-sm"
-                      : "border border-white/30 text-white/70 hover:border-white/60 hover:text-white"
-                  }`}
-                >
-                  {getCatLabel(cat, locale)}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Liste services — scrollable */}
-          <div className="flex-1 overflow-y-auto px-10 pb-8 space-y-1">
-            {filtered.map((service) => {
-              const isActive = service.id === activeId;
-              return (
-                <button
-                  key={service.id}
-                  onClick={() => selectService(service.id)}
-                  className={`w-full text-left px-5 py-4 rounded-xl transition-all duration-200 flex items-center justify-between group ${
-                    isActive
-                      ? "bg-white/15 border border-white/25"
-                      : "hover:bg-white/8 border border-transparent"
-                  }`}
-                >
-                  <div>
-                    <span
-                      className={`block font-medium text-[15px] leading-snug transition-colors duration-200 ${
+              {/* Liste catégories */}
+              <nav className="flex flex-col gap-3">
+                {CATEGORIES.map((c, idx) => {
+                  const isActive = idx === activeCatIdx;
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => selectCat(idx)}
+                      className={`flex items-center gap-4 px-6 py-4 rounded-2xl border text-left transition-all duration-300 ${
                         isActive
-                          ? "text-white"
-                          : "text-white/70 group-hover:text-white"
+                          ? "bg-white border-transparent shadow-md"
+                          : "border-white/30 hover:bg-white/10 hover:border-white/50"
                       }`}
                     >
-                      {getName(service, locale)}
-                    </span>
-                    <span className="block text-xs text-white/40 mt-0.5">
-                      {locale === "en"
-                        ? service.durationEn
-                        : service.durationFr}
-                    </span>
-                  </div>
-                  {/* Indicateur vidéo */}
-                  {service.media.type === "video" && (
-                    <span className="text-white/30 group-hover:text-white/60 transition-colors duration-200 flex-shrink-0 ml-3">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
+                      <span
+                        className={`text-sm flex-shrink-0 ${isActive ? "text-ocre" : "text-white/60"}`}
                       >
-                        <path d="M8 5v14l11-7z" />
-                      </svg>
-                    </span>
-                  )}
-                  {isActive && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-white/70 flex-shrink-0 ml-2" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+                        {c.icon}
+                      </span>
+                      <span
+                        className={`text-sm font-medium uppercase tracking-widest ${isActive ? "text-ocre" : "text-white"}`}
+                      >
+                        {getLabel(c, locale)}
+                      </span>
+                    </button>
+                  );
+                })}
+              </nav>
 
-        {/* ── DROITE : media du service sélectionné ── */}
-        <div className="w-[58%] relative bg-nuit overflow-hidden">
-          {/* Media avec fade */}
-          <div
-            className="absolute inset-0 transition-opacity duration-300"
-            style={{ opacity: fading ? 0 : 1 }}
-          >
-            {active.media.type === "video" ? (
-              <video
-                key={active.id}
-                src={active.media.src}
-                autoPlay
-                muted
-                loop
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            ) : (
-              <Image
-                key={active.id}
-                src={active.media.src}
-                alt={getName(active, locale)}
-                fill
-                className="object-cover"
-                sizes="60vw"
-                priority
-              />
-            )}
+              {/* Dots navigation */}
+              <div className="flex items-center gap-2 mt-8">
+                {cat.slides.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => goSlide(idx)}
+                    aria-label={`Slide ${idx + 1}`}
+                    className={`rounded-full transition-all duration-300 ${
+                      idx === slideIdx
+                        ? "bg-white w-7 h-2"
+                        : "bg-white/30 w-2 h-2 hover:bg-white/60"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
 
-            {/* Gradient du bas */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+            {/* ── DROITE : carte carousel arrondie ── */}
+            <div className="flex-1 relative rounded-3xl overflow-hidden shadow-2xl">
+              {/* Slides — toutes présentes, on fade la courante */}
+              {cat.slides.map((slide, idx) => (
+                <div
+                  key={`${cat.id}-${idx}`}
+                  className="absolute inset-0 transition-opacity duration-500"
+                  style={{ opacity: idx === slideIdx && !fading ? 1 : 0 }}
+                >
+                  <SlideMedia slide={slide} active={idx === slideIdx} />
+                </div>
+              ))}
 
-            {/* Info overlay en bas */}
-            <div className="absolute bottom-0 left-0 right-0 p-10">
-              <p className="text-white/50 text-[10px] uppercase tracking-[0.25em] mb-2 font-inter">
-                {CATEGORIES.find((c) => c.id === active.category)
-                  ? getCatLabel(
-                      CATEGORIES.find((c) => c.id === active.category)!,
-                      locale,
-                    )
-                  : ""}
-              </p>
-              <h2 className="font-playfair text-4xl text-white mb-1 leading-tight">
-                {getName(active, locale)}
-              </h2>
-              <p className="text-white/40 text-sm mb-8 font-inter">
-                {labels.duration} ·{" "}
-                {locale === "en" ? active.durationEn : active.durationFr}
-              </p>
-              <Link
-                href={`/${locale}/reservation?service=${encodeURIComponent(active.id)}`}
-                className="inline-flex items-center gap-3 bg-ocre text-white text-sm font-medium px-8 py-3.5 rounded-full hover:bg-or transition-colors duration-200 shadow-lg"
+              {/* Gradient bas */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-transparent pointer-events-none" />
+
+              {/* Flèches */}
+              <button
+                onClick={prevSlide}
+                aria-label="Précédent"
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/50 transition-all duration-200"
               >
-                {bookLabel}
                 <svg
-                  width="14"
-                  height="14"
+                  width="16"
+                  height="16"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2.5"
                   strokeLinecap="round"
                 >
-                  <path d="M5 12h14M12 5l7 7-7 7" />
+                  <polyline points="15 18 9 12 15 6" />
                 </svg>
-              </Link>
+              </button>
+              <button
+                onClick={nextSlide}
+                aria-label="Suivant"
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/50 transition-all duration-200"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </button>
+
+              {/* Overlay info bas */}
+              <div
+                className="absolute bottom-0 left-0 right-0 p-8 transition-opacity duration-300"
+                style={{ opacity: fading ? 0 : 1 }}
+              >
+                {/* Badge catégorie */}
+                <div className="inline-flex items-center gap-2 bg-black/30 backdrop-blur-md border border-white/20 text-white text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full mb-4">
+                  <span>{cat.icon}</span>
+                  <span>{getLabel(cat, locale)}</span>
+                </div>
+
+                {/* Description services */}
+                <p className="text-white font-medium text-lg leading-snug mb-1 max-w-sm">
+                  {getDesc(cat, locale)}
+                </p>
+
+                {/* Prix */}
+                <p className="text-white/60 text-sm mb-6 uppercase tracking-widest">
+                  {labels.price} {PRICES[cat.id]}
+                </p>
+
+                {/* Bouton */}
+                <Link
+                  href={`/${locale}/reservation?service=${encodeURIComponent(cat.id)}`}
+                  className="inline-flex items-center gap-3 bg-white text-brun text-sm font-medium px-7 py-3 rounded-full hover:bg-fond transition-colors duration-200 shadow-sm"
+                >
+                  {labels.book}
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  >
+                    <path d="M5 12h14M12 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ═══════════════ MOBILE ═══════════════ */}
-      <div className="lg:hidden">
-        {/* En-tête mobile */}
+      {/* ═══════════ MOBILE ═══════════ */}
+      <section className="lg:hidden">
+        {/* Header */}
         <div
           className="px-5 py-10 text-center"
           style={{
-            background: "linear-gradient(160deg, #B8722E 0%, #8C4F1A 100%)",
+            background: "linear-gradient(150deg, #C17B3F 0%, #8C4F1A 100%)",
           }}
         >
-          <h1 className="font-playfair text-4xl text-white">{labels.title}</h1>
+          <h2 className="font-playfair text-4xl text-white">{labels.title}</h2>
           <p className="text-white/50 text-xs mt-2 uppercase tracking-widest">
             {labels.sub}
           </p>
         </div>
 
-        {/* Onglets catégories mobile */}
-        <div className="flex gap-2 px-4 py-4 overflow-x-auto scrollbar-hide bg-white border-b border-or/10">
-          {CATEGORIES.map((cat) => (
+        {/* Onglets */}
+        <div className="flex gap-2 px-4 py-4 overflow-x-auto bg-white border-b border-or/10">
+          {CATEGORIES.map((c, idx) => (
             <button
-              key={cat.id}
-              onClick={() => selectCat(cat.id)}
-              className={`flex-shrink-0 text-[11px] font-medium uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-200 ${
-                cat.id === activeCat
+              key={c.id}
+              onClick={() => selectCat(idx)}
+              className={`flex-shrink-0 flex items-center gap-2 text-[11px] font-medium uppercase tracking-widest px-4 py-2 rounded-full transition-all duration-200 ${
+                idx === activeCatIdx
                   ? "bg-ocre text-white"
-                  : "border border-brun/20 text-brun/60 hover:border-ocre"
+                  : "border border-brun/20 text-brun/60"
               }`}
             >
-              {getCatLabel(cat, locale)}
+              <span>{c.icon}</span>
+              <span>{getLabel(c, locale)}</span>
             </button>
           ))}
         </div>
 
-        {/* Cards mobile */}
-        <div className="px-4 py-6 space-y-4 bg-fond">
-          {filtered.map((service) => (
-            <div
-              key={service.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-sm border border-or/10"
-            >
-              {/* Media */}
-              <div className="relative h-56">
-                {service.media.type === "video" ? (
-                  <video
-                    src={service.media.src}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-                ) : (
-                  <Image
-                    src={service.media.src}
-                    alt={getName(service, locale)}
-                    fill
-                    className="object-cover"
-                    sizes="100vw"
-                  />
-                )}
+        {/* Carte carousel mobile */}
+        <div className="bg-[#F5EDE0] px-4 py-6">
+          <div className="relative rounded-2xl overflow-hidden aspect-[4/3] shadow-xl">
+            {cat.slides.map((slide, idx) => (
+              <div
+                key={`m-${cat.id}-${idx}`}
+                className="absolute inset-0 transition-opacity duration-500"
+                style={{ opacity: idx === slideIdx ? 1 : 0 }}
+              >
+                <SlideMedia slide={slide} active={idx === slideIdx} />
               </div>
-              {/* Infos */}
-              <div className="p-5">
-                <h3 className="font-playfair text-xl text-brun mb-1">
-                  {getName(service, locale)}
-                </h3>
-                <p className="text-brun/40 text-xs mb-4">
-                  {labels.duration} ·{" "}
-                  {locale === "en" ? service.durationEn : service.durationFr}
-                </p>
-                <Link
-                  href={`/${locale}/reservation?service=${encodeURIComponent(service.id)}`}
-                  className="block text-center bg-ocre text-white py-3 rounded-full text-sm font-medium hover:bg-or transition-colors"
-                >
-                  {bookLabel}
-                </Link>
-              </div>
+            ))}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+
+            {/* Info */}
+            <div className="absolute bottom-0 left-0 right-0 p-5">
+              <p className="text-white font-medium text-base leading-snug mb-1">
+                {getDesc(cat, locale)}
+              </p>
+              <p className="text-white/50 text-xs mb-4 uppercase tracking-widest">
+                {labels.price} {PRICES[cat.id]}
+              </p>
+              <Link
+                href={`/${locale}/reservation?service=${encodeURIComponent(cat.id)}`}
+                className="inline-flex items-center gap-2 bg-white text-brun text-sm font-medium px-6 py-2.5 rounded-full"
+              >
+                {labels.book}
+              </Link>
             </div>
-          ))}
+
+            {/* Dots mobile */}
+            <div className="absolute top-3 right-3 flex gap-1.5">
+              {cat.slides.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => goSlide(idx)}
+                  className={`rounded-full transition-all duration-300 ${
+                    idx === slideIdx
+                      ? "bg-white w-5 h-1.5"
+                      : "bg-white/40 w-1.5 h-1.5"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }
