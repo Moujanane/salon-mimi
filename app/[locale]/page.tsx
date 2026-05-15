@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import Hero from "@/components/sections/Hero";
+import HeroHome from "@/components/sections/HeroHome";
 import TrustBadge from "@/components/sections/TrustBadge";
 import ServicesGrid from "@/components/sections/ServicesGrid";
 import PackageSignature from "@/components/sections/PackageSignature";
@@ -26,7 +26,7 @@ export default async function HomePage({
 
   return (
     <>
-      <Hero
+      <HeroHome
         locale={locale}
         title={t("title")}
         subtitle={t("subtitle")}

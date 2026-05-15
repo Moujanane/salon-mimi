@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -17,8 +17,7 @@ interface Category {
   descFr: string;
   descEn: string;
   descEs: string;
-  slides: string[]; // chemins d'images
-  priceFrom: string;
+  slides: string[];
   bookId: string;
 }
 
@@ -46,7 +45,6 @@ const CATEGORIES: Category[] = [
       "/images/s-fulani.jpg",
       "/images/s-cornrows.jpg",
     ],
-    priceFrom: "150 MAD",
     bookId: "box-braids-medium",
   },
   {
@@ -68,7 +66,6 @@ const CATEGORIES: Category[] = [
       "/images/s-marley.webp",
       "/images/s-crochet.webp",
     ],
-    priceFrom: "200 MAD",
     bookId: "depart-locks",
   },
   {
@@ -81,11 +78,10 @@ const CATEGORIES: Category[] = [
     descEn: "Natural blowout · Argan oil treatment · Moisturizing mask",
     descEs: "Brushing natural · Tratamiento argán · Mascarilla hidratante",
     slides: [
-      "/images/2025-11-20.jpg",
       "/images/s-brushing.png",
-      "/images/Ongles.jpeg",
+      "/images/s-tresse-fille2.png",
+      "/images/coiffure-1.jpg",
     ],
-    priceFrom: "80 MAD",
     bookId: "brushing-argan",
   },
   {
@@ -103,32 +99,25 @@ const CATEGORIES: Category[] = [
       "/images/s-crochet.webp",
       "/images/s-mini-braids.jpg",
     ],
-    priceFrom: "300 MAD",
     bookId: "boho-experience",
   },
 ];
 
-const LABELS: Record<
-  string,
-  { title: string; sub: string; book: string; price: string }
-> = {
+const LABELS: Record<string, { title: string; sub: string; book: string }> = {
   fr: {
     title: "Nos Services",
     sub: "Tresses · Locks · Soins · Packages",
     book: "Réserver ce service",
-    price: "À partir de",
   },
   en: {
     title: "Our Services",
     sub: "Braids · Locks · Treatments · Packages",
     book: "Book this service",
-    price: "From",
   },
   es: {
     title: "Nuestros Servicios",
     sub: "Trenzas · Locks · Tratamientos · Paquetes",
     book: "Reservar este servicio",
-    price: "Desde",
   },
 };
 
@@ -148,17 +137,45 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
   const [catIdx, setCatIdx] = useState(0);
   const [slideIdx, setSlideIdx] = useState(0);
   const [fading, setFading] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const ui = LABELS[locale] ?? LABELS.fr;
   const cat = CATEGORIES[catIdx];
 
-  // Auto-avance toutes les 4 secondes
-  useEffect(() => {
-    const t = setInterval(() => {
-      setSlideIdx((prev) => (prev + 1) % cat.slides.length);
+  // Démarre (ou redémarre) le timer auto-avance
+  const startTimer = useCallback((slidesLength: number) => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setSlideIdx((prev) => (prev + 1) % slidesLength);
     }, 4000);
-    return () => clearInterval(t);
-  }, [catIdx, cat.slides.length]);
+  }, []);
+
+  // Lance le timer au montage et à chaque changement de catégorie
+  useEffect(() => {
+    startTimer(cat.slides.length);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [catIdx, cat.slides.length, startTimer]);
+
+  // Réinitialise le timer quand l'utilisateur clique sur une flèche ou un dot
+  const goTo = useCallback(
+    (idx: number) => {
+      setSlideIdx(idx);
+      startTimer(cat.slides.length);
+    },
+    [cat.slides.length, startTimer],
+  );
+
+  const prev = useCallback(
+    () => goTo((slideIdx - 1 + cat.slides.length) % cat.slides.length),
+    [slideIdx, cat.slides.length, goTo],
+  );
+
+  const next = useCallback(
+    () => goTo((slideIdx + 1) % cat.slides.length),
+    [slideIdx, cat.slides.length, goTo],
+  );
 
   const selectCat = useCallback(
     (idx: number) => {
@@ -172,10 +189,6 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
     },
     [catIdx],
   );
-
-  const prev = () =>
-    setSlideIdx((p) => (p - 1 + cat.slides.length) % cat.slides.length);
-  const next = () => setSlideIdx((p) => (p + 1) % cat.slides.length);
 
   return (
     <>
@@ -198,7 +211,7 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
                   {ui.title}
                 </h2>
 
-                {/* Catégories */}
+                {/* Catégories cliquables */}
                 <nav className="flex flex-col gap-3">
                   {CATEGORIES.map((c, idx) => {
                     const active = idx === catIdx;
@@ -230,12 +243,12 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
                 </nav>
               </div>
 
-              {/* Dots */}
+              {/* Dots synchronisés avec la slide active */}
               <div className="flex items-center gap-2 mt-8">
                 {cat.slides.map((_, idx) => (
                   <button
                     key={idx}
-                    onClick={() => setSlideIdx(idx)}
+                    onClick={() => goTo(idx)}
                     aria-label={`Photo ${idx + 1}`}
                     className={`rounded-full transition-all duration-300 ${
                       idx === slideIdx
@@ -249,7 +262,7 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
 
             {/* ── DROITE : carte photo arrondie ── */}
             <div className="flex-1 relative rounded-3xl overflow-hidden shadow-2xl bg-nuit">
-              {/* Toutes les slides superposées, on affiche la courante */}
+              {/* Slides superposées — opacité contrôlée */}
               {cat.slides.map((src, idx) => (
                 <div
                   key={`${cat.id}-${idx}`}
@@ -267,7 +280,7 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
                 </div>
               ))}
 
-              {/* Gradient bas */}
+              {/* Gradient bas — pointer-events-none pour ne pas bloquer les boutons */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent pointer-events-none" />
 
               {/* Flèche gauche */}
@@ -308,21 +321,17 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
                 </svg>
               </button>
 
-              {/* Overlay bas */}
+              {/* Overlay bas avec info service */}
               <div
-                className="absolute bottom-0 left-0 right-0 p-8 transition-opacity duration-300"
+                className="absolute bottom-0 left-0 right-0 p-8 z-10 transition-opacity duration-300"
                 style={{ opacity: fading ? 0 : 1 }}
               >
                 <span className="inline-flex items-center gap-2 bg-black/30 backdrop-blur-md border border-white/20 text-white text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full mb-4">
                   {cat.icon} {getLabel(cat, locale)}
                 </span>
 
-                <p className="text-white font-medium text-lg leading-snug mb-1 max-w-sm">
+                <p className="text-white font-medium text-lg leading-snug mb-6 max-w-sm">
                   {getDesc(cat, locale)}
-                </p>
-
-                <p className="text-white/50 text-xs mb-6 uppercase tracking-widest">
-                  {ui.price} {cat.priceFrom}
                 </p>
 
                 <Link
@@ -399,14 +408,17 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
                 />
               </div>
             ))}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+
+            {/* Gradient — pointer-events-none pour ne pas capturer les clics */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none" />
 
             {/* Dots mobile */}
-            <div className="absolute top-3 right-3 flex gap-1.5">
+            <div className="absolute top-3 right-3 flex gap-1.5 z-10">
               {cat.slides.map((_, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setSlideIdx(idx)}
+                  onClick={() => goTo(idx)}
+                  aria-label={`Photo ${idx + 1}`}
                   className={`rounded-full transition-all duration-300 ${
                     idx === slideIdx
                       ? "bg-white w-5 h-1.5"
@@ -417,12 +429,9 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
             </div>
 
             {/* Info bas */}
-            <div className="absolute bottom-0 left-0 right-0 p-5">
-              <p className="text-white font-medium text-base leading-snug mb-1">
+            <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+              <p className="text-white font-medium text-base leading-snug mb-4">
                 {getDesc(cat, locale)}
-              </p>
-              <p className="text-white/50 text-xs mb-4 uppercase tracking-widest">
-                {ui.price} {cat.priceFrom}
               </p>
               <Link
                 href={`/${locale}/reservation?service=${encodeURIComponent(cat.bookId)}`}
