@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import ServicesLookbook from "@/components/sections/ServicesLookbook";
+import ServicesCarousel from "@/components/sections/ServicesCarousel";
 
 export default async function ServicesPage({
   params,
@@ -9,5 +9,5 @@ export default async function ServicesPage({
   const { locale } = await params;
   const tBooking = await getTranslations({ locale, namespace: "booking" });
 
-  return <ServicesLookbook locale={locale} bookLabel={tBooking("submit")} />;
+  return <ServicesCarousel locale={locale} bookLabel={tBooking("submit")} />;
 }
