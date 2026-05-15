@@ -36,6 +36,9 @@ const CATEGORIES: Category[] = [
     descEs:
       "Box Braids · Knotless · Boho Braids · Fulani · Cornrows · Mini Braids",
     slides: [
+      "/images/s-tresse-fille1.png",
+      "/images/s-tresse-fille2.png",
+      "/images/s-tresse-garcon.png",
       "/images/coiffure-1.jpg",
       "/images/s-box-braids-xl.jpg",
       "/images/s-knotless.jpg",
