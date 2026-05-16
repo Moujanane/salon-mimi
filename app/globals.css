@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -6,6 +6,41 @@
 
 @layer base {
   body {
-    @apply bg-fond text-brun font-inter;
+    @apply bg-nuit text-white font-inter;
+  }
+
+  @keyframes scrollUp {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-50%);
+    }
+  }
+  @keyframes scrollDown2 {
+    from {
+      transform: translateY(-10%);
+    }
+    to {
+      transform: translateY(40%);
+    }
+  }
+  @keyframes scrollUp3 {
+    from {
+      transform: translateY(-15%);
+    }
+    to {
+      transform: translateY(-65%);
+    }
+  }
+
+  .animate-scroll-up {
+    animation: scrollUp 22s linear infinite;
+  }
+  .animate-scroll-down2 {
+    animation: scrollDown2 28s linear infinite;
+  }
+  .animate-scroll-up3 {
+    animation: scrollUp3 19s linear infinite;
   }
 }
