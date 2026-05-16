@@ -22,10 +22,13 @@ function checkRateLimit(ip: string): boolean {
 const intlMiddleware = createMiddleware(routing);
 
 export default function middleware(request: NextRequest) {
-  if (
-    request.nextUrl.pathname === "/api/reservations" &&
-    request.method === "POST"
-  ) {
+  const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith("/admin")) {
+    return NextResponse.next();
+  }
+
+  if (pathname === "/api/reservations" && request.method === "POST") {
     const ip =
       request.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
     if (!checkRateLimit(ip)) {
