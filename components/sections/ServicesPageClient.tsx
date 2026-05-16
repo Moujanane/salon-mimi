@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -113,28 +113,18 @@ const SERVICES: ServiceData[] = [
 export default function ServicesPageClient({ locale }: { locale: string }) {
   const [active, setActive] = useState(0);
   const [leaving, setLeaving] = useState<number | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  function startTimer() {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setActive((prev) => (prev + 1) % SERVICES.length);
-    }, 4500);
-  }
 
   useEffect(() => {
-    startTimer();
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
+    const timer = setInterval(() => {
+      setActive((prev) => (prev + 1) % SERVICES.length);
+    }, 4500);
+    return () => clearInterval(timer);
   }, []);
 
   function goTo(index: number) {
-    if (index === active) return;
     setLeaving(active);
-    setTimeout(() => setLeaving(null), 700);
     setActive(index);
-    startTimer();
+    setTimeout(() => setLeaving(null), 700);
   }
 
   return (
