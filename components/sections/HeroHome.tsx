@@ -81,7 +81,7 @@ function PhotoColumn({
 
 export default function HeroHome({ locale }: HeroHomeProps) {
   return (
-    <section className="relative min-h-screen flex flex-col md:flex-row overflow-hidden bg-nuit">
+    <section className="relative h-screen flex flex-col md:flex-row overflow-hidden bg-nuit">
       {/* Halo ocre arrière-plan */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -93,8 +93,8 @@ export default function HeroHome({ locale }: HeroHomeProps) {
 
       {/* ── Colonne gauche ── */}
       <div
-        className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-14 pt-20 pb-10 md:pt-0 md:pb-0 relative z-10"
-        style={{ minHeight: "100vh" }}
+        className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-14 pt-20 md:pt-0 relative z-10"
+        style={{ height: "100%" }}
       >
         <div className="flex items-center gap-3 mb-7">
           <div className="w-7 h-px bg-ocre flex-shrink-0" />
@@ -146,7 +146,11 @@ export default function HeroHome({ locale }: HeroHomeProps) {
       </div>
 
       {/* ── Colonne droite — grille scroll ── */}
-      <div className="hidden md:grid flex-1 grid-cols-3 gap-2 p-4 overflow-hidden relative">
+      <div
+        className="hidden md:grid grid-cols-3 gap-2 flex-1 overflow-hidden relative items-start"
+        style={{ padding: "16px 16px 16px 8px" }}
+      >
+        {/* Fades haut et bas */}
         <div
           className="absolute top-0 inset-x-0 h-24 z-10 pointer-events-none"
           style={{
@@ -159,7 +163,6 @@ export default function HeroHome({ locale }: HeroHomeProps) {
             background: "linear-gradient(to top, #1a0d05 20%, transparent)",
           }}
         />
-
         <PhotoColumn photos={col1} animClass="animate-scroll-up" />
         <PhotoColumn photos={col2} animClass="animate-scroll-down2" />
         <PhotoColumn photos={col3} animClass="animate-scroll-up3" />

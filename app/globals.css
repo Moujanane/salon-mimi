@@ -31,18 +31,18 @@
 
 @keyframes scrollDown2 {
   from {
-    transform: translateY(-50%);
+    transform: translateY(-10%);
   }
   to {
-    transform: translateY(0);
+    transform: translateY(40%);
   }
 }
 
 @keyframes scrollUp3 {
   from {
-    transform: translateY(0);
+    transform: translateY(-15%);
   }
   to {
-    transform: translateY(-50%);
+    transform: translateY(-65%);
   }
 }
