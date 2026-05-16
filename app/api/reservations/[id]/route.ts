@@ -23,10 +23,11 @@ export async function PATCH(
     },
   );
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user || authError) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 

@@ -2,15 +2,49 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+const VALID_SERVICES = [
+  "box-braids-medium",
+  "box-braids-xl",
+  "knotless-braids",
+  "boho-braids",
+  "fulani-braids",
+  "cornrows",
+  "mini-braids-enfant",
+  "depart-locks",
+  "retouche-locks",
+  "faux-locks",
+  "marley-twists",
+  "crochet-braids",
+  "brushing-argan",
+  "soin-argan",
+  "boho-experience",
+  "faux-locks-perles",
+];
+
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { nom, telephone, service, date_souhaitee, message } = body;
 
-  if (!nom || !telephone || !service) {
-    return NextResponse.json(
-      { error: "Champs requis manquants" },
-      { status: 400 },
-    );
+  if (
+    !nom ||
+    typeof nom !== "string" ||
+    nom.trim().length < 2 ||
+    nom.length > 100
+  ) {
+    return NextResponse.json({ error: "Nom invalide" }, { status: 400 });
+  }
+  if (
+    !telephone ||
+    typeof telephone !== "string" ||
+    !/^\+?[\d\s\-().]{6,20}$/.test(telephone)
+  ) {
+    return NextResponse.json({ error: "Téléphone invalide" }, { status: 400 });
+  }
+  if (!service || !VALID_SERVICES.includes(service)) {
+    return NextResponse.json({ error: "Service invalide" }, { status: 400 });
+  }
+  if (message && typeof message === "string" && message.length > 1000) {
+    return NextResponse.json({ error: "Message trop long" }, { status: 400 });
   }
 
   const { error } = await supabaseAdmin.from("reservations").insert({
