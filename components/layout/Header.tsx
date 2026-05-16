@@ -13,7 +13,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-nuit/92 backdrop-blur-md border-b border-ocre/10">
-      <div className="flex items-center justify-between px-12 py-4">
+      <div className="relative flex items-center justify-between px-12 py-4">
         {/* Liens gauche */}
         <nav className="flex items-center gap-8">
           <Link
