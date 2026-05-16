@@ -161,7 +161,7 @@ export default function ReservationLayout({ locale, labels }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-nuit">
+    <div className="h-screen flex flex-col bg-nuit overflow-hidden">
       <div className="h-[57px] flex-shrink-0" />
 
       <div className="flex-shrink-0 px-5 md:px-12 py-3 border-b border-ocre/10">
