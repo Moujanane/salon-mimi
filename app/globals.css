@@ -9,31 +9,6 @@
     @apply bg-nuit text-white font-inter;
   }
 
-  @keyframes scrollUp {
-    from {
-      transform: translateY(0);
-    }
-    to {
-      transform: translateY(-50%);
-    }
-  }
-  @keyframes scrollDown2 {
-    from {
-      transform: translateY(-10%);
-    }
-    to {
-      transform: translateY(40%);
-    }
-  }
-  @keyframes scrollUp3 {
-    from {
-      transform: translateY(-15%);
-    }
-    to {
-      transform: translateY(-65%);
-    }
-  }
-
   .animate-scroll-up {
     animation: scrollUp 22s linear infinite;
   }
@@ -42,5 +17,32 @@
   }
   .animate-scroll-up3 {
     animation: scrollUp3 19s linear infinite;
+  }
+}
+
+@keyframes scrollUp {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes scrollDown2 {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes scrollUp3 {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
   }
 }
