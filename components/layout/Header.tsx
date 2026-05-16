@@ -1,78 +1,77 @@
 "use client";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
-
-const locales = ["fr", "en", "es"] as const;
+import { usePathname } from "next/navigation";
 
 export default function Header() {
   const t = useTranslations("nav");
   const locale = useLocale();
   const pathname = usePathname();
-  const router = useRouter();
 
-  function switchLocale(newLocale: string) {
-    const segments = pathname.split("/");
-    segments[1] = newLocale;
-    router.push(segments.join("/"));
-  }
+  const isActive = (path: string) =>
+    pathname === `/${locale}${path}` || pathname === `/${locale}${path}/`;
 
   return (
-    <header className="bg-nuit text-white sticky top-0 z-50">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href={`/${locale}`} className="font-playfair text-xl text-or">
-          Salon Mimi
-        </Link>
-        <nav className="hidden md:flex items-center gap-6 text-sm">
-          <Link href={`/${locale}`} className="hover:text-or transition-colors">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-nuit/92 backdrop-blur-md border-b border-ocre/10">
+      <div className="flex items-center justify-between px-12 py-4">
+        {/* Liens gauche */}
+        <nav className="flex items-center gap-8">
+          <Link
+            href={`/${locale}`}
+            className={`text-[10px] tracking-[3px] uppercase transition-colors ${
+              isActive("") ? "text-ocre" : "text-white/70 hover:text-white"
+            }`}
+          >
             {t("home")}
           </Link>
           <Link
             href={`/${locale}/services`}
-            className="hover:text-or transition-colors"
+            className={`text-[10px] tracking-[3px] uppercase transition-colors ${
+              isActive("/services")
+                ? "text-ocre"
+                : "text-white/70 hover:text-white"
+            }`}
           >
             {t("services")}
           </Link>
           <Link
-            href={`/${locale}/galerie`}
-            className="hover:text-or transition-colors"
-          >
-            {t("gallery")}
-          </Link>
-          <Link
             href={`/${locale}/a-propos`}
-            className="hover:text-or transition-colors"
+            className={`text-[10px] tracking-[3px] uppercase transition-colors ${
+              isActive("/a-propos")
+                ? "text-ocre"
+                : "text-white/70 hover:text-white"
+            }`}
           >
             {t("about")}
           </Link>
           <Link
             href={`/${locale}/contact`}
-            className="hover:text-or transition-colors"
+            className={`text-[10px] tracking-[3px] uppercase transition-colors ${
+              isActive("/contact")
+                ? "text-ocre"
+                : "text-white/70 hover:text-white"
+            }`}
           >
             {t("contact")}
           </Link>
-          <Link
-            href={`/${locale}/reservation`}
-            className="bg-ocre text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-or transition-colors"
-          >
-            {t("booking")}
-          </Link>
         </nav>
-        <div className="flex gap-2 text-xs">
-          {locales.map((l) => (
-            <button
-              key={l}
-              onClick={() => switchLocale(l)}
-              className={`uppercase px-2 py-1 rounded ${
-                locale === l
-                  ? "bg-or text-nuit font-bold"
-                  : "text-white hover:text-or"
-              }`}
-            >
-              {l}
-            </button>
-          ))}
-        </div>
+
+        {/* Logo centré */}
+        <Link
+          href={`/${locale}`}
+          className="absolute left-1/2 -translate-x-1/2 text-[11px] tracking-[6px] uppercase text-white font-inter"
+        >
+          Salon Mimi
+        </Link>
+
+        {/* CTA droite */}
+        <Link
+          href={`/${locale}/reservation`}
+          className="flex items-center gap-2 bg-ocre hover:bg-or text-white text-[10px] tracking-[2px] uppercase px-5 py-2.5 rounded-full transition-colors"
+        >
+          <span>→</span>
+          <span>{t("book")}</span>
+        </Link>
       </div>
     </header>
   );
