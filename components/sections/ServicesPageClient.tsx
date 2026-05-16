@@ -128,7 +128,7 @@ export default function ServicesPageClient({ locale }: { locale: string }) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-nuit">
+    <div className="h-screen flex flex-col bg-nuit overflow-hidden">
       <div className="h-[57px] flex-shrink-0" />
 
       <div className="flex-shrink-0 text-center px-12 py-4 border-b border-ocre/10">
@@ -158,7 +158,7 @@ export default function ServicesPageClient({ locale }: { locale: string }) {
       </div>
 
       <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-4 p-4 pt-3">
-        <div className="w-full md:w-[36%] bg-panneau rounded-2xl border border-ocre/20 p-4 md:p-6 flex flex-col gap-3 md:flex-shrink-0">
+        <div className="w-full md:w-[36%] bg-panneau rounded-2xl border border-ocre/20 p-4 md:p-6 flex flex-col gap-3 md:flex-shrink-0 overflow-y-auto">
           <div className="text-[9px] tracking-[4px] uppercase text-white/35 font-inter mb-1">
             Choisir un service
           </div>
