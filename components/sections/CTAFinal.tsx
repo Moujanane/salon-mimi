@@ -14,12 +14,12 @@ export default function CTAFinal({
   whatsappNumber,
 }: CTAFinalProps) {
   return (
-    <section className="bg-ocre py-20 px-4 text-center">
+    <section className="bg-nuit border-t border-ocre/18 py-20 px-4 text-center">
       <h2 className="font-playfair text-4xl text-white mb-8">{title}</h2>
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Link
           href={`/${locale}/reservation`}
-          className="bg-white text-ocre px-8 py-4 rounded-full font-medium text-lg hover:bg-fond transition-colors"
+          className="bg-panneau text-white px-8 py-4 rounded-full font-medium text-lg hover:bg-nuit transition-colors"
         >
           {ctaBook}
         </Link>
