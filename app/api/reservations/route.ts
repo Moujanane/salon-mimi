@@ -3,22 +3,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const VALID_SERVICES = [
-  "box-braids-medium",
-  "box-braids-xl",
-  "knotless-braids",
-  "boho-braids",
-  "fulani-braids",
-  "cornrows",
-  "mini-braids-enfant",
-  "depart-locks",
-  "retouche-locks",
-  "faux-locks",
-  "marley-twists",
-  "crochet-braids",
-  "brushing-argan",
-  "soin-argan",
-  "boho-experience",
-  "faux-locks-perles",
+  "Tresses africaines",
+  "Tresses et nattes",
+  "Box braids",
+  "Tresses Fulani",
+  "Tresses Boho",
+  "Locks & dreads",
+  "Cheveux attachés",
+  "Perruques et tissage",
+  "Colorations capillaires",
+  "Ongles, soins & épilation",
 ];
 
 export async function POST(request: NextRequest) {
