@@ -31,7 +31,7 @@ const col2 = [
     src: "/images/s-tressage-action.jpg",
     alt: "Tressage africain en cours salon Mimi Marrakech",
   },
-  { src: "/images/s-cornrows.jpg", alt: "Cornrows salon Mimi" },
+  { src: "/images/s-mini-braids.jpg", alt: "Mini braids salon Mimi Marrakech" },
   {
     src: "/images/s-box-braids-longues.jpg",
     alt: "Box braids longues dorées Marrakech",
@@ -39,10 +39,13 @@ const col2 = [
 ];
 const col3 = [
   { src: "/images/s-tresse-garcon.png", alt: "Tresses garçon salon Mimi" },
-  { src: "/images/s-depart-locks.jpg", alt: "Locks Marrakech" },
+  {
+    src: "/images/s-retouche-locks.jpg",
+    alt: "Retouche locks salon Mimi Marrakech",
+  },
   {
     src: "/images/s-tressage-mains.jpg",
-    alt: "Mains experte tressage afro Marrakech",
+    alt: "Mains expertes tressage afro Marrakech",
   },
   { src: "/images/s-fulani.jpg", alt: "Fulani braids salon afro Marrakech" },
 ];
@@ -89,7 +92,10 @@ export default function HeroHome({ locale }: HeroHomeProps) {
       />
 
       {/* ── Colonne gauche ── */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-14 pt-28 md:pt-10 relative z-10">
+      <div
+        className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-14 pt-20 pb-10 md:pt-0 md:pb-0 relative z-10"
+        style={{ minHeight: "100vh" }}
+      >
         <div className="flex items-center gap-3 mb-7">
           <div className="w-7 h-px bg-ocre flex-shrink-0" />
           <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter">
