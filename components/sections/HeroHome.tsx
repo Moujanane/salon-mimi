@@ -108,7 +108,7 @@ export default function HeroHome({ locale }: HeroHomeProps) {
           <em className="block not-italic text-ocre italic">Marrakech</em>
         </h1>
         <p className="font-georgia text-[18px] font-semibold text-white/70 leading-snug mb-4">
-          Salon Mimi · Place Jamaa El Fna
+          Salon Mimi · <span className="text-ocre">Place Jamaa El Fna</span>
         </p>
 
         <p className="font-georgia text-[18px] font-bold text-white leading-snug mb-4 max-w-sm">
