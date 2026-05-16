@@ -33,7 +33,7 @@ export default function LoginForm() {
   }
 
   const inputClass =
-    "w-full border border-or/30 rounded-xl px-4 py-3 focus:outline-none focus:border-ocre bg-white";
+    "w-full border border-or/30 rounded-xl px-4 py-3 focus:outline-none focus:border-ocre bg-white text-gray-900";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-sm mx-auto">
