@@ -1,12 +1,23 @@
 // app/[locale]/layout.tsx
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import "../globals.css";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 const BASE_URL = "https://salonmimi-marrakech.com";
+
+const titles: Record<string, string> = {
+  fr: "Salon Mimi — Tresses africaines Marrakech | Place Jamaa El Fna",
+  en: "Salon Mimi — African Hair Braiding Marrakech | Jamaa El Fna",
+  es: "Salon Mimi — Trenzas africanas Marrakech | Plaza Jamaa El Fna",
+};
 
 const descriptions: Record<string, string> = {
   fr: "Coiffures africaines authentiques au cœur de la médina de Marrakech. Box braids, knotless, locks, soins argan. Réservez en ligne.",
@@ -22,7 +33,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    title: "Salon Mimi — African Hair Braiding Marrakech",
+    title: titles[locale] ?? titles.fr,
     description: descriptions[locale] ?? descriptions.fr,
     alternates: {
       canonical: `${BASE_URL}/${locale}`,
@@ -30,14 +41,23 @@ export async function generateMetadata({
         fr: `${BASE_URL}/fr`,
         en: `${BASE_URL}/en`,
         es: `${BASE_URL}/es`,
+        "x-default": `${BASE_URL}/fr`,
       },
     },
     openGraph: {
-      title: "Salon Mimi — African Hair Braiding Marrakech",
+      title: titles[locale] ?? titles.fr,
       description: descriptions[locale] ?? descriptions.fr,
       locale,
       type: "website",
       url: `${BASE_URL}/${locale}`,
+      images: [
+        {
+          url: `${BASE_URL}/og-image.jpg`,
+          width: 1200,
+          height: 630,
+          alt: "Salon Mimi — Tresses africaines Marrakech",
+        },
+      ],
     },
   };
 }
@@ -45,9 +65,11 @@ export async function generateMetadata({
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "HairSalon",
-  name: "Salon Mimi — African Hair Braiding",
-  url: BASE_URL,
+  name: "Salon Mimi",
+  url: "https://salonmimi-marrakech.com",
   telephone: "+212710388204",
+  description:
+    "Salon de coiffure afro spécialisé en tresses africaines, knotless braids, locks et styles naturels. Situé près de la Place Jamaa El Fna, Médina de Marrakech.",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Place Jemaa el-Fna",
@@ -57,12 +79,31 @@ const jsonLd = {
   },
   geo: {
     "@type": "GeoCoordinates",
-    latitude: 31.625956,
-    longitude: -7.989167,
+    latitude: 31.6258,
+    longitude: -7.9892,
   },
-  openingHours: "Mo-Sa 09:00-19:00",
-  priceRange: "200-950 MAD",
-  servesCuisine: "African Hair Braiding",
+  openingHoursSpecification: [
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ],
+      opens: "09:00",
+      closes: "20:00",
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Sunday"],
+      opens: "10:00",
+      closes: "18:00",
+    },
+  ],
+  priceRange: "150–950 MAD",
 };
 
 export default async function LocaleLayout({

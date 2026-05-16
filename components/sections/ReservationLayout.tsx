@@ -117,10 +117,10 @@ export default function ReservationLayout({ locale, labels }: Props) {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-nuit overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-nuit">
       <div className="h-[57px] flex-shrink-0" />
 
-      <div className="flex-shrink-0 px-12 py-3 border-b border-ocre/10">
+      <div className="flex-shrink-0 px-5 md:px-12 py-3 border-b border-ocre/10">
         <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter block mb-0.5">
           Réservation en ligne · Marrakech
         </span>
@@ -129,8 +129,8 @@ export default function ReservationLayout({ locale, labels }: Props) {
         </h1>
       </div>
 
-      <div className="flex flex-1 min-h-0 gap-4 p-4 pt-3">
-        <div className="w-[44%] bg-panneau rounded-2xl border border-ocre/20 p-6 flex-shrink-0 overflow-y-auto">
+      <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-4 p-4 pt-3">
+        <div className="w-full md:w-[44%] bg-panneau rounded-2xl border border-ocre/20 p-5 md:p-6 md:flex-shrink-0 overflow-y-auto">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
               <div className="font-georgia text-[15px] font-bold text-white mb-0.5">
@@ -167,7 +167,7 @@ export default function ReservationLayout({ locale, labels }: Props) {
 
             <div className="h-px bg-ocre/15" />
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
                   Nom complet <span className="text-ocre">*</span>
@@ -198,7 +198,7 @@ export default function ReservationLayout({ locale, labels }: Props) {
 
             <div className="h-px bg-ocre/15" />
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
                   Date souhaitée <span className="text-ocre">*</span>
@@ -274,7 +274,7 @@ export default function ReservationLayout({ locale, labels }: Props) {
           </form>
         </div>
 
-        <div className="flex-1 bg-panneau rounded-2xl border border-ocre/20 overflow-hidden relative">
+        <div className="hidden md:block flex-1 bg-panneau rounded-2xl border border-ocre/20 overflow-hidden relative">
           {SERVICES.map((s, i) => (
             <div
               key={s.id}

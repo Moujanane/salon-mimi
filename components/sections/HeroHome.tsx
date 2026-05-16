@@ -66,7 +66,7 @@ function PhotoColumn({
 
 export default function HeroHome({ locale }: HeroHomeProps) {
   return (
-    <section className="relative h-screen flex overflow-hidden bg-nuit">
+    <section className="relative min-h-screen flex flex-col md:flex-row overflow-hidden bg-nuit">
       {/* Halo ocre arrière-plan */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -77,7 +77,7 @@ export default function HeroHome({ locale }: HeroHomeProps) {
       />
 
       {/* ── Colonne gauche ── */}
-      <div className="w-1/2 flex flex-col justify-center px-14 pt-10 relative z-10">
+      <div className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-14 pt-28 md:pt-10 relative z-10">
         <div className="flex items-center gap-3 mb-7">
           <div className="w-7 h-px bg-ocre flex-shrink-0" />
           <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter">
@@ -85,10 +85,13 @@ export default function HeroHome({ locale }: HeroHomeProps) {
           </span>
         </div>
 
-        <h1 className="font-georgia text-[clamp(52px,6vw,88px)] font-bold uppercase leading-[0.9] text-white mb-7">
-          Salon
-          <em className="block not-italic text-ocre italic">Mimi</em>
+        <h1 className="font-georgia text-[clamp(52px,6vw,88px)] font-bold uppercase leading-[0.9] text-white mb-4">
+          Tresses africaines
+          <em className="block not-italic text-ocre italic">Marrakech</em>
         </h1>
+        <p className="font-georgia text-[18px] font-semibold text-white/70 leading-snug mb-4">
+          Salon Mimi · Place Jamaa El Fna
+        </p>
 
         <p className="font-georgia text-[18px] font-bold text-white leading-snug mb-4 max-w-sm">
           Tes cheveux méritent
@@ -125,7 +128,7 @@ export default function HeroHome({ locale }: HeroHomeProps) {
       </div>
 
       {/* ── Colonne droite — grille scroll ── */}
-      <div className="flex-1 grid grid-cols-3 gap-2 p-4 overflow-hidden relative">
+      <div className="hidden md:grid flex-1 grid-cols-3 gap-2 p-4 overflow-hidden relative">
         <div
           className="absolute top-0 inset-x-0 h-24 z-10 pointer-events-none"
           style={{
