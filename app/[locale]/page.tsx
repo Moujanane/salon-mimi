@@ -4,13 +4,14 @@ import TrustBadge from "@/components/sections/TrustBadge";
 import ServicesGrid from "@/components/sections/ServicesGrid";
 import PackageSignature from "@/components/sections/PackageSignature";
 import CTAFinal from "@/components/sections/CTAFinal";
+import LocationSection from "@/components/sections/LocationSection";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import { services } from "@/lib/services-data";
 
 const ctaTitles: Record<string, string> = {
-  fr: "Prête pour votre transformation ?",
-  en: "Ready for your transformation?",
-  es: "¿Lista para tu transformación?",
+  fr: "Prends soin de ta couronne",
+  en: "Take care of your crown",
+  es: "Cuida tu corona",
 };
 
 export default async function HomePage({
@@ -42,6 +43,7 @@ export default async function HomePage({
         showAll={false}
       />
       <PackageSignature locale={locale} bookLabel={t("cta_book")} />
+      <LocationSection locale={locale} />
       <CTAFinal
         locale={locale}
         title={ctaTitles[locale] ?? ctaTitles.fr}
