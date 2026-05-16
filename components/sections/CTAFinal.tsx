@@ -19,7 +19,7 @@ export default function CTAFinal({
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
         <Link
           href={`/${locale}/reservation`}
-          className="bg-panneau text-white px-8 py-4 rounded-full font-medium text-lg hover:bg-nuit transition-colors"
+          className="bg-ocre text-white px-8 py-4 rounded-full font-medium text-lg hover:bg-or transition-colors"
         >
           {ctaBook}
         </Link>
