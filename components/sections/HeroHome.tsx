@@ -3,127 +3,145 @@ import Image from "next/image";
 
 interface HeroHomeProps {
   locale: string;
-  title: string;
-  subtitle: string;
-  location: string;
-  ctaBook: string;
-  ctaServices: string;
+  title?: string;
+  subtitle?: string;
+  location?: string;
+  ctaBook?: string;
+  ctaServices?: string;
 }
 
-// Photos de la grille — 6 images en quinconce comme Africa Beauty
-const gridPhotos = [
-  { src: "/images/s-tresse-fille1.png", alt: "Tresses fille salon Mimi" },
-  { src: "/images/s-knotless.jpg", alt: "Knotless braids" },
-  { src: "/images/s-fulani.jpg", alt: "Fulani braids" },
-  { src: "/images/s-tresse-fille2.png", alt: "Tresses fille 2" },
-  { src: "/images/s-boho.jpg", alt: "Boho braids" },
+const col1 = [
+  {
+    src: "/images/s-tresse-fille1.png",
+    alt: "Tresses africaines salon Mimi Marrakech",
+  },
+  { src: "/images/s-knotless.jpg", alt: "Knotless braids Marrakech" },
+  { src: "/images/s-fulani.jpg", alt: "Fulani braids salon afro Marrakech" },
+  { src: "/images/s-boho.jpg", alt: "Boho braids Marrakech" },
+];
+const col2 = [
+  {
+    src: "/images/s-tresse-fille2.png",
+    alt: "Tresses africaines fille Marrakech",
+  },
   { src: "/images/coiffure-1.jpg", alt: "Coiffure afro Marrakech" },
+  { src: "/images/s-cornrows.jpg", alt: "Cornrows salon Mimi" },
+  { src: "/images/s-mini-braids.jpg", alt: "Mini braids salon Mimi" },
+];
+const col3 = [
+  { src: "/images/s-tresse-garcon.png", alt: "Tresses garçon salon Mimi" },
+  { src: "/images/s-depart-locks.jpg", alt: "Locks Marrakech" },
+  { src: "/images/s-box-braids-xl.jpg", alt: "Box braids XL Marrakech" },
+  { src: "/images/s-tresse-fille1.png", alt: "Tresses africaines Marrakech" },
 ];
 
-export default function HeroHome({
-  locale,
-  title,
-  subtitle,
-  location,
-  ctaBook,
-  ctaServices,
-}: HeroHomeProps) {
+function PhotoColumn({
+  photos,
+  animClass,
+}: {
+  photos: { src: string; alt: string }[];
+  animClass: string;
+}) {
+  const doubled = [...photos, ...photos];
   return (
-    <section
-      className="w-full min-h-screen flex items-center"
-      style={{ backgroundColor: "#2C1508" }}
-    >
-      <div className="w-full max-w-7xl mx-auto px-6 py-16 lg:py-24 flex flex-col lg:flex-row gap-12 lg:gap-16 items-center">
-        {/* ─── Colonne gauche — texte ─── */}
-        <div className="w-full lg:w-[55%] flex flex-col items-center lg:items-start text-center lg:text-left">
-          {/* Badge localisation */}
-          <p className="text-ocre text-xs tracking-[0.25em] uppercase font-inter font-medium mb-6">
-            {location}
-          </p>
+    <div className={`flex flex-col gap-2 ${animClass}`}>
+      {doubled.map((p, i) => (
+        <div
+          key={i}
+          className="relative rounded-xl overflow-hidden flex-shrink-0"
+          style={{ aspectRatio: "0.68" }}
+        >
+          <Image
+            src={p.src}
+            alt={p.alt}
+            fill
+            className="object-cover"
+            sizes="15vw"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
 
-          {/* Titre principal — très grand, Playfair bold */}
-          <h1 className="font-playfair font-bold text-white leading-[0.9] mb-6 text-[clamp(3.5rem,8vw,6.5rem)]">
-            {title}
-          </h1>
+export default function HeroHome({ locale }: HeroHomeProps) {
+  return (
+    <section className="relative h-screen flex overflow-hidden bg-nuit">
+      {/* Halo ocre arrière-plan */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at 25% 50%, rgba(193,123,63,0.10) 0%, transparent 55%)",
+        }}
+      />
 
-          {/* Sous-titre — petites caps espacées, couleur ocre */}
-          <p className="text-ocre text-sm tracking-[0.2em] uppercase font-inter font-medium mb-8">
-            {subtitle}
-          </p>
-
-          {/* Texte descriptif */}
-          <p className="text-white/60 font-inter text-base leading-relaxed max-w-md mb-10">
-            {locale === "fr"
-              ? "Spécialistes des tresses africaines, locks, knotless et styles naturels. Un salon pensé pour sublimer chaque texture, au cœur de Marrakech."
-              : locale === "en"
-                ? "Specialists in African braids, locks, knotless and natural styles. A salon designed to highlight every texture, in the heart of Marrakech."
-                : "Especialistas en trenzas africanas, locks, knotless y estilos naturales. Un salón pensado para realzar cada textura, en el corazón de Marrakech."}
-          </p>
-
-          {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link
-              href={`/${locale}/reservation`}
-              className="bg-ocre text-white px-8 py-4 rounded-full font-inter font-medium text-base hover:bg-or transition-colors text-center"
-            >
-              {ctaBook}
-            </Link>
-            <Link
-              href={`/${locale}/services`}
-              className="border border-white/30 text-white px-8 py-4 rounded-full font-inter font-medium text-base hover:border-ocre hover:text-ocre transition-colors text-center"
-            >
-              {ctaServices}
-            </Link>
-          </div>
+      {/* ── Colonne gauche ── */}
+      <div className="w-1/2 flex flex-col justify-center px-14 pt-10 relative z-10">
+        <div className="flex items-center gap-3 mb-7">
+          <div className="w-7 h-px bg-ocre flex-shrink-0" />
+          <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter">
+            Salon afro · Marrakech
+          </span>
         </div>
 
-        {/* ─── Colonne droite — grille photos ─── */}
-        <div className="w-full lg:w-[45%]">
-          {/*
-            Grille 2 colonnes.
-            La colonne de droite est décalée vers le bas (translate-y)
-            pour l'effet quinconce Africa Beauty.
-          */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* Colonne A — photos 0, 2, 4 */}
-            <div className="flex flex-col gap-3">
-              {[gridPhotos[0], gridPhotos[2], gridPhotos[4]].map((photo) => (
-                <div
-                  key={photo.src}
-                  className="relative w-full overflow-hidden rounded-2xl"
-                  style={{ aspectRatio: "3/4" }}
-                >
-                  <Image
-                    src={photo.src}
-                    alt={photo.alt}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 50vw, 22vw"
-                  />
-                </div>
-              ))}
-            </div>
+        <h1 className="font-georgia text-[clamp(52px,6vw,88px)] font-bold uppercase leading-[0.9] text-white mb-7">
+          Salon
+          <em className="block not-italic text-ocre italic">Mimi</em>
+        </h1>
 
-            {/* Colonne B — décalée vers le bas */}
-            <div className="flex flex-col gap-3 mt-10">
-              {[gridPhotos[1], gridPhotos[3], gridPhotos[5]].map((photo) => (
-                <div
-                  key={photo.src}
-                  className="relative w-full overflow-hidden rounded-2xl"
-                  style={{ aspectRatio: "3/4" }}
-                >
-                  <Image
-                    src={photo.src}
-                    alt={photo.alt}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 1024px) 50vw, 22vw"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
+        <p className="font-georgia text-[18px] font-bold text-white leading-snug mb-4 max-w-sm">
+          Tes cheveux méritent
+          <br />
+          <em className="text-ocre">mieux qu&apos;une coiffure ordinaire.</em>
+        </p>
+
+        <p className="text-white/55 text-[14px] leading-relaxed max-w-[360px] mb-10 font-inter">
+          À Marrakech, <strong className="text-white">Salon Mimi</strong> est le
+          spécialiste des{" "}
+          <strong className="text-ocre">tresses africaines</strong>, knotless,
+          locks et styles naturels. Chaque cliente repart avec une coiffure qui
+          lui ressemble —{" "}
+          <strong className="text-white">
+            réalisée par des mains expertes
+          </strong>
+          .
+        </p>
+
+        <div className="flex flex-col gap-3 max-w-[260px]">
+          <Link
+            href={`/${locale}/reservation`}
+            className="flex items-center justify-center gap-2 bg-ocre hover:bg-or text-white text-[10px] tracking-[3px] uppercase px-7 py-4 rounded-full transition-all hover:-translate-y-0.5 font-inter"
+          >
+            → Prendre rendez-vous
+          </Link>
+          <Link
+            href={`/${locale}/services`}
+            className="flex items-center justify-center text-white border border-white/20 hover:border-ocre hover:text-ocre text-[10px] tracking-[3px] uppercase px-7 py-4 rounded-full transition-colors font-inter"
+          >
+            Découvrir les services
+          </Link>
         </div>
+      </div>
+
+      {/* ── Colonne droite — grille scroll ── */}
+      <div className="flex-1 grid grid-cols-3 gap-2 p-4 overflow-hidden relative">
+        <div
+          className="absolute top-0 inset-x-0 h-24 z-10 pointer-events-none"
+          style={{
+            background: "linear-gradient(to bottom, #1a0d05 20%, transparent)",
+          }}
+        />
+        <div
+          className="absolute bottom-0 inset-x-0 h-24 z-10 pointer-events-none"
+          style={{
+            background: "linear-gradient(to top, #1a0d05 20%, transparent)",
+          }}
+        />
+
+        <PhotoColumn photos={col1} animClass="animate-scroll-up" />
+        <PhotoColumn photos={col2} animClass="animate-scroll-down2" />
+        <PhotoColumn photos={col3} animClass="animate-scroll-up3" />
       </div>
     </section>
   );
