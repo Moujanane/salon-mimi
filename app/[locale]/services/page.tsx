@@ -1,4 +1,4 @@
-import ServicesCarousel from "@/components/sections/ServicesCarousel";
+import ServicesPageClient from "@/components/sections/ServicesPageClient";
 
 export default async function ServicesPage({
   params,
@@ -6,5 +6,5 @@ export default async function ServicesPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return <ServicesCarousel locale={locale} />;
+  return <ServicesPageClient locale={locale} />;
 }
