@@ -16,7 +16,10 @@ const col1 = [
     alt: "Tresses africaines salon Mimi Marrakech",
   },
   { src: "/images/s-knotless.jpg", alt: "Knotless braids Marrakech" },
-  { src: "/images/s-fulani.jpg", alt: "Fulani braids salon afro Marrakech" },
+  {
+    src: "/images/s-box-braids-profil.jpg",
+    alt: "Box braids salon afro Marrakech",
+  },
   { src: "/images/s-boho.jpg", alt: "Boho braids Marrakech" },
 ];
 const col2 = [
@@ -24,15 +27,24 @@ const col2 = [
     src: "/images/s-tresse-fille2.png",
     alt: "Tresses africaines fille Marrakech",
   },
-  { src: "/images/coiffure-1.jpg", alt: "Coiffure afro Marrakech" },
+  {
+    src: "/images/s-tressage-action.jpg",
+    alt: "Tressage africain en cours salon Mimi Marrakech",
+  },
   { src: "/images/s-cornrows.jpg", alt: "Cornrows salon Mimi" },
-  { src: "/images/s-mini-braids.jpg", alt: "Mini braids salon Mimi" },
+  {
+    src: "/images/s-box-braids-longues.jpg",
+    alt: "Box braids longues dorées Marrakech",
+  },
 ];
 const col3 = [
   { src: "/images/s-tresse-garcon.png", alt: "Tresses garçon salon Mimi" },
   { src: "/images/s-depart-locks.jpg", alt: "Locks Marrakech" },
-  { src: "/images/s-box-braids-xl.jpg", alt: "Box braids XL Marrakech" },
-  { src: "/images/s-tresse-fille1.png", alt: "Tresses africaines Marrakech" },
+  {
+    src: "/images/s-tressage-mains.jpg",
+    alt: "Mains experte tressage afro Marrakech",
+  },
+  { src: "/images/s-fulani.jpg", alt: "Fulani braids salon afro Marrakech" },
 ];
 
 function PhotoColumn({
