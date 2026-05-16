@@ -105,7 +105,7 @@ const SERVICES: ServiceData[] = [
     subServices:
       "Pose d'ongles · Manucure · Soins du visage · Épilation · Sourcils",
     price: "dès 50 MAD",
-    image: "/images/s-tressage-mains.jpg",
+    image: "/images/s-ongles.jpg",
     imageAlt: "Ongles soins épilation salon Mimi Marrakech",
   },
 ];
