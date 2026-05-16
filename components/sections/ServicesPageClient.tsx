@@ -185,6 +185,7 @@ export default function ServicesPageClient({ locale }: { locale: string }) {
               className="absolute inset-0 transition-all duration-700"
               style={{
                 opacity: i === active ? 1 : 0,
+                pointerEvents: i === active ? "auto" : "none",
                 transform:
                   i === active
                     ? "perspective(1400px) rotateY(0deg)"
