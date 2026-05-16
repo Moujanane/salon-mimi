@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Home — Salon Mimi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #111; color: #fff; font-family: sans-serif; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 40px;
+    background: linear-gradient(to bottom, rgba(26,13,5,0.95), transparent);
+  }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { color: #fff; text-decoration: none; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.8; transition: opacity 0.2s; }
+  .nav-links a:hover { opacity: 1; }
+  .nav-logo { font-size: 12px; letter-spacing: 5px; text-transform: uppercase; color: #fff; }
+  .nav-cta {
+    background: #c17b3f; color: #fff; border: none; cursor: pointer;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 10px 20px; border-radius: 24px; display: flex; align-items: center; gap: 8px;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: #d4a843; }
+  .nav-cta .arrow { width: 18px; height: 18px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    background: #1a0d05;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+  }
+  /* Overlay texture */
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, rgba(193,123,63,0.12) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  /* Colonne gauche */
+  .hero-left {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px 80px;
+    position: relative; z-index: 2;
+    min-height: 100vh;
+  }
+  .hero-badge {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 32px;
+  }
+  .hero-badge-line { width: 32px; height: 1px; background: #c17b3f; }
+  .hero-badge span { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #c17b3f; }
+
+  .hero-title {
+    font-family: Georgia, serif;
+    font-size: clamp(64px, 8vw, 110px);
+    font-weight: 700;
+    line-height: 0.88;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 32px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: #c17b3f;
+    display: block;
+  }
+
+  .hero-text {
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(255,255,255,0.65);
+    max-width: 380px;
+    margin-bottom: 48px;
+  }
+
+  .hero-ctas { display: flex; flex-direction: column; gap: 14px; max-width: 280px; }
+  .cta-primary {
+    background: #c17b3f; color: #fff;
+    border: none; cursor: pointer;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 16px 28px; border-radius: 40px;
+    display: flex; align-items: center; gap: 10px;
+    transition: background 0.25s, transform 0.2s;
+  }
+  .cta-primary:hover { background: #d4a843; transform: translateY(-1px); }
+  .cta-secondary {
+    background: transparent; color: #fff;
+    border: 1px solid rgba(255,255,255,0.25); cursor: pointer;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 16px 28px; border-radius: 40px;
+    transition: border-color 0.25s, color 0.25s;
+  }
+  .cta-secondary:hover { border-color: #c17b3f; color: #c17b3f; }
+
+  /* Colonne droite — grille photos animée */
+  .hero-right {
+    width: 50%;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 20px 20px 20px 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .photo-col {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .photo-col:nth-child(1) { animation: scrollUp 20s linear infinite; }
+  .photo-col:nth-child(2) { animation: scrollDown 25s linear infinite; margin-top: -60px; }
+  .photo-col:nth-child(3) { animation: scrollUp 18s linear infinite; margin-top: -30px; }
+
+  @keyframes scrollUp {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+  @keyframes scrollDown {
+    0% { transform: translateY(-50%); }
+    100% { transform: translateY(0); }
+  }
+
+  .photo-item {
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 0.7;
+    background: #2d1508;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .photo-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+  }
+  .photo-item:hover img { transform: scale(1.04); }
+
+  /* Gradient fade haut/bas sur la grille */
+  .hero-right::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 80px;
+    background: linear-gradient(to bottom, #1a0d05, transparent);
+    z-index: 3; pointer-events: none;
+  }
+  .hero-right::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 80px;
+    background: linear-gradient(to top, #1a0d05, transparent);
+    z-index: 3; pointer-events: none;
+  }
+
+  /* ── LABEL SECTION ── */
+  .section-label {
+    background: #1a0d05;
+    padding: 80px 60px;
+    text-align: center;
+    border-top: 1px solid rgba(193,123,63,0.2);
+  }
+  .section-label h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  .section-label p {
+    color: rgba(255,255,255,0.55);
+    font-size: 14px;
+    line-height: 1.7;
+    max-width: 520px;
+    margin: 0 auto 32px;
+  }
+  .section-label .cta-primary { margin: 0 auto; }
+
+  /* ── NOTE DESIGN ── */
+  .design-note {
+    background: #0f0804;
+    padding: 24px 40px;
+    border-top: 1px solid rgba(193,123,63,0.15);
+    display: flex; gap: 40px; flex-wrap: wrap;
+  }
+  .note-item { flex: 1; min-width: 180px; }
+  .note-label { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: #c17b3f; margin-bottom: 6px; }
+  .note-value { font-size: 12px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-links">
+    <a href="#">Accueil</a>
+    <a href="#">À propos</a>
+    <a href="#">Services</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="nav-logo">Salon Mimi</div>
+  <button class="nav-cta">
+    <span class="arrow">→</span>
+    Prendre RDV
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-badge">
+      <div class="hero-badge-line"></div>
+      <span>Salon afro · Marrakech</span>
+    </div>
+
+    <h1 class="hero-title">
+      Salon
+      <em>Mimi</em>
+    </h1>
+
+    <p class="hero-text">
+      Spécialistes des tresses africaines, knotless, locks et styles naturels.
+      Un salon pensé pour sublimer chaque texture, au cœur de Marrakech.
+    </p>
+
+    <div class="hero-ctas">
+      <button class="cta-primary">→ &nbsp; Prendre rendez-vous</button>
+      <button class="cta-secondary">Découvrir les services</button>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <!-- Col 1 — scroll vers le haut -->
+    <div class="photo-col">
+      <div class="photo-item"><img src="/images/s-tresse-fille1.png" alt="Tresses" onerror="this.parentElement.style.background='#3d1f0a'"/></div>
+      <div class="photo-item"><img src="/images/s-knotless.jpg" alt="Knotless" onerror="this.parentElement.style.background='#5c2e10'"/></div>
+      <div class="photo-item"><img src="/images/s-fulani.jpg" alt="Fulani" onerror="this.parentElement.style.background='#2d1508'"/></div>
+      <!-- Duplication pour scroll infini -->
+      <div class="photo-item"><img src="/images/s-tresse-fille1.png" alt="Tresses" onerror="this.parentElement.style.background='#3d1f0a'"/></div>
+      <div class="photo-item"><img src="/images/s-knotless.jpg" alt="Knotless" onerror="this.parentElement.style.background='#5c2e10'"/></div>
+      <div class="photo-item"><img src="/images/s-fulani.jpg" alt="Fulani" onerror="this.parentElement.style.background='#2d1508'"/></div>
+    </div>
+    <!-- Col 2 — scroll vers le bas -->
+    <div class="photo-col">
+      <div class="photo-item"><img src="/images/s-boho.jpg" alt="Boho" onerror="this.parentElement.style.background='#4a2010'"/></div>
+      <div class="photo-item"><img src="/images/s-tresse-fille2.png" alt="Tresses 2" onerror="this.parentElement.style.background='#6b3015'"/></div>
+      <div class="photo-item"><img src="/images/coiffure-1.jpg" alt="Coiffure" onerror="this.parentElement.style.background='#3d1f0a'"/></div>
+      <!-- Duplication -->
+      <div class="photo-item"><img src="/images/s-boho.jpg" alt="Boho" onerror="this.parentElement.style.background='#4a2010'"/></div>
+      <div class="photo-item"><img src="/images/s-tresse-fille2.png" alt="Tresses 2" onerror="this.parentElement.style.background='#6b3015'"/></div>
+      <div class="photo-item"><img src="/images/coiffure-1.jpg" alt="Coiffure" onerror="this.parentElement.style.background='#3d1f0a'"/></div>
+    </div>
+    <!-- Col 3 — scroll vers le haut, vitesse différente -->
+    <div class="photo-col">
+      <div class="photo-item"><img src="/images/s-tresse-garcon.png" alt="Tresses garçon" onerror="this.parentElement.style.background='#5c2e10'"/></div>
+      <div class="photo-item"><img src="/images/s-knotless.jpg" alt="Knotless 2" onerror="this.parentElement.style.background='#2d1508'"/></div>
+      <div class="photo-item"><img src="/images/s-fulani.jpg" alt="Fulani 2" onerror="this.parentElement.style.background='#7a3d15'"/></div>
+      <!-- Duplication -->
+      <div class="photo-item"><img src="/images/s-tresse-garcon.png" alt="Tresses garçon" onerror="this.parentElement.style.background='#5c2e10'"/></div>
+      <div class="photo-item"><img src="/images/s-knotless.jpg" alt="Knotless 2" onerror="this.parentElement.style.background='#2d1508'"/></div>
+      <div class="photo-item"><img src="/images/s-fulani.jpg" alt="Fulani 2" onerror="this.parentElement.style.background='#7a3d15'"/></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECTION CTA BAS DE HOME -->
+<div class="section-label">
+  <h2>Prends soin de ta couronne</h2>
+  <p>Réserve en ligne en 2 minutes. Choisis ton service, ton créneau, et on s'occupe du reste.</p>
+  <button class="cta-primary">→ &nbsp; Réserver maintenant</button>
+</div>
+
+<!-- NOTES DESIGN -->
+<div class="design-note">
+  <div class="note-item">
+    <div class="note-label">Palette</div>
+    <div class="note-value">#1a0d05 fond · #c17b3f ocre · #d4a843 or · #fff texte</div>
+  </div>
+  <div class="note-item">
+    <div class="note-label">Typographie</div>
+    <div class="note-value">Georgia serif (titres) · Inter sans-serif (corps, nav)</div>
+  </div>
+  <div class="note-item">
+    <div class="note-label">Animations</div>
+    <div class="note-value">3 colonnes photos scroll infini · vitesses différentes · fade haut/bas</div>
+  </div>
+  <div class="note-item">
+    <div class="note-label">Pages concernées</div>
+    <div class="note-value">Home · Services · Réservation</div>
+  </div>
+</div>
+
+</body>
+</html>

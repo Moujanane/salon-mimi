@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Home v2 — Salon Mimi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { background: #1a0d05; color: #fff; font-family: sans-serif; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 48px;
+    background: rgba(26,13,5,0.92);
+    backdrop-filter: blur(8px);
+  }
+  .nav-links { display: flex; gap: 36px; }
+  .nav-links a {
+    color: #fff; text-decoration: none;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    opacity: 0.75; transition: opacity 0.2s;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-logo { font-size: 11px; letter-spacing: 6px; text-transform: uppercase; color: #fff; }
+  .nav-cta {
+    background: #c17b3f; color: #fff; border: none; cursor: pointer;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 10px 22px; border-radius: 24px;
+    display: flex; align-items: center; gap: 8px;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: #d4a843; }
+
+  /* ── HERO ── */
+  .hero {
+    height: 100vh;
+    display: flex;
+    background: #1a0d05;
+    overflow: hidden;
+    position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 25% 50%, rgba(193,123,63,0.10) 0%, transparent 55%);
+    pointer-events: none; z-index: 1;
+  }
+
+  /* ── GAUCHE ── */
+  .hero-left {
+    width: 48%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 56px 0 56px;
+    padding-top: 40px; /* légèrement au-dessus du centre */
+    position: relative; z-index: 2;
+    flex-shrink: 0;
+  }
+
+  .hero-badge {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 28px;
+  }
+  .hero-badge-line { width: 28px; height: 1px; background: #c17b3f; flex-shrink: 0; }
+  .hero-badge span {
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: #c17b3f;
+  }
+
+  .hero-title {
+    font-family: Georgia, serif;
+    font-size: clamp(52px, 6vw, 88px);
+    font-weight: 700;
+    line-height: 0.9;
+    text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 28px;
+  }
+  .hero-title em {
+    font-style: italic;
+    color: #c17b3f;
+    display: block;
+  }
+
+  .hero-text {
+    font-size: 15px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.55);
+    max-width: 380px;
+    margin-bottom: 40px;
+  }
+  .hero-text strong {
+    color: #fff;
+    font-weight: 600;
+  }
+  .hero-text em {
+    color: #c17b3f;
+    font-style: normal;
+    font-weight: 600;
+  }
+  .hero-hook {
+    font-family: Georgia, serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.4;
+    margin-bottom: 16px;
+    max-width: 380px;
+  }
+  .hero-hook em {
+    color: #c17b3f;
+    font-style: italic;
+  }
+
+  .hero-ctas { display: flex; flex-direction: column; gap: 12px; max-width: 260px; }
+
+  .cta-primary {
+    background: #c17b3f; color: #fff;
+    border: none; cursor: pointer;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 15px 28px; border-radius: 40px;
+    display: flex; align-items: center; gap: 8px;
+    transition: background 0.25s, transform 0.2s;
+    width: 100%; justify-content: center;
+  }
+  .cta-primary:hover { background: #d4a843; transform: translateY(-1px); }
+
+  .cta-secondary {
+    background: transparent; color: #fff;
+    border: 1px solid rgba(255,255,255,0.22); cursor: pointer;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 15px 28px; border-radius: 40px;
+    transition: border-color 0.25s, color 0.25s;
+    width: 100%; text-align: center;
+  }
+  .cta-secondary:hover { border-color: #c17b3f; color: #c17b3f; }
+
+  /* ── DROITE — grille photos animée ── */
+  .hero-right {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    padding: 16px 16px 16px 8px;
+    overflow: hidden;
+    position: relative;
+    align-items: start;
+  }
+
+  /* Fade haut et bas */
+  .hero-right::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 100px;
+    background: linear-gradient(to bottom, #1a0d05 20%, transparent);
+    z-index: 3; pointer-events: none;
+  }
+  .hero-right::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 100px;
+    background: linear-gradient(to top, #1a0d05 20%, transparent);
+    z-index: 3; pointer-events: none;
+  }
+
+  .photo-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  /* Col 1 — monte */
+  .photo-col:nth-child(1) { animation: scrollUp 22s linear infinite; }
+  /* Col 2 — descend, décalée vers le bas */
+  .photo-col:nth-child(2) { animation: scrollDown 28s linear infinite; transform: translateY(-40%); }
+  /* Col 3 — monte, décalée */
+  .photo-col:nth-child(3) { animation: scrollUp 19s linear infinite; transform: translateY(-20%); }
+
+  @keyframes scrollUp {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-50%); }
+  }
+  @keyframes scrollDown {
+    from { transform: translateY(-50%); }
+    to   { transform: translateY(0); }
+  }
+
+  /* Pour col 2 qui a un translateY initial : on override avec animation-only values */
+  .photo-col:nth-child(2) {
+    animation: scrollDown2 28s linear infinite;
+  }
+  @keyframes scrollDown2 {
+    from { transform: translateY(-10%); }
+    to   { transform: translateY(40%); }
+  }
+  .photo-col:nth-child(3) {
+    animation: scrollUp3 19s linear infinite;
+  }
+  @keyframes scrollUp3 {
+    from { transform: translateY(-15%); }
+    to   { transform: translateY(-65%); }
+  }
+
+  .photo-item {
+    border-radius: 10px;
+    overflow: hidden;
+    aspect-ratio: 0.68;
+    background: #2d1508;
+    flex-shrink: 0;
+  }
+  .photo-item img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+
+  /* ── SECTION BAS ── */
+  .section-cta {
+    background: #1a0d05;
+    padding: 72px 60px;
+    text-align: center;
+    border-top: 1px solid rgba(193,123,63,0.18);
+  }
+  .section-cta h2 {
+    font-family: Georgia, serif;
+    font-size: clamp(26px, 3.5vw, 44px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 14px;
+  }
+  .section-cta p {
+    color: rgba(255,255,255,0.5);
+    font-size: 14px; line-height: 1.7;
+    max-width: 480px; margin: 0 auto 32px;
+  }
+  .section-cta .cta-primary { margin: 0 auto; max-width: 220px; }
+
+  /* ── NOTES ── */
+  .design-note {
+    background: #110804;
+    padding: 20px 48px;
+    border-top: 1px solid rgba(193,123,63,0.12);
+    display: flex; gap: 40px; flex-wrap: wrap;
+  }
+  .note-item { flex: 1; min-width: 160px; }
+  .note-label { font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: #c17b3f; margin-bottom: 5px; }
+  .note-value { font-size: 11px; color: rgba(255,255,255,0.6); line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-links">
+    <a href="#">Accueil</a>
+    <a href="#">À propos</a>
+    <a href="#">Services</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="nav-logo">Salon Mimi</div>
+  <button class="nav-cta">→ &nbsp;Prendre RDV</button>
+</nav>
+
+<section class="hero">
+
+  <!-- GAUCHE -->
+  <div class="hero-left">
+    <div class="hero-badge">
+      <div class="hero-badge-line"></div>
+      <span>Salon afro · Marrakech</span>
+    </div>
+
+    <h1 class="hero-title">
+      Salon
+      <em>Mimi</em>
+    </h1>
+
+    <p class="hero-hook">
+      Tes cheveux méritent<br><em>mieux qu'une coiffure ordinaire.</em>
+    </p>
+    <p class="hero-text">
+      À Marrakech, <strong>Salon Mimi</strong> est le spécialiste des <em>tresses africaines</em>,
+      knotless, locks et styles naturels. Chaque cliente repart avec
+      une coiffure qui lui ressemble — <strong>réalisée par des mains expertes</strong>,
+      dans un salon pensé pour toi.
+    </p>
+
+    <div class="hero-ctas">
+      <button class="cta-primary">→ &nbsp;Prendre rendez-vous</button>
+      <button class="cta-secondary">Découvrir les services</button>
+    </div>
+  </div>
+
+  <!-- DROITE — 3 colonnes scroll -->
+  <div class="hero-right">
+
+    <!-- Col 1 -->
+    <div class="photo-col">
+      <div class="photo-item"><img src="/images/s-tresse-fille1.png" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-knotless.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-fulani.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-boho.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <!-- clone -->
+      <div class="photo-item"><img src="/images/s-tresse-fille1.png" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-knotless.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-fulani.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-boho.jpg" alt="" onerror="this.style.display='none'"/></div>
+    </div>
+
+    <!-- Col 2 -->
+    <div class="photo-col">
+      <div class="photo-item"><img src="/images/s-tresse-fille2.png" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/coiffure-1.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-knotless.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-fulani.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <!-- clone -->
+      <div class="photo-item"><img src="/images/s-tresse-fille2.png" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/coiffure-1.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-knotless.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-fulani.jpg" alt="" onerror="this.style.display='none'"/></div>
+    </div>
+
+    <!-- Col 3 -->
+    <div class="photo-col">
+      <div class="photo-item"><img src="/images/s-tresse-garcon.png" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-boho.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-tresse-fille1.png" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/coiffure-1.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <!-- clone -->
+      <div class="photo-item"><img src="/images/s-tresse-garcon.png" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-boho.jpg" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/s-tresse-fille1.png" alt="" onerror="this.style.display='none'"/></div>
+      <div class="photo-item"><img src="/images/coiffure-1.jpg" alt="" onerror="this.style.display='none'"/></div>
+    </div>
+
+  </div>
+</section>
+
+<div class="section-cta">
+  <h2>Prends soin de ta couronne</h2>
+  <p>Réserve en ligne en 2 minutes. Choisis ton service, ton créneau, et on s'occupe du reste.</p>
+  <button class="cta-primary">→ &nbsp;Réserver maintenant</button>
+</div>
+
+<div class="design-note">
+  <div class="note-item">
+    <div class="note-label">Palette</div>
+    <div class="note-value">#1a0d05 fond · #c17b3f ocre · #d4a843 or</div>
+  </div>
+  <div class="note-item">
+    <div class="note-label">Typographie</div>
+    <div class="note-value">Georgia serif (titres) · Inter (corps)</div>
+  </div>
+  <div class="note-item">
+    <div class="note-label">Animations</div>
+    <div class="note-value">3 colonnes · scroll infini · vitesses différentes</div>
+  </div>
+</div>
+
+</body>
+</html>

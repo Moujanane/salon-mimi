@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Services v2 — Salon Mimi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { height: 100%; }
+  body {
+    height: 100vh;
+    background: #1a0d05;
+    color: #fff;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 48px;
+    background: rgba(26,13,5,0.95);
+    backdrop-filter: blur(8px);
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(193,123,63,0.1);
+  }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { color: #fff; text-decoration: none; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; }
+  .nav-links a.active { opacity: 1; color: #c17b3f; }
+  .nav-logo { font-size: 11px; letter-spacing: 6px; text-transform: uppercase; color: #fff; }
+  .nav-cta {
+    background: #c17b3f; color: #fff; border: none; cursor: pointer;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 9px 20px; border-radius: 24px;
+  }
+
+  /* ── HERO compact ── */
+  .services-hero {
+    padding: 20px 60px 16px;
+    text-align: center;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(193,123,63,0.12);
+  }
+  .services-hero .badge {
+    font-size: 9px; letter-spacing: 5px; text-transform: uppercase;
+    color: #c17b3f; margin-bottom: 6px; display: block;
+  }
+  .services-hero h1 {
+    font-family: Georgia, serif;
+    font-size: clamp(20px, 2.5vw, 30px);
+    font-weight: 700; color: #fff; line-height: 1.15; margin-bottom: 6px;
+  }
+  .services-hero h1 em { font-style: italic; color: #c17b3f; }
+  .services-hero p {
+    font-size: 12px; line-height: 1.6;
+    color: rgba(255,255,255,0.45);
+    max-width: 480px; margin: 0 auto 12px;
+  }
+  .services-hero p strong { color: #fff; }
+  .services-hero p em { color: #c17b3f; font-style: normal; font-weight: 600; }
+  .hero-cta-row { display: flex; gap: 10px; justify-content: center; }
+  .cta-outline {
+    background: transparent; color: #fff;
+    border: 1px solid rgba(255,255,255,0.2); cursor: pointer;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 9px 20px; border-radius: 40px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .cta-outline:hover { border-color: #c17b3f; color: #c17b3f; }
+  .cta-filled {
+    background: #c17b3f; color: #fff; border: none; cursor: pointer;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 9px 20px; border-radius: 40px;
+    transition: background 0.2s;
+  }
+  .cta-filled:hover { background: #d4a843; }
+
+  /* ── SPLIT ── */
+  .split {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    padding: 16px 48px 20px;
+    gap: 16px;
+  }
+
+  /* ── GAUCHE — boutons pill ── */
+  .panel-left {
+    width: 36%;
+    background: #3d1a06;
+    border-radius: 16px;
+    border: 1px solid rgba(193,123,63,0.2);
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .panel-left .panel-label {
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(255,255,255,0.35); margin-bottom: 4px;
+  }
+
+  .pill-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 50px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: rgba(255,255,255,0.75);
+    cursor: pointer;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-family: sans-serif;
+    transition: all 0.25s;
+    text-align: left;
+  }
+  .pill-btn:hover {
+    border-color: rgba(193,123,63,0.5);
+    color: #fff;
+    background: rgba(193,123,63,0.08);
+  }
+  .pill-btn.active {
+    background: #c17b3f;
+    border-color: #c17b3f;
+    color: #fff;
+  }
+  .pill-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  /* ── DROITE — photo + overlay texte ── */
+  .panel-right {
+    flex: 1;
+    border-radius: 16px;
+    border: 1px solid rgba(193,123,63,0.2);
+    overflow: hidden;
+    position: relative;
+    background: #2a1005;
+  }
+
+  /* Stack de pages */
+  .page {
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 0.6s ease, transform 0.7s cubic-bezier(0.4,0,0.2,1);
+    transform: perspective(1400px) rotateY(8deg);
+    transform-origin: left center;
+    pointer-events: none;
+  }
+  .page.active {
+    opacity: 1;
+    transform: perspective(1400px) rotateY(0deg);
+    pointer-events: auto;
+  }
+  .page.leaving {
+    opacity: 0;
+    transform: perspective(1400px) rotateY(-12deg);
+  }
+
+  .page img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+
+  /* Overlay bas — dégradé fort */
+  .page-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(10,4,0,0.15) 0%,
+      rgba(10,4,0,0.1) 40%,
+      rgba(10,4,0,0.75) 65%,
+      rgba(10,4,0,0.95) 100%
+    );
+  }
+
+  /* Contenu texte sur la photo */
+  .page-content {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 28px 32px;
+    z-index: 2;
+  }
+  .page-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 5px 12px; border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .page-services-list {
+    font-family: Georgia, serif;
+    font-size: 15px;
+    color: #fff;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    font-weight: 400;
+  }
+  .page-price {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 16px;
+  }
+  .page-price span { color: #c17b3f; font-weight: 700; }
+  .btn-reserver {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #fff; color: #1a0d05;
+    border: none; cursor: pointer;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 12px 24px; border-radius: 40px;
+    font-weight: 700;
+    transition: background 0.2s, color 0.2s;
+  }
+  .btn-reserver:hover { background: #c17b3f; color: #fff; }
+
+  /* Fond coloré quand pas d'image */
+  .page-bg {
+    width: 100%; height: 100%;
+    position: absolute; inset: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-links">
+    <a href="#">Accueil</a>
+    <a href="#">À propos</a>
+    <a href="#" class="active">Services</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="nav-logo">Salon Mimi</div>
+  <button class="nav-cta">→ Prendre RDV</button>
+</nav>
+
+<!-- HERO -->
+<div class="services-hero">
+  <span class="badge">Ce qu'on fait · ce qu'on maîtrise</span>
+  <h1>Des services pensés pour <em>chaque texture</em></h1>
+  <p>
+    Que tu veuilles des <em>tresses africaines</em>, des <strong>knotless braids</strong>,
+    des locks ou un soin naturel — on a ce qu'il te faut. <strong>Réserve en ligne</strong>, on s'occupe du reste.
+  </p>
+  <div class="hero-cta-row">
+    <button class="cta-filled">→ &nbsp;Réserver maintenant</button>
+    <button class="cta-outline">Voir les tarifs</button>
+  </div>
+</div>
+
+<!-- SPLIT -->
+<div class="split">
+
+  <!-- GAUCHE : pills -->
+  <div class="panel-left">
+    <div class="panel-label">Choisir un service</div>
+
+    <button class="pill-btn active" onclick="showPage(0)">
+      <span class="pill-icon">✦</span> Tresses africaines
+    </button>
+    <button class="pill-btn" onclick="showPage(1)">
+      <span class="pill-icon">◈</span> Knotless braids
+    </button>
+    <button class="pill-btn" onclick="showPage(2)">
+      <span class="pill-icon">❋</span> Fulani braids
+    </button>
+    <button class="pill-btn" onclick="showPage(3)">
+      <span class="pill-icon">◉</span> Boho braids
+    </button>
+    <button class="pill-btn" onclick="showPage(4)">
+      <span class="pill-icon">⟁</span> Locks & dreads
+    </button>
+  </div>
+
+  <!-- DROITE : photos + texte overlay -->
+  <div class="panel-right">
+
+    <div class="page active" id="page-0">
+      <div class="page-bg" style="background:linear-gradient(135deg,#4a2010,#2d1005);"></div>
+      <img src="/images/s-tresse-fille1.png" alt="Tresses africaines"/>
+      <div class="page-overlay"></div>
+      <div class="page-content">
+        <span class="page-badge">Tresses africaines</span>
+        <p class="page-services-list">Box braids · Cornrows · Tribal braids · Tresse frontale · Micro braids · Nattes collées</p>
+        <p class="page-price">À partir de <span>150 MAD</span></p>
+        <button class="btn-reserver">→ &nbsp;Réserver ce service</button>
+      </div>
+    </div>
+
+    <div class="page" id="page-1">
+      <div class="page-bg" style="background:linear-gradient(135deg,#3d2510,#1f0e05);"></div>
+      <img src="/images/s-knotless.jpg" alt="Knotless braids"/>
+      <div class="page-overlay"></div>
+      <div class="page-content">
+        <span class="page-badge">Knotless braids</span>
+        <p class="page-services-list">Knotless classiques · Knotless jumbo · Knotless avec couleur · Knotless fini perles</p>
+        <p class="page-price">À partir de <span>200 MAD</span></p>
+        <button class="btn-reserver">→ &nbsp;Réserver ce service</button>
+      </div>
+    </div>
+
+    <div class="page" id="page-2">
+      <div class="page-bg" style="background:linear-gradient(135deg,#5c2e10,#2d1005);"></div>
+      <img src="/images/s-fulani.jpg" alt="Fulani braids"/>
+      <div class="page-overlay"></div>
+      <div class="page-content">
+        <span class="page-badge">Fulani braids</span>
+        <p class="page-services-list">Fulani classiques · Fulani avec perles · Fulani avec fils de couleur · Fulani tribal</p>
+        <p class="page-price">À partir de <span>180 MAD</span></p>
+        <button class="btn-reserver">→ &nbsp;Réserver ce service</button>
+      </div>
+    </div>
+
+    <div class="page" id="page-3">
+      <div class="page-bg" style="background:linear-gradient(135deg,#6b3015,#2d1005);"></div>
+      <img src="/images/s-boho.jpg" alt="Boho braids"/>
+      <div class="page-overlay"></div>
+      <div class="page-content">
+        <span class="page-badge">Boho braids</span>
+        <p class="page-services-list">Boho knotless · Boho avec frisures · Boho jumbo · Boho colorées</p>
+        <p class="page-price">À partir de <span>220 MAD</span></p>
+        <button class="btn-reserver">→ &nbsp;Réserver ce service</button>
+      </div>
+    </div>
+
+    <div class="page" id="page-4">
+      <div class="page-bg" style="background:linear-gradient(135deg,#3d1a06,#1a0a03);"></div>
+      <img src="/images/coiffure-1.jpg" alt="Locks"/>
+      <div class="page-overlay"></div>
+      <div class="page-content">
+        <span class="page-badge">Locks & dreads</span>
+        <p class="page-services-list">Pose de locks · Sisterlocks · Entretien · Retouche racines · Déverrouillage</p>
+        <p class="page-price">À partir de <span>250 MAD</span></p>
+        <button class="btn-reserver">→ &nbsp;Réserver ce service</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let current = 0;
+  const total = 5;
+
+  function showPage(index) {
+    const pages = document.querySelectorAll('.page');
+    const btns  = document.querySelectorAll('.pill-btn');
+
+    pages[current].classList.remove('active');
+    pages[current].classList.add('leaving');
+    setTimeout(() => pages[current].classList.remove('leaving'), 700);
+
+    pages[index].classList.add('active');
+
+    btns.forEach(b => b.classList.remove('active'));
+    btns[index].classList.add('active');
+
+    current = index;
+  }
+
+  function next() { showPage((current + 1) % total); }
+  setInterval(next, 4500);
+</script>
+
+</body>
+</html>

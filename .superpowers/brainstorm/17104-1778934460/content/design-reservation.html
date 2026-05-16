@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Réservation — Salon Mimi</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { height: 100%; }
+  body {
+    height: 100vh;
+    background: #1a0d05;
+    color: #fff;
+    font-family: sans-serif;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── NAV ── */
+  nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 48px;
+    background: rgba(26,13,5,0.95);
+    border-bottom: 1px solid rgba(193,123,63,0.1);
+    flex-shrink: 0;
+  }
+  .nav-links { display: flex; gap: 32px; }
+  .nav-links a { color: #fff; text-decoration: none; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; }
+  .nav-logo { font-size: 11px; letter-spacing: 6px; text-transform: uppercase; color: #fff; }
+  .nav-cta {
+    background: #c17b3f; color: #fff; border: none; cursor: pointer;
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    padding: 9px 20px; border-radius: 24px;
+  }
+
+  /* ── TITRE PAGE ── */
+  .page-header {
+    padding: 14px 48px 10px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(193,123,63,0.1);
+  }
+  .page-header .badge {
+    font-size: 9px; letter-spacing: 4px; text-transform: uppercase;
+    color: #c17b3f; display: block; margin-bottom: 4px;
+  }
+  .page-header h1 {
+    font-family: Georgia, serif;
+    font-size: clamp(18px, 2vw, 26px);
+    font-weight: 700; color: #fff;
+  }
+  .page-header h1 em { font-style: italic; color: #c17b3f; }
+
+  /* ── SPLIT ── */
+  .split {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    padding: 14px 48px 18px;
+    gap: 16px;
+  }
+
+  /* ── PANNEAU GAUCHE — formulaire ── */
+  .panel-form {
+    width: 44%;
+    background: #3d1a06;
+    border-radius: 16px;
+    border: 1px solid rgba(193,123,63,0.2);
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex-shrink: 0;
+    overflow-y: auto;
+  }
+  .panel-form::-webkit-scrollbar { width: 4px; }
+  .panel-form::-webkit-scrollbar-thumb { background: rgba(193,123,63,0.3); border-radius: 2px; }
+
+  .form-title {
+    font-family: Georgia, serif;
+    font-size: 15px; font-weight: 700; color: #fff;
+    margin-bottom: 4px;
+  }
+  .form-subtitle {
+    font-size: 10px; color: rgba(255,255,255,0.4);
+    letter-spacing: 1px; margin-bottom: 4px;
+  }
+  .form-divider {
+    height: 1px; background: rgba(193,123,63,0.2);
+    margin: 2px 0;
+  }
+
+  /* Grille 2 colonnes pour certains champs */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label {
+    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+  }
+  .field label span { color: #c17b3f; }
+
+  .field input,
+  .field select,
+  .field textarea {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 13px;
+    padding: 10px 14px;
+    outline: none;
+    font-family: sans-serif;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder { color: rgba(255,255,255,0.25); }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: #c17b3f;
+    background: rgba(193,123,63,0.08);
+  }
+  .field select { cursor: pointer; appearance: none; }
+  .field select option { background: #2d1005; color: #fff; }
+  .field textarea { resize: none; height: 64px; }
+
+  /* Select service — pill visuel */
+  .service-pills {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .service-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: sans-serif;
+  }
+  .service-pill:hover { border-color: rgba(193,123,63,0.5); color: #fff; }
+  .service-pill.active { background: #c17b3f; border-color: #c17b3f; color: #fff; }
+
+  .btn-submit {
+    background: #c17b3f; color: #fff;
+    border: none; cursor: pointer;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 14px; border-radius: 40px;
+    width: 100%; font-family: sans-serif;
+    transition: background 0.2s;
+    margin-top: 4px;
+  }
+  .btn-submit:hover { background: #d4a843; }
+
+  .form-note {
+    text-align: center;
+    font-size: 10px; color: rgba(255,255,255,0.3);
+    line-height: 1.5;
+  }
+
+  /* ── PANNEAU DROIT — photo service ── */
+  .panel-photo {
+    flex: 1;
+    border-radius: 16px;
+    border: 1px solid rgba(193,123,63,0.2);
+    overflow: hidden;
+    position: relative;
+    background: #2a1005;
+  }
+
+  .photo-slide {
+    position: absolute; inset: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .photo-slide.active { opacity: 1; }
+
+  .photo-slide .bg {
+    width: 100%; height: 100%;
+    position: absolute; inset: 0;
+  }
+  .photo-slide img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    position: absolute; inset: 0;
+  }
+  .photo-slide .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(10,4,0,0.92) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.15) 100%);
+  }
+
+  .photo-info {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 24px 28px;
+    z-index: 2;
+  }
+  .photo-badge {
+    display: inline-block;
+    background: rgba(193,123,63,0.25);
+    border: 1px solid rgba(193,123,63,0.4);
+    color: #c17b3f;
+    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    padding: 4px 12px; border-radius: 20px;
+    margin-bottom: 8px;
+  }
+  .photo-name {
+    font-family: Georgia, serif;
+    font-size: 22px; font-weight: 700; color: #fff;
+    line-height: 1.15; margin-bottom: 6px;
+  }
+  .photo-desc {
+    font-size: 12px; color: rgba(255,255,255,0.55);
+    line-height: 1.6; margin-bottom: 10px;
+  }
+  .photo-price {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+  .photo-price span { color: #c17b3f; font-weight: 700; font-size: 13px; }
+
+  /* Tag "aucun service sélectionné" */
+  .photo-placeholder {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 12px; opacity: 1; transition: opacity 0.3s;
+  }
+  .photo-placeholder.hidden { opacity: 0; pointer-events: none; }
+  .placeholder-icon { font-size: 40px; opacity: 0.2; }
+  .placeholder-text { font-size: 11px; letter-spacing: 2px; color: rgba(255,255,255,0.25); text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-links">
+    <a href="#">Accueil</a>
+    <a href="#">À propos</a>
+    <a href="#">Services</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="nav-logo">Salon Mimi</div>
+  <button class="nav-cta">→ Prendre RDV</button>
+</nav>
+
+<!-- HEADER -->
+<div class="page-header">
+  <span class="badge">Réservation en ligne · Marrakech</span>
+  <h1>Réserve ton <em>rendez-vous</em></h1>
+</div>
+
+<!-- SPLIT -->
+<div class="split">
+
+  <!-- GAUCHE : formulaire -->
+  <div class="panel-form">
+    <div>
+      <div class="form-title">Tes informations</div>
+      <div class="form-subtitle">Tous les champs marqués * sont obligatoires</div>
+    </div>
+
+    <div class="field">
+      <label>Service <span>*</span></label>
+      <select id="service-select" onchange="onServiceChange(this)">
+        <option value="0">Tresses africaines</option>
+        <option value="1" selected>Knotless braids</option>
+        <option value="2">Fulani braids</option>
+        <option value="3">Boho braids</option>
+        <option value="4">Locks & dreads</option>
+      </select>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <div class="form-row">
+      <div class="field">
+        <label>Nom complet <span>*</span></label>
+        <input type="text" placeholder="Fatima Zahra..."/>
+      </div>
+      <div class="field">
+        <label>Téléphone / WhatsApp <span>*</span></label>
+        <input type="tel" placeholder="+212 6..."/>
+      </div>
+    </div>
+
+    <div class="form-divider"></div>
+
+    <div class="form-row">
+      <div class="field">
+        <label>Date souhaitée <span>*</span></label>
+        <input type="date"/>
+      </div>
+      <div class="field">
+        <label>Heure souhaitée <span>*</span></label>
+        <input type="time"/>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Nombre de personnes</label>
+      <select>
+        <option>1 personne</option>
+        <option>2 personnes</option>
+        <option>3 personnes</option>
+        <option>4 personnes et +</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Message (optionnel)</label>
+      <textarea placeholder="Précisions sur le style, longueur souhaitée..."></textarea>
+    </div>
+
+    <button class="btn-submit">→ &nbsp;Confirmer la réservation</button>
+    <div class="form-note">Confirmation par WhatsApp sous 24h · Aucun paiement requis maintenant</div>
+  </div>
+
+  <!-- DROITE : photo du service -->
+  <div class="panel-photo">
+
+    <!-- Placeholder quand rien n'est sélectionné -->
+    <div class="photo-placeholder" id="placeholder">
+      <div class="placeholder-icon">✦</div>
+      <div class="placeholder-text">Choisis un service pour voir la photo</div>
+    </div>
+
+    <!-- Slide 0 — Tresses africaines -->
+    <div class="photo-slide" id="slide-0">
+      <div class="bg" style="background:linear-gradient(135deg,#4a2010,#1a0d05);"></div>
+      <img src="/images/s-tresse-fille1.png" alt="Tresses africaines"/>
+      <div class="overlay"></div>
+      <div class="photo-info">
+        <span class="photo-badge">Tresses africaines</span>
+        <div class="photo-name">Box braids · Cornrows<br>Tribal · Micro braids</div>
+        <div class="photo-desc">Tresses classiques ou créatives, réalisées avec soin pour durer. Adaptées à toutes les longueurs et textures.</div>
+        <div class="photo-price">À partir de <span>150 MAD</span></div>
+      </div>
+    </div>
+
+    <!-- Slide 1 — Knotless -->
+    <div class="photo-slide" id="slide-1">
+      <div class="bg" style="background:linear-gradient(135deg,#3d2510,#1a0d05);"></div>
+      <img src="/images/s-knotless.jpg" alt="Knotless braids"/>
+      <div class="overlay"></div>
+      <div class="photo-info">
+        <span class="photo-badge">Knotless braids</span>
+        <div class="photo-name">Knotless classiques<br>Jumbo · Avec couleur</div>
+        <div class="photo-desc">Sans nœuds au départ, plus légères et naturelles. Moins de tension sur le cuir chevelu, plus de confort.</div>
+        <div class="photo-price">À partir de <span>200 MAD</span></div>
+      </div>
+    </div>
+
+    <!-- Slide 2 — Fulani -->
+    <div class="photo-slide" id="slide-2">
+      <div class="bg" style="background:linear-gradient(135deg,#5c2e10,#1a0d05);"></div>
+      <img src="/images/s-fulani.jpg" alt="Fulani braids"/>
+      <div class="overlay"></div>
+      <div class="photo-info">
+        <span class="photo-badge">Fulani braids</span>
+        <div class="photo-name">Fulani classiques<br>Avec perles · Tribal</div>
+        <div class="photo-desc">Style inspiré de la culture peule, avec perles et fils de couleur. Élégant, culturel et unique.</div>
+        <div class="photo-price">À partir de <span>180 MAD</span></div>
+      </div>
+    </div>
+
+    <!-- Slide 3 — Boho -->
+    <div class="photo-slide" id="slide-3">
+      <div class="bg" style="background:linear-gradient(135deg,#6b3015,#1a0d05);"></div>
+      <img src="/images/s-boho.jpg" alt="Boho braids"/>
+      <div class="overlay"></div>
+      <div class="photo-info">
+        <span class="photo-badge">Boho braids</span>
+        <div class="photo-name">Boho knotless<br>Avec frisures · Jumbo</div>
+        <div class="photo-desc">Style bohème avec frisures libres aux pointes. Naturel, romantique, parfait pour un look unique et décontracté.</div>
+        <div class="photo-price">À partir de <span>220 MAD</span></div>
+      </div>
+    </div>
+
+    <!-- Slide 4 — Locks -->
+    <div class="photo-slide" id="slide-4">
+      <div class="bg" style="background:linear-gradient(135deg,#3d1a06,#1a0d05);"></div>
+      <img src="/images/coiffure-1.jpg" alt="Locks"/>
+      <div class="overlay"></div>
+      <div class="photo-info">
+        <span class="photo-badge">Locks & dreads</span>
+        <div class="photo-name">Pose · Sisterlocks<br>Entretien · Retouche</div>
+        <div class="photo-desc">Pose complète ou entretien de locks existants. Technique soignée pour des locks propres, uniformes et durables.</div>
+        <div class="photo-price">À partir de <span>250 MAD</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let activeSlide = 1; // pré-sélectionné depuis la page Services
+
+  function showSlide(index) {
+    document.getElementById('placeholder').classList.add('hidden');
+    document.querySelectorAll('.photo-slide').forEach((s, i) => {
+      s.classList.toggle('active', i === index);
+    });
+    activeSlide = index;
+  }
+
+  function onServiceChange(select) {
+    showSlide(parseInt(select.value));
+  }
+
+  // Au chargement — affiche le service pré-sélectionné
+  window.addEventListener('DOMContentLoaded', () => showSlide(1));
+</script>
+
+</body>
+</html>
