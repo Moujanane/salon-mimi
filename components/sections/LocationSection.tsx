@@ -31,56 +31,8 @@ export default function LocationSection({ locale }: { locale: string }) {
 
   const c = content[locale as keyof typeof content] ?? content.fr;
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "HairSalon",
-    name: "Salon Mimi",
-    description:
-      "Salon de coiffure afro spécialisé en tresses africaines, knotless braids, locks et styles naturels. Situé près de la Place Jamaa El Fna, Médina de Marrakech.",
-    url: "https://salon-mimi.com",
-    address: {
-      "@type": "PostalAddress",
-      streetAddress: "Médina, près de la Place Jamaa El Fna",
-      addressLocality: "Marrakech",
-      addressCountry: "MA",
-    },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: 31.6258,
-      longitude: -7.9892,
-    },
-    openingHoursSpecification: [
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: [
-          "Monday",
-          "Tuesday",
-          "Wednesday",
-          "Thursday",
-          "Friday",
-          "Saturday",
-        ],
-        opens: "09:00",
-        closes: "20:00",
-      },
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Sunday"],
-        opens: "10:00",
-        closes: "18:00",
-      },
-    ],
-    telephone: "+212710388204",
-    priceRange: "150–500 MAD",
-  };
-
   return (
     <section className="bg-nuit border-t border-ocre/15 py-20 px-6 md:px-16">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
       <div className="flex items-center gap-3 mb-6 justify-center">
         <div className="w-8 h-px bg-ocre" />
         <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter">

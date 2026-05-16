@@ -1,0 +1,2 @@
+TODO: Créer og-image.jpg en 1200x630px avec une belle photo de tresses du salon.
+À placer ici : /public/og-image.jpg
