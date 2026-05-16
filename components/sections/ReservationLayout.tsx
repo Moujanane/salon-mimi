@@ -1,0 +1,317 @@
+"use client";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
+import Image from "next/image";
+
+const SERVICES = [
+  {
+    id: "tresses-africaines",
+    label: "Tresses africaines",
+    subServices: "Box braids · Cornrows · Tribal braids · Tresse frontale",
+    price: "150 MAD",
+    image: "/images/s-tresse-fille1.png",
+    imageAlt: "Tresses africaines salon Mimi Marrakech",
+  },
+  {
+    id: "knotless-braids",
+    label: "Knotless braids",
+    subServices: "Knotless classiques · Jumbo · Avec couleur · Fini perles",
+    price: "200 MAD",
+    image: "/images/s-knotless.jpg",
+    imageAlt: "Knotless braids Marrakech",
+  },
+  {
+    id: "fulani-braids",
+    label: "Fulani braids",
+    subServices: "Classiques · Avec perles · Fils de couleur · Tribal",
+    price: "180 MAD",
+    image: "/images/s-fulani.jpg",
+    imageAlt: "Fulani braids salon afro Marrakech",
+  },
+  {
+    id: "boho-braids",
+    label: "Boho braids",
+    subServices: "Boho knotless · Avec frisures · Jumbo · Colorées",
+    price: "220 MAD",
+    image: "/images/s-boho.jpg",
+    imageAlt: "Boho braids salon Mimi",
+  },
+  {
+    id: "locks-dreads",
+    label: "Locks & dreads",
+    subServices: "Pose · Sisterlocks · Entretien · Retouche racines",
+    price: "250 MAD",
+    image: "/images/s-depart-locks.jpg",
+    imageAlt: "Locks dreads Marrakech",
+  },
+];
+
+interface Props {
+  locale: string;
+  labels: {
+    name: string;
+    phone: string;
+    service: string;
+    date: string;
+    message: string;
+    submit: string;
+    success: string;
+    error: string;
+  };
+}
+
+export default function ReservationLayout({ locale, labels }: Props) {
+  const searchParams = useSearchParams();
+  const serviceParam = searchParams.get("service") ?? "tresses-africaines";
+
+  const initialIndex = SERVICES.findIndex((s) => s.id === serviceParam);
+  const [activeIndex, setActiveIndex] = useState(
+    initialIndex >= 0 ? initialIndex : 0,
+  );
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+
+  const activeSvc = SERVICES[activeIndex];
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = {
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
+      service: activeSvc.label,
+      date: (form.elements.namedItem("date") as HTMLInputElement).value,
+      time: (form.elements.namedItem("time") as HTMLInputElement).value,
+      persons: (form.elements.namedItem("persons") as HTMLSelectElement).value,
+      message: (form.elements.namedItem("message") as HTMLTextAreaElement)
+        .value,
+      locale,
+    };
+    try {
+      const res = await fetch("/api/reservation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error();
+      setSubmitted(true);
+    } catch {
+      setError(labels.error);
+    }
+  }
+
+  if (submitted) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-nuit">
+        <div className="text-center">
+          <div className="text-ocre text-4xl mb-4">✦</div>
+          <h2 className="font-georgia text-2xl text-white mb-3">
+            {labels.success}
+          </h2>
+          <p className="text-white/50 text-sm font-inter">
+            Confirmation par WhatsApp sous 24h.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-screen flex flex-col bg-nuit overflow-hidden">
+      <div className="h-[57px] flex-shrink-0" />
+
+      <div className="flex-shrink-0 px-12 py-3 border-b border-ocre/10">
+        <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter block mb-0.5">
+          Réservation en ligne · Marrakech
+        </span>
+        <h1 className="font-georgia text-[clamp(18px,2vw,26px)] font-bold text-white">
+          Réserve ton <em className="text-ocre italic">rendez-vous</em>
+        </h1>
+      </div>
+
+      <div className="flex flex-1 min-h-0 gap-4 p-4 pt-3">
+        <div className="w-[44%] bg-panneau rounded-2xl border border-ocre/20 p-6 flex-shrink-0 overflow-y-auto">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <div className="font-georgia text-[15px] font-bold text-white mb-0.5">
+                Tes informations
+              </div>
+              <div className="text-[10px] text-white/35 font-inter tracking-wide">
+                Tous les champs * sont obligatoires
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                Service <span className="text-ocre">*</span>
+              </label>
+              <select
+                name="service"
+                value={activeIndex}
+                onChange={(e) => setActiveIndex(Number(e.target.value))}
+                required
+                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter appearance-none cursor-pointer"
+                style={{ background: "rgba(255,255,255,0.06)" }}
+              >
+                {SERVICES.map((s, i) => (
+                  <option
+                    key={s.id}
+                    value={i}
+                    style={{ background: "#2d1005" }}
+                  >
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="h-px bg-ocre/15" />
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                  Nom complet <span className="text-ocre">*</span>
+                </label>
+                <input
+                  name="name"
+                  type="text"
+                  placeholder="Fatima Zahra..."
+                  required
+                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter placeholder:text-white/25"
+                  style={{ background: "rgba(255,255,255,0.06)" }}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                  Téléphone / WhatsApp <span className="text-ocre">*</span>
+                </label>
+                <input
+                  name="phone"
+                  type="tel"
+                  placeholder="+212 6..."
+                  required
+                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter placeholder:text-white/25"
+                  style={{ background: "rgba(255,255,255,0.06)" }}
+                />
+              </div>
+            </div>
+
+            <div className="h-px bg-ocre/15" />
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                  Date souhaitée <span className="text-ocre">*</span>
+                </label>
+                <input
+                  name="date"
+                  type="date"
+                  required
+                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter"
+                  style={{ background: "rgba(255,255,255,0.06)" }}
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                  Heure souhaitée <span className="text-ocre">*</span>
+                </label>
+                <input
+                  name="time"
+                  type="time"
+                  required
+                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter"
+                  style={{ background: "rgba(255,255,255,0.06)" }}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                Nombre de personnes
+              </label>
+              <select
+                name="persons"
+                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter appearance-none"
+                style={{ background: "rgba(255,255,255,0.06)" }}
+              >
+                <option style={{ background: "#2d1005" }}>1 personne</option>
+                <option style={{ background: "#2d1005" }}>2 personnes</option>
+                <option style={{ background: "#2d1005" }}>3 personnes</option>
+                <option style={{ background: "#2d1005" }}>
+                  4 personnes et +
+                </option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                Message (optionnel)
+              </label>
+              <textarea
+                name="message"
+                rows={3}
+                placeholder="Précisions sur le style, longueur souhaitée..."
+                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter placeholder:text-white/25 resize-none"
+                style={{ background: "rgba(255,255,255,0.06)" }}
+              />
+            </div>
+
+            {error && (
+              <p className="text-red-400 text-[12px] font-inter">{error}</p>
+            )}
+
+            <button
+              type="submit"
+              className="w-full bg-ocre hover:bg-or text-white text-[11px] tracking-[3px] uppercase py-3.5 rounded-full transition-colors font-inter font-medium"
+            >
+              → Confirmer la réservation
+            </button>
+
+            <p className="text-center text-white/30 text-[10px] font-inter leading-relaxed">
+              Confirmation par WhatsApp sous 24h · Aucun paiement requis
+              maintenant
+            </p>
+          </form>
+        </div>
+
+        <div className="flex-1 bg-panneau rounded-2xl border border-ocre/20 overflow-hidden relative">
+          {SERVICES.map((s, i) => (
+            <div
+              key={s.id}
+              className="absolute inset-0 transition-opacity duration-500"
+              style={{ opacity: i === activeIndex ? 1 : 0 }}
+            >
+              <Image
+                src={s.image}
+                alt={s.imageAlt}
+                fill
+                className="object-cover"
+                sizes="50vw"
+                priority={i === 0}
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(to top, rgba(10,4,0,0.92) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.12) 100%)",
+                }}
+              />
+              <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
+                <span className="inline-block bg-ocre/25 border border-ocre/40 text-ocre text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
+                  {s.label}
+                </span>
+                <p className="font-georgia text-[15px] text-white leading-relaxed mb-2">
+                  {s.subServices}
+                </p>
+                <p className="text-[10px] tracking-[3px] uppercase text-white/50 font-inter">
+                  À partir de{" "}
+                  <span className="text-ocre font-bold">{s.price}</span>
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

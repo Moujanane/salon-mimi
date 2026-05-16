@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
-import ReservationForm from "@/components/sections/ReservationForm";
+import { Suspense } from "react";
+import ReservationLayout from "@/components/sections/ReservationLayout";
 
 export default async function ReservationPage({
   params,
@@ -21,13 +22,8 @@ export default async function ReservationPage({
   };
 
   return (
-    <div className="bg-fond min-h-screen">
-      <div className="bg-nuit py-16 text-center">
-        <h1 className="font-playfair text-5xl text-ocre">{t("title")}</h1>
-      </div>
-      <div className="max-w-xl mx-auto px-4 py-16">
-        <ReservationForm locale={locale} labels={labels} />
-      </div>
-    </div>
+    <Suspense fallback={<div className="h-screen bg-nuit" />}>
+      <ReservationLayout locale={locale} labels={labels} />
+    </Suspense>
   );
 }
