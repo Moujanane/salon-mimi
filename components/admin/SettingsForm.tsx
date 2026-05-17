@@ -1,6 +1,6 @@
 // components/admin/SettingsForm.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Settings } from "@/lib/settings";
 
 const SERVICE_KEYS: (keyof Settings)[] = [
@@ -31,8 +31,25 @@ const SERVICE_LABELS: Record<string, string> = {
 
 export default function SettingsForm({ initial }: { initial: Settings }) {
   const [values, setValues] = useState<Settings>(initial);
+  const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
+      .then((data: Settings) => {
+        setValues(data);
+        setLoaded(true);
+      })
+      .catch((err) => {
+        console.error("[SettingsForm] fetch failed:", err);
+        setLoaded(true);
+      });
+  }, []);
 
   function handleChange(key: keyof Settings, value: string) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -59,6 +76,12 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8 max-w-xl">
+      {!loaded && (
+        <p className="text-sm text-gray-400 animate-pulse">
+          Chargement des paramètres…
+        </p>
+      )}
+
       <div className="flex flex-col gap-3">
         <h2 className="font-playfair text-xl text-brun">WhatsApp</h2>
         <div className="flex flex-col gap-1.5">
@@ -92,7 +115,7 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
                 <input
                   type="number"
                   min="0"
-                  value={values[key]}
+                  value={values[key] ?? ""}
                   onChange={(e) => handleChange(key, e.target.value)}
                   className="flex-1 px-4 py-2.5 text-sm outline-none"
                 />
@@ -115,7 +138,7 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
 
       <button
         type="submit"
-        disabled={saving}
+        disabled={saving || !loaded}
         className="self-start bg-brun hover:bg-brun/90 text-white text-sm px-6 py-3 rounded-full transition-colors disabled:opacity-50"
       >
         {saving ? "Sauvegarde…" : "Sauvegarder"}
