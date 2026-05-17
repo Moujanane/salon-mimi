@@ -104,7 +104,7 @@ export default function HeroHome({ locale }: HeroHomeProps) {
         </div>
 
         <h1 className="font-georgia text-[clamp(52px,6vw,88px)] font-bold uppercase leading-[0.9] text-white mb-4">
-          Tresses africaines
+          Tresses africaines & Rasta
           <em className="block not-italic text-ocre italic">Marrakech</em>
         </h1>
         <p className="font-georgia text-[18px] font-semibold text-white/70 leading-snug mb-4">
