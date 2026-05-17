@@ -91,7 +91,6 @@ const SERVICES = [
 ];
 
 interface Props {
-  locale: string;
   labels: {
     name: string;
     phone: string;
@@ -104,7 +103,7 @@ interface Props {
   };
 }
 
-export default function ReservationLayout({ locale, labels }: Props) {
+export default function ReservationLayout({ labels }: Props) {
   const searchParams = useSearchParams();
   const serviceParam = searchParams.get("service") ?? "tresses-africaines";
 

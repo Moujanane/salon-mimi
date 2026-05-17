@@ -23,7 +23,7 @@ export default async function ReservationPage({
 
   return (
     <Suspense fallback={<div className="h-screen bg-nuit" />}>
-      <ReservationLayout locale={locale} labels={labels} />
+      <ReservationLayout labels={labels} />
     </Suspense>
   );
 }
