@@ -55,5 +55,6 @@ export async function getSettings(): Promise<Settings> {
   }
 
   const map = Object.fromEntries(data.map((r) => [r.key, r.value]));
+  console.log("[getSettings] data:", JSON.stringify(map));
   return map as Settings;
 }

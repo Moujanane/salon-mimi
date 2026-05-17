@@ -1,6 +1,6 @@
 // components/admin/SettingsForm.tsx
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Settings } from "@/lib/settings";
 
 const SERVICE_KEYS: (keyof Settings)[] = [
@@ -30,34 +30,17 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 export default function SettingsForm({ initial }: { initial: Settings }) {
-  const [settings, setSettings] = useState<Settings>(initial);
-  const [loading, setLoading] = useState(true);
+  const [values, setValues] = useState<Settings>(initial);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    fetch("/api/settings")
-      .then((r) => {
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
-      })
-      .then((data) => {
-        setSettings(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("[SettingsForm] fetch /api/settings:", err.message);
-        setLoading(false);
-      });
-  }, []);
-
   function handleChange(key: keyof Settings, value: string) {
-    setSettings((prev) => ({ ...prev, [key]: value }));
+    setValues((prev) => ({ ...prev, [key]: value }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!/^\+?[\d\s\-().]{6,20}$/.test(settings.whatsapp_number)) {
+    if (!/^\+?[\d\s\-().]{6,20}$/.test(values.whatsapp_number)) {
       setMessage("Numéro WhatsApp invalide. Format attendu : +212600000000");
       return;
     }
@@ -66,16 +49,12 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
     const res = await fetch("/api/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(settings),
+      body: JSON.stringify(values),
     });
     setSaving(false);
     setMessage(
       res.ok ? "Paramètres sauvegardés." : "Erreur lors de la sauvegarde.",
     );
-  }
-
-  if (loading) {
-    return <div className="text-sm text-gray-400">Chargement…</div>;
   }
 
   return (
@@ -88,7 +67,7 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
           </label>
           <input
             type="text"
-            value={settings.whatsapp_number}
+            value={values.whatsapp_number}
             onChange={(e) => handleChange("whatsapp_number", e.target.value)}
             className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brun"
             placeholder="+212600000000"
@@ -113,7 +92,7 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
                 <input
                   type="number"
                   min="0"
-                  value={settings[key]}
+                  value={values[key]}
                   onChange={(e) => handleChange(key, e.target.value)}
                   className="flex-1 px-4 py-2.5 text-sm outline-none"
                 />

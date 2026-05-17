@@ -30,7 +30,7 @@ export default async function SettingsPage() {
           Numéro WhatsApp et prix des services.
         </p>
       </div>
-      <SettingsForm initial={settings} />
+      <SettingsForm key={JSON.stringify(settings)} initial={settings} />
     </div>
   );
 }
