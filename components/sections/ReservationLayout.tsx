@@ -113,6 +113,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
     initialIndex >= 0 ? initialIndex : 0,
   );
   const [submitted, setSubmitted] = useState(false);
+  const [whatsappLink, setWhatsappLink] = useState("");
   const [error, setError] = useState("");
 
   const activeSvc = SERVICES[activeIndex];
@@ -142,10 +143,8 @@ export default function ReservationLayout({ labels, prices }: Props) {
       });
       if (!res.ok) throw new Error();
       const json = await res.json();
+      if (json.whatsappLink) setWhatsappLink(json.whatsappLink);
       setSubmitted(true);
-      if (json.whatsappLink) {
-        window.open(json.whatsappLink, "_blank");
-      }
     } catch {
       setError(labels.error);
     }
@@ -154,14 +153,24 @@ export default function ReservationLayout({ labels, prices }: Props) {
   if (submitted) {
     return (
       <div className="h-screen flex items-center justify-center bg-nuit">
-        <div className="text-center">
+        <div className="text-center px-6">
           <div className="text-ocre text-4xl mb-4">✦</div>
           <h2 className="font-georgia text-2xl text-white mb-3">
             {labels.success}
           </h2>
-          <p className="text-white/50 text-sm font-inter">
-            Confirmation par WhatsApp sous 24h.
+          <p className="text-white/50 text-sm font-inter mb-6">
+            Clique ci-dessous pour envoyer ta demande sur WhatsApp.
           </p>
+          {whatsappLink && (
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm font-inter font-medium px-8 py-3.5 rounded-full transition-colors"
+            >
+              Envoyer sur WhatsApp
+            </a>
+          )}
         </div>
       </div>
     );
