@@ -1,7 +1,20 @@
 // components/admin/SettingsForm.tsx
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Settings } from "@/lib/settings";
+
+const SERVICE_KEYS: (keyof Settings)[] = [
+  "price_tresses_africaines",
+  "price_tresses_et_nattes",
+  "price_box_braids",
+  "price_tresses_fulani",
+  "price_tresses_boho",
+  "price_locks_dreads",
+  "price_cheveux_attaches",
+  "price_perruques_tissage",
+  "price_colorations",
+  "price_ongles_soins_epilation",
+];
 
 const SERVICE_LABELS: Record<string, string> = {
   price_tresses_africaines: "Tresses africaines",
@@ -17,37 +30,46 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 export default function SettingsForm({ initial }: { initial: Settings }) {
-  const [values, setValues] = useState<Settings>(initial);
+  const formRef = useRef<HTMLFormElement>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
-  function handleChange(key: keyof Settings, value: string) {
-    setValues((prev) => ({ ...prev, [key]: value }));
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!/^\+?[\d\s\-().]{6,20}$/.test(values.whatsapp_number)) {
+    if (!formRef.current) return;
+
+    const fd = new FormData(formRef.current);
+    const whatsapp = (fd.get("whatsapp_number") as string) ?? "";
+
+    if (!/^\+?[\d\s\-().]{6,20}$/.test(whatsapp)) {
       setMessage("Numéro WhatsApp invalide. Format attendu : +212600000000");
       return;
     }
+
+    const payload: Record<string, string> = { whatsapp_number: whatsapp };
+    for (const key of SERVICE_KEYS) {
+      payload[key] = (fd.get(key) as string) ?? "";
+    }
+
     setSaving(true);
     setMessage("");
     const res = await fetch("/api/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
+      body: JSON.stringify(payload),
     });
     setSaving(false);
-    if (res.ok) {
-      setMessage("Paramètres sauvegardés.");
-    } else {
-      setMessage("Erreur lors de la sauvegarde.");
-    }
+    setMessage(
+      res.ok ? "Paramètres sauvegardés." : "Erreur lors de la sauvegarde.",
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-8 max-w-xl">
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-8 max-w-xl"
+    >
       <div className="flex flex-col gap-3">
         <h2 className="font-playfair text-xl text-brun">WhatsApp</h2>
         <div className="flex flex-col gap-1.5">
@@ -56,8 +78,8 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
           </label>
           <input
             type="text"
-            value={values.whatsapp_number}
-            onChange={(e) => handleChange("whatsapp_number", e.target.value)}
+            name="whatsapp_number"
+            defaultValue={initial.whatsapp_number}
             className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brun"
             placeholder="+212600000000"
           />
@@ -72,19 +94,17 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
           Prix des services (MAD)
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {Object.entries(SERVICE_LABELS).map(([key, label]) => (
+          {SERVICE_KEYS.map((key) => (
             <div key={key} className="flex flex-col gap-1.5">
               <label className="text-xs text-gray-500 uppercase tracking-wide">
-                {label}
+                {SERVICE_LABELS[key]}
               </label>
               <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-brun">
                 <input
                   type="number"
+                  name={key}
                   min="0"
-                  value={values[key as keyof Settings]}
-                  onChange={(e) =>
-                    handleChange(key as keyof Settings, e.target.value)
-                  }
+                  defaultValue={initial[key]}
                   className="flex-1 px-4 py-2.5 text-sm outline-none"
                 />
                 <span className="px-3 text-sm text-gray-400 bg-gray-50 border-l border-gray-200">
