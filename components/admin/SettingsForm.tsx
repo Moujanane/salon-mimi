@@ -1,6 +1,6 @@
 // components/admin/SettingsForm.tsx
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { Settings } from "@/lib/settings";
 
 const SERVICE_KEYS: (keyof Settings)[] = [
@@ -30,33 +30,39 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 export default function SettingsForm({ initial }: { initial: Settings }) {
-  const formRef = useRef<HTMLFormElement>(null);
+  const [settings, setSettings] = useState<Settings>(initial);
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    fetch("/api/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        setSettings(data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  function handleChange(key: keyof Settings, value: string) {
+    setSettings((prev) => ({ ...prev, [key]: value }));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!formRef.current) return;
-
-    const fd = new FormData(formRef.current);
-    const whatsapp = (fd.get("whatsapp_number") as string) ?? "";
-
-    if (!/^\+?[\d\s\-().]{6,20}$/.test(whatsapp)) {
+    if (!/^\+?[\d\s\-().]{6,20}$/.test(settings.whatsapp_number)) {
       setMessage("Numéro WhatsApp invalide. Format attendu : +212600000000");
       return;
     }
-
-    const payload: Record<string, string> = { whatsapp_number: whatsapp };
-    for (const key of SERVICE_KEYS) {
-      payload[key] = (fd.get(key) as string) ?? "";
-    }
-
     setSaving(true);
     setMessage("");
     const res = await fetch("/api/settings", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(settings),
     });
     setSaving(false);
     setMessage(
@@ -64,12 +70,12 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
     );
   }
 
+  if (loading) {
+    return <div className="text-sm text-gray-400">Chargement…</div>;
+  }
+
   return (
-    <form
-      ref={formRef}
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-8 max-w-xl"
-    >
+    <form onSubmit={handleSubmit} className="flex flex-col gap-8 max-w-xl">
       <div className="flex flex-col gap-3">
         <h2 className="font-playfair text-xl text-brun">WhatsApp</h2>
         <div className="flex flex-col gap-1.5">
@@ -78,8 +84,8 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
           </label>
           <input
             type="text"
-            name="whatsapp_number"
-            defaultValue={initial.whatsapp_number}
+            value={settings.whatsapp_number}
+            onChange={(e) => handleChange("whatsapp_number", e.target.value)}
             className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brun"
             placeholder="+212600000000"
           />
@@ -102,9 +108,9 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
               <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden focus-within:border-brun">
                 <input
                   type="number"
-                  name={key}
                   min="0"
-                  defaultValue={initial[key]}
+                  value={settings[key]}
+                  onChange={(e) => handleChange(key, e.target.value)}
                   className="flex-1 px-4 py-2.5 text-sm outline-none"
                 />
                 <span className="px-3 text-sm text-gray-400 bg-gray-50 border-l border-gray-200">
