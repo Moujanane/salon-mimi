@@ -92,7 +92,7 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
             type="text"
             value={values.whatsapp_number}
             onChange={(e) => handleChange("whatsapp_number", e.target.value)}
-            className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm outline-none focus:border-brun"
+            className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-brun"
             placeholder="+212600000000"
           />
           <p className="text-xs text-gray-400 mt-1">
@@ -117,7 +117,7 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
                   min="0"
                   value={values[key] ?? ""}
                   onChange={(e) => handleChange(key, e.target.value)}
-                  className="flex-1 px-4 py-2.5 text-sm outline-none"
+                  className="flex-1 px-4 py-2.5 text-sm text-gray-900 outline-none"
                 />
                 <span className="px-3 text-sm text-gray-400 bg-gray-50 border-l border-gray-200">
                   MAD
