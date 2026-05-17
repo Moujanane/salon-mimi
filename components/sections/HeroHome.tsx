@@ -81,7 +81,7 @@ function PhotoColumn({
 
 export default function HeroHome({ locale }: HeroHomeProps) {
   return (
-    <section className="relative h-screen flex flex-col md:flex-row overflow-hidden bg-nuit">
+    <section className="relative h-screen flex flex-col md:flex-row overflow-hidden bg-nuit pt-[57px]">
       {/* Halo ocre arrière-plan */}
       <div
         className="absolute inset-0 pointer-events-none"
@@ -93,7 +93,7 @@ export default function HeroHome({ locale }: HeroHomeProps) {
 
       {/* ── Colonne gauche ── */}
       <div
-        className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-14 pt-28 md:pt-0 relative z-10"
+        className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-14 relative z-10"
         style={{ height: "100%" }}
       >
         <div className="flex items-center gap-3 mb-7">
