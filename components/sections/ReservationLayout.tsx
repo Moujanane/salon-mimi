@@ -141,7 +141,11 @@ export default function ReservationLayout({ labels, prices }: Props) {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error();
+      const json = await res.json();
       setSubmitted(true);
+      if (json.whatsappLink) {
+        window.open(json.whatsappLink, "_blank");
+      }
     } catch {
       setError(labels.error);
     }

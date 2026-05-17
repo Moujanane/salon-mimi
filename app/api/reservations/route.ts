@@ -1,6 +1,8 @@
 // app/api/reservations/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { getSettings } from "@/lib/settings";
+import { generateWhatsAppLink } from "@/lib/whatsapp";
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
@@ -92,5 +94,25 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return NextResponse.json({ success: true }, { status: 201 });
+  const settings = await getSettings();
+  const whatsappLink = generateWhatsAppLink(
+    {
+      nom,
+      telephone,
+      service,
+      dateSouhaitee: date_souhaitee
+        ? `${date_souhaitee}${heure_souhaitee ? " à " + heure_souhaitee : ""}`
+        : undefined,
+      message:
+        [
+          nombre_personnes ? `Personnes : ${nombre_personnes}` : null,
+          message || null,
+        ]
+          .filter(Boolean)
+          .join(" — ") || undefined,
+    },
+    settings.whatsapp_number,
+  );
+
+  return NextResponse.json({ success: true, whatsappLink }, { status: 201 });
 }
