@@ -1,4 +1,10 @@
-export default function LocationSection({ locale }: { locale: string }) {
+export default function LocationSection({
+  locale,
+  whatsappNumber,
+}: {
+  locale: string;
+  whatsappNumber: string;
+}) {
   const content = {
     fr: {
       badge: "Où nous trouver",
@@ -86,10 +92,10 @@ export default function LocationSection({ locale }: { locale: string }) {
               WhatsApp
             </div>
             <a
-              href="https://wa.me/212710388204"
+              href={`https://wa.me/${whatsappNumber}`}
               className="text-white hover:text-ocre text-[14px] transition-colors"
             >
-              +212 710 388 204
+              {whatsappNumber}
             </a>
           </div>
           <a

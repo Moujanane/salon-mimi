@@ -8,8 +8,12 @@ export interface ReservationData {
   message?: string;
 }
 
-export function generateWhatsAppLink(data: ReservationData): string {
-  const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "212710388204";
+export function generateWhatsAppLink(
+  data: ReservationData,
+  whatsappNumber?: string,
+): string {
+  const number =
+    whatsappNumber ?? process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? "212710388204";
   const text = [
     `Bonjour Mimi, je souhaite réserver une prestation.`,
     `Nom : ${data.nom}`,

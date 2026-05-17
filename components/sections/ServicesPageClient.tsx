@@ -110,7 +110,15 @@ const SERVICES: ServiceData[] = [
   },
 ];
 
-export default function ServicesPageClient({ locale }: { locale: string }) {
+interface ServicesPageClientProps {
+  locale: string;
+  prices: Record<string, string>;
+}
+
+export default function ServicesPageClient({
+  locale,
+  prices,
+}: ServicesPageClientProps) {
   const [active, setActive] = useState(0);
   const [leaving, setLeaving] = useState<number | null>(null);
 
@@ -220,7 +228,9 @@ export default function ServicesPageClient({ locale }: { locale: string }) {
                 <p className="text-[10px] tracking-[3px] uppercase text-white/55 font-inter mb-4">
                   À partir de{" "}
                   <span className="text-ocre font-bold">
-                    {s.price.replace("dès ", "")}
+                    {prices[s.id] != null
+                      ? `${prices[s.id]} MAD`
+                      : s.price.replace("dès ", "")}
                   </span>
                 </p>
                 <Link

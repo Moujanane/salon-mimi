@@ -24,6 +24,22 @@ export default function AdminLayout({
             ← Retour au site
           </a>
         </header>
+        <nav className="bg-white border-b border-gray-100 px-6">
+          <div className="max-w-6xl mx-auto flex gap-6">
+            <a
+              href="/admin/dashboard"
+              className="text-sm text-gray-600 hover:text-brun py-3 border-b-2 border-transparent hover:border-brun transition-colors"
+            >
+              Réservations
+            </a>
+            <a
+              href="/admin/settings"
+              className="text-sm text-gray-600 hover:text-brun py-3 border-b-2 border-transparent hover:border-brun transition-colors"
+            >
+              Paramètres
+            </a>
+          </div>
+        </nav>
         <main className="max-w-6xl mx-auto px-4 py-10">{children}</main>
       </body>
     </html>

@@ -1,3 +1,5 @@
+import { getSettings } from "@/lib/settings";
+
 const content: Record<
   string,
   {
@@ -41,6 +43,7 @@ export default async function ContactPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const settings = await getSettings();
   const data = content[locale] ?? content.fr;
 
   return (
@@ -58,7 +61,7 @@ export default async function ContactPage({
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <a
-            href="https://wa.me/212710388204"
+            href={`https://wa.me/${settings.whatsapp_number}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 bg-[#25D366] text-white text-center py-4 rounded-full font-medium hover:bg-[#128C7E] transition-colors"

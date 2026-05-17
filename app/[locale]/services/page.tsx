@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ServicesPageClient from "@/components/sections/ServicesPageClient";
+import { getSettings } from "@/lib/settings";
 
 export async function generateMetadata({
   params,
@@ -41,5 +42,20 @@ export default async function ServicesPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  return <ServicesPageClient locale={locale} />;
+  const settings = await getSettings();
+
+  const prices: Record<string, string> = {
+    "tresses-africaines": settings.price_tresses_africaines,
+    "tresses-et-nattes": settings.price_tresses_et_nattes,
+    "box-braids": settings.price_box_braids,
+    "fulani-braids": settings.price_tresses_fulani,
+    "boho-braids": settings.price_tresses_boho,
+    "locks-dreads": settings.price_locks_dreads,
+    "cheveux-attaches": settings.price_cheveux_attaches,
+    "perruques-tissage": settings.price_perruques_tissage,
+    colorations: settings.price_colorations,
+    "ongles-soins-epilation": settings.price_ongles_soins_epilation,
+  };
+
+  return <ServicesPageClient locale={locale} prices={prices} />;
 }

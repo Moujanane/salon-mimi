@@ -101,9 +101,10 @@ interface Props {
     success: string;
     error: string;
   };
+  prices: Record<string, string>;
 }
 
-export default function ReservationLayout({ labels }: Props) {
+export default function ReservationLayout({ labels, prices }: Props) {
   const searchParams = useSearchParams();
   const serviceParam = searchParams.get("service") ?? "tresses-africaines";
 
@@ -351,7 +352,9 @@ export default function ReservationLayout({ labels }: Props) {
                 </p>
                 <p className="text-[10px] tracking-[3px] uppercase text-white/50 font-inter">
                   À partir de{" "}
-                  <span className="text-ocre font-bold">{s.price}</span>
+                  <span className="text-ocre font-bold">
+                    {prices[s.id] ?? s.price} MAD
+                  </span>
                 </p>
               </div>
             </div>
