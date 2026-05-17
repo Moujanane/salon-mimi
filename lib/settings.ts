@@ -20,7 +20,11 @@ export async function getSettings(): Promise<Settings> {
     .from("settings")
     .select("key, value");
 
-  if (error || !data) {
+  if (error || !data || data.length === 0) {
+    console.error(
+      "[getSettings] Erreur ou table vide:",
+      error?.message ?? "data.length=" + (data?.length ?? "null"),
+    );
     return {
       whatsapp_number: "+212600000000",
       price_tresses_africaines: "150",
