@@ -2,6 +2,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const windowMs = 10 * 60 * 1000;
+  const maxRequests = 5;
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  if (entry.count >= maxRequests) return false;
+  entry.count++;
+  return true;
+}
+
 const VALID_SERVICES = [
   "Tresses africaines",
   "Tresses et nattes",
@@ -16,8 +32,24 @@ const VALID_SERVICES = [
 ];
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: "Trop de tentatives, réessaie dans 10 minutes." },
+      { status: 429 },
+    );
+  }
+
   const body = await request.json();
-  const { nom, telephone, service, date_souhaitee, message } = body;
+  const {
+    nom,
+    telephone,
+    service,
+    date_souhaitee,
+    heure_souhaitee,
+    nombre_personnes,
+    message,
+  } = body;
 
   if (
     !nom ||
@@ -46,6 +78,8 @@ export async function POST(request: NextRequest) {
     telephone,
     service,
     date_souhaitee: date_souhaitee || null,
+    heure_souhaitee: heure_souhaitee || null,
+    nombre_personnes: nombre_personnes || null,
     message: message || null,
     statut: "en_attente",
   });

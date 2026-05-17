@@ -121,18 +121,21 @@ export default function ReservationLayout({ locale, labels }: Props) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = {
-      name: (form.elements.namedItem("name") as HTMLInputElement).value,
-      phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
+      nom: (form.elements.namedItem("name") as HTMLInputElement).value,
+      telephone: (form.elements.namedItem("phone") as HTMLInputElement).value,
       service: activeSvc.label,
-      date: (form.elements.namedItem("date") as HTMLInputElement).value,
-      time: (form.elements.namedItem("time") as HTMLInputElement).value,
-      persons: (form.elements.namedItem("persons") as HTMLSelectElement).value,
+      date_souhaitee: (form.elements.namedItem("date") as HTMLInputElement)
+        .value,
+      heure_souhaitee: (form.elements.namedItem("time") as HTMLInputElement)
+        .value,
+      nombre_personnes: (
+        form.elements.namedItem("persons") as HTMLSelectElement
+      ).value,
       message: (form.elements.namedItem("message") as HTMLTextAreaElement)
         .value,
-      locale,
     };
     try {
-      const res = await fetch("/api/reservation", {
+      const res = await fetch("/api/reservations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
