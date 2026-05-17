@@ -18,10 +18,6 @@ async function getAuthUser() {
 }
 
 export async function GET() {
-  const user = await getAuthUser();
-  if (!user)
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-
   const { data, error } = await supabaseAdmin
     .from("settings")
     .select("key, value");

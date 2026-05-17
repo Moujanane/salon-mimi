@@ -37,12 +37,16 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
 
   useEffect(() => {
     fetch("/api/settings")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
       .then((data) => {
         setSettings(data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("[SettingsForm] fetch /api/settings:", err.message);
         setLoading(false);
       });
   }, []);
