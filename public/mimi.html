@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+    <meta name="theme-color" content="#1a0a00" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Mimi Planning" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <title>Mimi Coiffure — Planning</title>
+    <link rel="manifest" href="/mimi-manifest.json" />
+    <link rel="apple-touch-icon" href="/mimi-icon-192.png" />
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #faf8f5;
+      }
+
+      /* Ecran PIN */
+      #pin-screen {
+        min-height: 100vh;
+        background: #1a0a00;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      #pin-screen .card {
+        width: 100%;
+        max-width: 360px;
+      }
+      #pin-screen .logo {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      #pin-screen .logo .icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+      #pin-screen .logo h1 {
+        color: white;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      #pin-screen .logo p {
+        color: #c9a96e;
+        font-size: 14px;
+      }
+      #pin-screen .form {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 24px;
+      }
+      #pin-screen label {
+        display: block;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 12px;
+      }
+      #pin-screen input {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.2);
+        border: 2px solid transparent;
+        border-radius: 12px;
+        padding: 16px;
+        color: white;
+        font-size: 28px;
+        text-align: center;
+        letter-spacing: 12px;
+        outline: none;
+      }
+      #pin-screen input:focus {
+        border-color: #c9a96e;
+      }
+      #pin-screen input::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 4px;
+        font-size: 20px;
+      }
+      #pin-error {
+        color: #f87171;
+        font-size: 13px;
+        margin-top: 8px;
+        text-align: center;
+        display: none;
+      }
+      #pin-btn {
+        width: 100%;
+        margin-top: 16px;
+        background: #c9a96e;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      #pin-btn:disabled {
+        opacity: 0.5;
+      }
+
+      /* Dashboard */
+      #dashboard {
+        display: none;
+        min-height: 100vh;
+      }
+      #header {
+        background: #1a0a00;
+        padding: 32px 16px 16px;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+      #header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      #header h1 {
+        color: white;
+        font-size: 20px;
+        font-weight: 700;
+      }
+      #header-date {
+        color: #c9a96e;
+        font-size: 12px;
+        margin-top: 2px;
+      }
+      #refresh-btn {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 8px 12px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      #filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .filter-btn {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+      .filter-btn.active {
+        background: #c9a96e;
+      }
+
+      #content {
+        padding: 16px;
+      }
+      .empty {
+        text-align: center;
+        padding: 64px 0;
+        color: #9ca3af;
+        font-size: 14px;
+      }
+      .empty .empty-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+      }
+
+      .card-resa {
+        background: white;
+        border-radius: 16px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+      .card-date {
+        background: #f9fafb;
+        padding: 8px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .card-date-text {
+        font-size: 12px;
+        font-weight: 500;
+        color: #374151;
+      }
+      .card-date-heure {
+        color: #c9a96e;
+        margin-left: 8px;
+      }
+      .badge {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-weight: 500;
+      }
+      .badge.en_attente {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .badge.confirmee {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .badge.annulee {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+      .card-body {
+        padding: 12px 16px;
+      }
+      .card-row {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .card-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .card-nom {
+        font-weight: 700;
+        color: #1a0a00;
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .card-service {
+        color: #c9a96e;
+        font-size: 13px;
+        font-weight: 500;
+        margin-top: 2px;
+      }
+      .card-personnes {
+        color: #9ca3af;
+        font-size: 11px;
+        margin-top: 2px;
+      }
+      .card-message {
+        color: #6b7280;
+        font-size: 11px;
+        margin-top: 4px;
+        font-style: italic;
+      }
+      .wa-btn {
+        flex-shrink: 0;
+        background: #25d366;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 8px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        cursor: pointer;
+      }
+      .card-tel {
+        color: #9ca3af;
+        font-size: 11px;
+        margin-top: 8px;
+      }
+      .statut-btns {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .statut-btn {
+        flex: 1;
+        font-size: 11px;
+        padding: 6px;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        background: white;
+        color: #374151;
+        cursor: pointer;
+      }
+      .statut-btn.active {
+        background: #f3f4f6;
+        color: #9ca3af;
+        border-color: #f3f4f6;
+        cursor: default;
+      }
+      .statut-btn:disabled {
+        opacity: 0.4;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Ecran PIN -->
+    <div id="pin-screen">
+      <div class="card">
+        <div class="logo">
+          <div class="icon">✂️</div>
+          <h1>Mimi Coiffure</h1>
+          <p>Planning des réservations</p>
+        </div>
+        <div class="form">
+          <label for="pin-input">Entre ton code</label>
+          <input
+            id="pin-input"
+            type="password"
+            inputmode="numeric"
+            maxlength="6"
+            placeholder="• • • •"
+            autocomplete="off"
+          />
+          <div id="pin-error">Code incorrect. Réessaie.</div>
+          <button id="pin-btn" onclick="submitPin()">
+            Voir mes réservations
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard">
+      <div id="header">
+        <div id="header-top">
+          <div>
+            <h1>✂️ Mimi Coiffure</h1>
+            <div id="header-date"></div>
+          </div>
+          <button id="refresh-btn" onclick="loadReservations()">
+            🔄 Actualiser
+          </button>
+        </div>
+        <div id="filters">
+          <button
+            class="filter-btn active"
+            onclick="setFiltre('aujourd_hui', this)"
+          >
+            Aujourd'hui (<span id="count-today">0</span>)
+          </button>
+          <button class="filter-btn" onclick="setFiltre('semaine', this)">
+            Semaine (<span id="count-semaine">0</span>)
+          </button>
+          <button class="filter-btn" onclick="setFiltre('tout', this)">
+            Tout (<span id="count-tout">0</span>)
+          </button>
+        </div>
+      </div>
+      <div id="content"></div>
+    </div>
+
+    <script>
+      var allReservations = [];
+      var currentPin = "";
+      var currentFiltre = "aujourd_hui";
+
+      var STATUT_LABELS = {
+        en_attente: "En attente",
+        confirmee: "Confirmée",
+        annulee: "Annulée",
+      };
+
+      document.getElementById("header-date").textContent =
+        new Date().toLocaleDateString("fr-FR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        });
+
+      document
+        .getElementById("pin-input")
+        .addEventListener("keydown", function (e) {
+          if (e.key === "Enter") submitPin();
+        });
+
+      function isToday(d) {
+        if (!d) return false;
+        var today = new Date();
+        var date = new Date(d);
+        return (
+          date.getDate() === today.getDate() &&
+          date.getMonth() === today.getMonth() &&
+          date.getFullYear() === today.getFullYear()
+        );
+      }
+
+      function isThisWeek(d) {
+        if (!d) return false;
+        var today = new Date();
+        var date = new Date(d);
+        var diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
+        return diff >= -1 && diff <= 7;
+      }
+
+      function formatDate(d) {
+        if (!d) return "Date non précisée";
+        return new Date(d).toLocaleDateString("fr-FR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        });
+      }
+
+      function submitPin() {
+        var pin = document.getElementById("pin-input").value.trim();
+        if (pin.length < 4) return;
+        var btn = document.getElementById("pin-btn");
+        btn.disabled = true;
+        btn.textContent = "Chargement…";
+        document.getElementById("pin-error").style.display = "none";
+        fetch("/api/mimi?pin=" + encodeURIComponent(pin))
+          .then(function (res) {
+            if (!res.ok) throw new Error("PIN incorrect");
+            return res.json();
+          })
+          .then(function (data) {
+            currentPin = pin;
+            allReservations = data.reservations || [];
+            document.getElementById("pin-screen").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+            renderReservations();
+          })
+          .catch(function () {
+            document.getElementById("pin-error").style.display = "block";
+            btn.disabled = false;
+            btn.textContent = "Voir mes réservations";
+          });
+      }
+
+      function loadReservations() {
+        fetch("/api/mimi?pin=" + encodeURIComponent(currentPin))
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (data) {
+            allReservations = data.reservations || [];
+            renderReservations();
+          });
+      }
+
+      function setFiltre(f, btn) {
+        currentFiltre = f;
+        document.querySelectorAll(".filter-btn").forEach(function (b) {
+          b.classList.remove("active");
+        });
+        btn.classList.add("active");
+        renderReservations();
+      }
+
+      function renderReservations() {
+        var todayList = allReservations.filter(function (r) {
+          return isToday(r.date_souhaitee);
+        });
+        var semaineList = allReservations.filter(function (r) {
+          return isThisWeek(r.date_souhaitee);
+        });
+        document.getElementById("count-today").textContent = todayList.length;
+        document.getElementById("count-semaine").textContent =
+          semaineList.length;
+        document.getElementById("count-tout").textContent =
+          allReservations.length;
+
+        var filtered =
+          currentFiltre === "aujourd_hui"
+            ? todayList
+            : currentFiltre === "semaine"
+              ? semaineList
+              : allReservations;
+
+        var content = document.getElementById("content");
+        if (filtered.length === 0) {
+          var msg =
+            currentFiltre === "aujourd_hui"
+              ? "Aucune réservation aujourd'hui"
+              : currentFiltre === "semaine"
+                ? "Aucune réservation cette semaine"
+                : "Aucune réservation";
+          content.innerHTML =
+            '<div class="empty"><div class="empty-icon">🗓️</div><p>' +
+            msg +
+            "</p></div>";
+          return;
+        }
+
+        content.innerHTML = filtered
+          .map(function (r) {
+            var tel = r.telephone.replace(/[^0-9]/g, "");
+            return (
+              '<div class="card-resa" id="card-' +
+              r.id +
+              '">' +
+              '<div class="card-date">' +
+              '<span class="card-date-text">' +
+              formatDate(r.date_souhaitee) +
+              (r.heure_souhaitee
+                ? '<span class="card-date-heure">à ' +
+                  r.heure_souhaitee +
+                  "</span>"
+                : "") +
+              "</span>" +
+              '<span class="badge ' +
+              r.statut +
+              '">' +
+              STATUT_LABELS[r.statut] +
+              "</span>" +
+              "</div>" +
+              '<div class="card-body">' +
+              '<div class="card-row">' +
+              '<div class="card-info">' +
+              '<div class="card-nom">' +
+              escHtml(r.nom) +
+              "</div>" +
+              '<div class="card-service">' +
+              escHtml(r.service) +
+              "</div>" +
+              (r.nombre_personnes
+                ? '<div class="card-personnes">' +
+                  r.nombre_personnes +
+                  " personne</div>"
+                : "") +
+              (r.message
+                ? '<div class="card-message">&ldquo;' +
+                  escHtml(r.message) +
+                  "&rdquo;</div>"
+                : "") +
+              "</div>" +
+              '<a class="wa-btn" href="https://wa.me/' +
+              tel +
+              '" target="_blank" rel="noopener">📞 WA</a>' +
+              "</div>" +
+              '<div class="card-tel">' +
+              escHtml(r.telephone) +
+              "</div>" +
+              '<div class="statut-btns">' +
+              ["en_attente", "confirmee", "annulee"]
+                .map(function (s) {
+                  return (
+                    '<button class="statut-btn' +
+                    (r.statut === s ? " active" : "") +
+                    '"' +
+                    (r.statut === s
+                      ? " disabled"
+                      : " onclick=\"updateStatut('" +
+                        r.id +
+                        "','" +
+                        s +
+                        "')\"") +
+                    ">" +
+                    STATUT_LABELS[s] +
+                    "</button>"
+                  );
+                })
+                .join("") +
+              "</div>" +
+              "</div>" +
+              "</div>"
+            );
+          })
+          .join("");
+      }
+
+      function updateStatut(id, statut) {
+        fetch("/api/reservations/" + id, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ statut: statut }),
+        }).then(function (res) {
+          if (res.ok) {
+            allReservations = allReservations.map(function (r) {
+              return r.id === id ? Object.assign({}, r, { statut: statut }) : r;
+            });
+            renderReservations();
+          }
+        });
+      }
+
+      function escHtml(str) {
+        if (!str) return "";
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+    </script>
+  </body>
+</html>

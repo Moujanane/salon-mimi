@@ -2,7 +2,7 @@
   "name": "Mimi Coiffure — Planning",
   "short_name": "Mimi Planning",
   "description": "Réservations du salon Mimi Coiffure",
-  "start_url": "/mimi",
+  "start_url": "/mimi.html",
   "display": "standalone",
   "background_color": "#1a0a00",
   "theme_color": "#1a0a00",
