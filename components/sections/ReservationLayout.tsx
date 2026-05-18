@@ -143,7 +143,10 @@ export default function ReservationLayout({ labels, prices }: Props) {
       });
       if (!res.ok) throw new Error();
       const json = await res.json();
-      if (json.whatsappLink) setWhatsappLink(json.whatsappLink);
+      if (json.whatsappLink) {
+        setWhatsappLink(json.whatsappLink);
+        window.location.href = json.whatsappLink;
+      }
       setSubmitted(true);
     } catch {
       setError(labels.error);
