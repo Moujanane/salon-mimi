@@ -33,7 +33,64 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 3. Fichiers touchés (session mai 2026)
+## 3. Nouveautés — session 18 mai 2026
+
+### PWA mobile pour Mimi (planning réservations)
+
+- Fichier : `public/mimi.html` — page HTML vanilla complète, hors React/Next.js
+- API : `app/api/mimi/route.ts` — vérifie le PIN (`MIMI_PIN` env var) et retourne les réservations
+- PIN actuel : `1993` (variable Railway `MIMI_PIN`)
+- URL d'accès : `https://mimi-coiffure.com/mimi.html`
+- Installation Android : Chrome > 3 points > "Ajouter à l'écran d'accueil"
+- Le middleware exclut `/mimi*` de l'i18n (ligne `if (pathname.startsWith("/mimi"))`)
+- **Leçon critique** : ne jamais mettre cette page dans `app/mimi/page.tsx` — le root layout Next.js injecte `<html><body>` et cause l'erreur React #418 (hydration mismatch) irrésoluble. La solution est `public/mimi.html` servi directement.
+
+### Notifications email à chaque réservation
+
+- Lib : `lib/sendNotificationEmail.ts` — utilise Resend
+- Appelé dans `app/api/reservations/route.ts` après INSERT réussi
+- Expéditeur : `onboarding@resend.dev` (domaine Resend gratuit, 1 domaine custom déjà utilisé par atlas-swincar)
+- Destinataire : configurable dans `/admin/settings` > champ "Email de notification"
+- Variable Railway requise : `RESEND_API_KEY`
+- La valeur est stockée dans Supabase table `settings`, clé `notification_email`
+
+### Settings admin — champ notification_email
+
+- Ajouté dans `lib/settings.ts` (type Settings + DEFAULTS)
+- Ajouté dans `components/admin/SettingsForm.tsx` (section Notifications)
+- Ajouté dans `app/api/settings/route.ts` (allowedKeys)
+- **Leçon** : l'API settings utilisait `update` pur — si la clé n'existe pas en base, rien ne s'enregistre. Corrigé en `upsert` avec `onConflict: "key"`. Ne jamais inclure `updated_at` dans l'upsert — cette colonne n'existe pas dans la table settings.
+
+### SEO — optimisations ciblées
+
+- Keyword cible : "salon de coiffure Rasta et Africaine Marrakech"
+- Title FR : "Salon Mimi — Tresses Rasta & Africaines Marrakech | Jamaa El Fna"
+- Description FR : contient "Rasta", "Africaine", "Marrakech", "Place Jamaa El Fna — la place la plus touristique de la ville"
+- FAQ schema ajouté (4 Q&R) pour les featured snippets Google
+- URL JSON-LD corrigée : `salonmimi-marrakech.com` → `mimi-coiffure.com`
+- Google Search Console configuré + sitemap soumis
+- Fiche TripAdvisor créée (en attente validation)
+
+### Performances — score PageSpeed mobile
+
+- Avant : 81/100
+- Après : 99/100
+- Cause du problème : `@import url("https://fonts.googleapis.com/...")` dans `globals.css` — requête externe bloquante (+2050ms)
+- Fix : suppression du `@import`, remplacement par `next/font/google` (`Playfair_Display` + `Inter`) dans le layout, variables CSS `--font-playfair` et `--font-inter` dans Tailwind
+- **Règle** : ne jamais utiliser `@import` Google Fonts dans un fichier CSS Next.js. Toujours utiliser `next/font/google`.
+
+### Tests de non-régression Playwright
+
+- Dossier : `e2e/site.spec.ts`
+- Config : `playwright.config.ts` (desktop + mobile Pixel 5)
+- Cible : `https://mimi-coiffure.com`
+- 11 tests couvrant : accueil, navigation, réservation, SEO, responsive
+- Commande : `npx playwright test --project=desktop`
+- **Règle** : toujours lancer les tests avant et après une modification de performance ou de layout
+
+---
+
+## 4. Fichiers touchés (session mai 2026 — première partie)
 
 ```
 components/sections/HeroHome.tsx          — titre, pt navbar, taille clamp
