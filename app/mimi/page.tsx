@@ -28,6 +28,9 @@ const STATUT_LABELS: Record<string, string> = {
   annulee: "Annulée",
 };
 
+const DARK = "#1a0a00";
+const GOLD = "#c9a96e";
+
 function formatDate(d: string | null) {
   if (!d) return "Date non précisée";
   return new Date(d).toLocaleDateString("fr-FR", {
@@ -155,17 +158,25 @@ export default function MimiPage() {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-[#1a0a00] flex flex-col items-center justify-center px-6">
+      <div
+        className="min-h-screen flex flex-col items-center justify-center px-6"
+        style={{ backgroundColor: DARK }}
+      >
         <div className="w-full max-w-sm">
           <div className="text-center mb-10">
             <div className="text-5xl mb-4">✂️</div>
             <h1 className="text-white text-2xl font-bold mb-1">
               Mimi Coiffure
             </h1>
-            <p className="text-[#c9a96e] text-sm">Planning des réservations</p>
+            <p className="text-sm" style={{ color: GOLD }}>
+              Planning des réservations
+            </p>
           </div>
 
-          <div className="bg-white/10 rounded-2xl p-6 backdrop-blur">
+          <div
+            className="rounded-2xl p-6"
+            style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
+          >
             <label className="block text-white text-sm mb-3 font-medium">
               Entre ton code
             </label>
@@ -180,7 +191,11 @@ export default function MimiPage() {
               }}
               onKeyDown={(e) => e.key === "Enter" && handlePinSubmit()}
               placeholder="• • • •"
-              className="w-full bg-white/20 text-white placeholder-white/40 text-center text-3xl tracking-[1rem] rounded-xl px-4 py-4 outline-none border-2 border-transparent focus:border-[#c9a96e]"
+              className="w-full text-white text-center text-3xl rounded-xl px-4 py-4 outline-none border-2 border-transparent"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.2)",
+                letterSpacing: "1rem",
+              }}
             />
             {pinError && (
               <p className="text-red-400 text-sm mt-2 text-center">
@@ -190,7 +205,8 @@ export default function MimiPage() {
             <button
               onClick={handlePinSubmit}
               disabled={loading}
-              className="w-full mt-4 bg-[#c9a96e] text-white font-semibold py-4 rounded-xl text-lg disabled:opacity-50 active:scale-95 transition-transform"
+              className="w-full mt-4 text-white font-semibold py-4 rounded-xl text-lg disabled:opacity-50"
+              style={{ backgroundColor: GOLD }}
             >
               {loading ? "Chargement…" : "Voir mes réservations"}
             </button>
@@ -201,13 +217,16 @@ export default function MimiPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#faf8f5]">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-[#1a0a00] px-4 pt-8 pb-4 sticky top-0 z-10">
+      <div
+        className="px-4 pt-8 pb-4 sticky top-0 z-10"
+        style={{ backgroundColor: DARK }}
+      >
         <div className="flex items-center justify-between mb-4">
           <div>
             <h1 className="text-white font-bold text-xl">✂️ Mimi Coiffure</h1>
-            <p className="text-[#c9a96e] text-xs">
+            <p className="text-xs" style={{ color: GOLD }}>
               {new Date().toLocaleDateString("fr-FR", {
                 weekday: "long",
                 day: "numeric",
@@ -217,29 +236,31 @@ export default function MimiPage() {
           </div>
           <button
             onClick={() => fetchReservations(pin)}
-            className="bg-white/10 text-white text-sm px-3 py-2 rounded-xl active:scale-95 transition-transform"
+            className="text-white text-sm px-3 py-2 rounded-xl"
+            style={{ backgroundColor: "rgba(255,255,255,0.1)" }}
           >
             🔄 Actualiser
           </button>
         </div>
 
         {/* Filtres */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {(
             [
               { key: "aujourd_hui", label: `Aujourd'hui (${todayCount})` },
-              { key: "semaine", label: `Cette semaine (${semaineCount})` },
+              { key: "semaine", label: `Semaine (${semaineCount})` },
               { key: "tout", label: `Tout (${reservations.length})` },
             ] as { key: Filtre; label: string }[]
           ).map(({ key, label }) => (
             <button
               key={key}
               onClick={() => setFiltre(key)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                filtre === key
-                  ? "bg-[#c9a96e] text-white"
-                  : "bg-white/10 text-white/70"
-              }`}
+              className="px-3 py-1 rounded-full text-xs font-medium transition-colors"
+              style={{
+                backgroundColor:
+                  filtre === key ? GOLD : "rgba(255,255,255,0.1)",
+                color: "white",
+              }}
             >
               {label}
             </button>
@@ -277,11 +298,11 @@ export default function MimiPage() {
             className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
           >
             {/* Bandeau date */}
-            <div className="bg-[#1a0a00]/5 px-4 py-2 flex items-center justify-between">
-              <span className="text-xs font-medium text-[#1a0a00]">
+            <div className="px-4 py-2 flex items-center justify-between bg-gray-50">
+              <span className="text-xs font-medium text-gray-700">
                 {formatDate(r.date_souhaitee)}
                 {r.heure_souhaitee && (
-                  <span className="ml-2 text-[#c9a96e]">
+                  <span className="ml-2" style={{ color: GOLD }}>
                     à {r.heure_souhaitee}
                   </span>
                 )}
@@ -297,16 +318,18 @@ export default function MimiPage() {
             <div className="px-4 py-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
-                  <p className="font-bold text-[#1a0a00] text-base truncate">
+                  <p
+                    className="font-bold text-base truncate"
+                    style={{ color: DARK }}
+                  >
                     {r.nom}
                   </p>
-                  <p className="text-[#c9a96e] text-sm font-medium">
+                  <p className="text-sm font-medium" style={{ color: GOLD }}>
                     {r.service}
                   </p>
                   {r.nombre_personnes && (
                     <p className="text-gray-400 text-xs mt-0.5">
                       {r.nombre_personnes} personne
-                      {r.nombre_personnes > 1 ? "s" : ""}
                     </p>
                   )}
                   {r.message && (
@@ -316,12 +339,12 @@ export default function MimiPage() {
                   )}
                 </div>
 
-                {/* Bouton WhatsApp */}
                 <a
                   href={`https://wa.me/${r.telephone.replace(/[^0-9]/g, "")}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-shrink-0 bg-[#25D366] text-white text-xs font-semibold px-3 py-2 rounded-xl active:scale-95 transition-transform"
+                  className="flex-shrink-0 text-white text-xs font-semibold px-3 py-2 rounded-xl"
+                  style={{ backgroundColor: "#25D366" }}
                 >
                   📞 WA
                 </a>
@@ -336,11 +359,12 @@ export default function MimiPage() {
                     key={s}
                     disabled={r.statut === s || updating === r.id}
                     onClick={() => updateStatut(r.id, s)}
-                    className={`flex-1 text-xs py-1.5 rounded-lg border transition-colors disabled:opacity-40 ${
+                    className="flex-1 text-xs py-1.5 rounded-lg border border-gray-200 text-gray-600 disabled:opacity-40"
+                    style={
                       r.statut === s
-                        ? "border-transparent bg-gray-100 text-gray-400"
-                        : "border-gray-200 text-gray-600 active:bg-gray-50"
-                    }`}
+                        ? { backgroundColor: "#f3f4f6", color: "#9ca3af" }
+                        : {}
+                    }
                   >
                     {STATUT_LABELS[s]}
                   </button>
@@ -351,7 +375,6 @@ export default function MimiPage() {
         ))}
       </div>
 
-      {/* Padding bottom pour éviter que le dernier élément soit caché */}
       <div className="h-8" />
     </div>
   );
