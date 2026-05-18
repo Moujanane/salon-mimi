@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 
 interface Reservation {
   id: string;
@@ -100,31 +100,7 @@ export default function MimiPage() {
     setReservations(data.reservations ?? []);
     setAuthenticated(true);
     setLoading(false);
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("mimi_pin", pin);
-    }
   }
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const saved = sessionStorage.getItem("mimi_pin");
-    if (!saved) return;
-    setPin(saved);
-    fetch(`/api/mimi?pin=${encodeURIComponent(saved)}`)
-      .then((res) => {
-        if (res.ok) {
-          return res.json().then((data) => {
-            setReservations(data.reservations ?? []);
-            setAuthenticated(true);
-          });
-        } else {
-          sessionStorage.removeItem("mimi_pin");
-        }
-      })
-      .catch(() => {
-        sessionStorage.removeItem("mimi_pin");
-      });
-  }, []);
 
   const filtered = reservations.filter((r) => {
     if (filtre === "aujourd_hui") return isToday(r.date_souhaitee);
