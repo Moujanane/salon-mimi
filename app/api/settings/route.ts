@@ -59,10 +59,7 @@ export async function PATCH(request: NextRequest) {
   for (const [key, value] of updates) {
     const { error } = await supabaseAdmin
       .from("settings")
-      .upsert(
-        { key, value: String(value), updated_at: new Date().toISOString() },
-        { onConflict: "key" },
-      );
+      .upsert({ key, value: String(value) }, { onConflict: "key" });
     if (error)
       return NextResponse.json({ error: error.message }, { status: 500 });
   }
