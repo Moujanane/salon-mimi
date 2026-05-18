@@ -103,20 +103,24 @@ export default function MimiPage() {
   }
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = sessionStorage.getItem("mimi_pin");
-      if (saved) {
-        setPin(saved);
-        fetch(`/api/mimi?pin=${encodeURIComponent(saved)}`).then((res) => {
-          if (res.ok) {
-            res.json().then((data) => {
-              setReservations(data.reservations ?? []);
-              setAuthenticated(true);
-            });
-          }
-        });
-      }
-    }
+    if (typeof window === "undefined") return;
+    const saved = sessionStorage.getItem("mimi_pin");
+    if (!saved) return;
+    setPin(saved);
+    fetch(`/api/mimi?pin=${encodeURIComponent(saved)}`)
+      .then((res) => {
+        if (res.ok) {
+          return res.json().then((data) => {
+            setReservations(data.reservations ?? []);
+            setAuthenticated(true);
+          });
+        } else {
+          sessionStorage.removeItem("mimi_pin");
+        }
+      })
+      .catch(() => {
+        sessionStorage.removeItem("mimi_pin");
+      });
   }, []);
 
   const filtered = reservations.filter((r) => {
