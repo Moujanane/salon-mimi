@@ -162,7 +162,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
             {labels.success}
           </h2>
           <p className="text-white/50 text-sm font-inter mb-6">
-            Clique ci-dessous pour envoyer ta demande sur WhatsApp.
+            Mimi vous contacte dès que possible pour confirmer.
           </p>
           {whatsappLink && (
             <a
@@ -171,7 +171,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
               rel="noopener noreferrer"
               className="inline-block bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm font-inter font-medium px-8 py-3.5 rounded-full transition-colors"
             >
-              Envoyer sur WhatsApp
+              WhatsApp non ouvert ? Cliquer ici
             </a>
           )}
         </div>
