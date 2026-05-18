@@ -18,8 +18,8 @@ const config: Config = {
         panneau: "#3D1A06",
       },
       fontFamily: {
-        playfair: ["Playfair Display", "serif"],
-        inter: ["Inter", "sans-serif"],
+        playfair: ["var(--font-playfair)", "serif"],
+        inter: ["var(--font-inter)", "sans-serif"],
         georgia: ["Georgia", "serif"],
       },
     },
