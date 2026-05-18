@@ -7,13 +7,13 @@ const intlMiddleware = createMiddleware(routing);
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/admin")) {
-    return intlMiddleware(request);
+  if (pathname.startsWith("/mimi")) {
+    return;
   }
 
   return intlMiddleware(request);
 }
 
 export const config = {
-  matcher: ["/((?!api|admin|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!api|admin|mimi|_next|_vercel|.*\\..*).*)"],
 };

@@ -1,0 +1,24 @@
+{
+  "name": "Mimi Coiffure — Planning",
+  "short_name": "Mimi Planning",
+  "description": "Réservations du salon Mimi Coiffure",
+  "start_url": "/mimi",
+  "display": "standalone",
+  "background_color": "#1a0a00",
+  "theme_color": "#1a0a00",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/mimi-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/mimi-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
