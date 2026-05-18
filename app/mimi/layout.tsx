@@ -28,11 +28,5 @@ export default function MimiLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <>
-      <link rel="manifest" href="/mimi-manifest.json" />
-      <link rel="apple-touch-icon" href="/mimi-icon-192.png" />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }

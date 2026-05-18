@@ -1,5 +1,7 @@
 "use client";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+
+export const dynamic = "force-dynamic";
 
 interface Reservation {
   id: string;
@@ -60,6 +62,7 @@ function isThisWeek(d: string | null) {
 }
 
 export default function MimiPage() {
+  const [mounted, setMounted] = useState(false);
   const [pin, setPin] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -68,6 +71,10 @@ export default function MimiPage() {
   const [error, setError] = useState("");
   const [updating, setUpdating] = useState<string | null>(null);
   const [pinError, setPinError] = useState("");
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchReservations = useCallback(async (currentPin: string) => {
     setLoading(true);
@@ -131,6 +138,8 @@ export default function MimiPage() {
     }
     setUpdating(null);
   }
+
+  if (!mounted) return null;
 
   if (!authenticated) {
     return (
