@@ -14,15 +14,15 @@ export const viewport: Viewport = {
 const BASE_URL = "https://salonmimi-marrakech.com";
 
 const titles: Record<string, string> = {
-  fr: "Salon Mimi — Tresses africaines Marrakech | Place Jamaa El Fna",
-  en: "Salon Mimi — African Hair Braiding Marrakech | Jamaa El Fna",
-  es: "Salon Mimi — Trenzas africanas Marrakech | Plaza Jamaa El Fna",
+  fr: "Salon Mimi — Tresses Rasta & Africaines Marrakech | Jamaa El Fna",
+  en: "Salon Mimi — Rasta & African Braids Marrakech | Jamaa El Fna",
+  es: "Salon Mimi — Trenzas Rasta y Africanas Marrakech | Jamaa El Fna",
 };
 
 const descriptions: Record<string, string> = {
-  fr: "Coiffures africaines authentiques au cœur de la médina de Marrakech. Box braids, knotless, locks, soins argan. Réservez en ligne.",
-  en: "Authentic African hairstyles in the heart of Marrakech Medina. Box braids, knotless braids, locks, argan treatments. Book online.",
-  es: "Peinados africanos auténticos en el corazón de la medina de Marrakech. Box braids, knotless, locks, tratamientos argán. Reserva en línea.",
+  fr: "Salon de coiffure Rasta et Africaine à Marrakech. Tresses africaines, box braids, locks, knotless — Place Jamaa El Fna, Médina. Réservez en ligne.",
+  en: "Rasta and African hair salon in Marrakech. African braids, box braids, locks, knotless — Jamaa El Fna Square, Medina. Book online.",
+  es: "Salón de coiffure Rasta y Africano en Marrakech. Trenzas africanas, box braids, locks, knotless — Plaza Jamaa El Fna, Medina. Reserva en línea.",
 };
 
 export async function generateMetadata({
@@ -66,10 +66,10 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "HairSalon",
   name: "Salon Mimi",
-  url: "https://salonmimi-marrakech.com",
+  url: "https://mimi-coiffure.com",
   telephone: "+212710388204",
   description:
-    "Salon de coiffure afro spécialisé en tresses africaines, knotless braids, locks et styles naturels. Situé près de la Place Jamaa El Fna, Médina de Marrakech.",
+    "Salon de coiffure Rasta et Africaine à Marrakech. Spécialisé en tresses africaines, box braids, locks, knotless braids. Situé Place Jamaa El Fna, Médina de Marrakech.",
   address: {
     "@type": "PostalAddress",
     streetAddress: "Place Jemaa el-Fna",
@@ -106,6 +106,45 @@ const jsonLd = {
   priceRange: "150–950 MAD",
 };
 
+const faqLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Où se trouve le salon Mimi à Marrakech ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Le salon Mimi est situé Place Jamaa El Fna, dans la Médina de Marrakech.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Quels services de tresses propose le salon Mimi ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Le salon Mimi propose des tresses africaines, tresses rasta, box braids, knotless braids, tresses Fulani, tresses Boho, locks et dreads, cheveux attachés, perruques et tissage.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Comment réserver au salon Mimi Marrakech ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Vous pouvez réserver en ligne directement sur mimi-coiffure.com ou contacter le salon par WhatsApp.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Quels sont les tarifs du salon Mimi Marrakech ?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Les tarifs du salon Mimi varient entre 65 MAD et 220 MAD selon la prestation. Les tresses africaines commencent à 125 MAD.",
+      },
+    },
+  ],
+};
+
 export default async function LocaleLayout({
   children,
   params,
@@ -122,6 +161,10 @@ export default async function LocaleLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
         />
       </head>
       <body>
