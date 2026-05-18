@@ -102,6 +102,25 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
       </div>
 
       <div className="flex flex-col gap-3">
+        <h2 className="font-playfair text-xl text-brun">Notifications</h2>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs text-gray-500 uppercase tracking-wide">
+            Email de notification des réservations
+          </label>
+          <input
+            type="email"
+            value={values.notification_email}
+            onChange={(e) => handleChange("notification_email", e.target.value)}
+            className="border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 outline-none focus:border-brun"
+            placeholder="mimi@exemple.com"
+          />
+          <p className="text-xs text-gray-400 mt-1">
+            Un email est envoyé à cette adresse à chaque nouvelle réservation.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3">
         <h2 className="font-playfair text-xl text-brun">
           Prix des services (MAD)
         </h2>

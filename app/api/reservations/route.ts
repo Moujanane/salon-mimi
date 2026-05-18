@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { getSettings } from "@/lib/settings";
 import { generateWhatsAppLink } from "@/lib/whatsapp";
+import { sendNotificationEmail } from "@/lib/sendNotificationEmail";
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
@@ -95,6 +96,19 @@ export async function POST(request: NextRequest) {
   }
 
   const settings = await getSettings();
+
+  if (settings.notification_email) {
+    sendNotificationEmail(settings.notification_email, {
+      nom,
+      telephone,
+      service,
+      date_souhaitee,
+      heure_souhaitee,
+      nombre_personnes,
+      message,
+    }).catch((err) => console.error("[email notification]", err));
+  }
+
   const whatsappLink = generateWhatsAppLink(
     {
       nom,

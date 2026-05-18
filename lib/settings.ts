@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 
 export type Settings = {
   whatsapp_number: string;
+  notification_email: string;
   price_tresses_africaines: string;
   price_tresses_et_nattes: string;
   price_box_braids: string;
@@ -17,6 +18,7 @@ export type Settings = {
 
 const DEFAULTS: Settings = {
   whatsapp_number: "+212600000000",
+  notification_email: "",
   price_tresses_africaines: "150",
   price_tresses_et_nattes: "80",
   price_box_braids: "200",

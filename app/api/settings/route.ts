@@ -36,6 +36,7 @@ export async function PATCH(request: NextRequest) {
   const body = await request.json();
   const allowedKeys = [
     "whatsapp_number",
+    "notification_email",
     "price_tresses_africaines",
     "price_tresses_et_nattes",
     "price_box_braids",

@@ -1,0 +1,56 @@
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+interface ReservationData {
+  nom: string;
+  telephone: string;
+  service: string;
+  date_souhaitee?: string;
+  heure_souhaitee?: string;
+  nombre_personnes?: string;
+  message?: string;
+}
+
+export async function sendNotificationEmail(
+  to: string,
+  reservation: ReservationData,
+) {
+  if (!to || !process.env.RESEND_API_KEY) return;
+
+  const date = reservation.date_souhaitee
+    ? new Date(reservation.date_souhaitee).toLocaleDateString("fr-FR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      })
+    : "Non précisée";
+
+  const heure = reservation.heure_souhaitee ?? "Non précisée";
+  const personnes = reservation.nombre_personnes ?? "1";
+  const messageClient = reservation.message ?? "—";
+
+  await resend.emails.send({
+    from: "Mimi Coiffure <reservations@mimi-coiffure.com>",
+    to,
+    subject: `Nouvelle réservation — ${reservation.nom} · ${reservation.service}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border:1px solid #eee;border-radius:12px;">
+        <h2 style="color:#1a0a00;margin-bottom:4px;">Nouvelle réservation</h2>
+        <p style="color:#c9a96e;font-size:14px;margin-top:0;">Salon Mimi Coiffure</p>
+        <hr style="border:none;border-top:1px solid #f0e8de;margin:16px 0;">
+        <table style="width:100%;font-size:14px;border-collapse:collapse;">
+          <tr><td style="padding:6px 0;color:#888;width:140px;">Client</td><td style="padding:6px 0;font-weight:600;color:#1a0a00;">${reservation.nom}</td></tr>
+          <tr><td style="padding:6px 0;color:#888;">Téléphone</td><td style="padding:6px 0;color:#1a0a00;">${reservation.telephone}</td></tr>
+          <tr><td style="padding:6px 0;color:#888;">Service</td><td style="padding:6px 0;color:#1a0a00;">${reservation.service}</td></tr>
+          <tr><td style="padding:6px 0;color:#888;">Date</td><td style="padding:6px 0;color:#1a0a00;">${date}</td></tr>
+          <tr><td style="padding:6px 0;color:#888;">Heure</td><td style="padding:6px 0;color:#1a0a00;">${heure}</td></tr>
+          <tr><td style="padding:6px 0;color:#888;">Personnes</td><td style="padding:6px 0;color:#1a0a00;">${personnes}</td></tr>
+          <tr><td style="padding:6px 0;color:#888;">Message</td><td style="padding:6px 0;color:#1a0a00;font-style:italic;">${messageClient}</td></tr>
+        </table>
+        <hr style="border:none;border-top:1px solid #f0e8de;margin:16px 0;">
+        <p style="font-size:12px;color:#aaa;text-align:center;">Mimi Coiffure · Marrakech</p>
+      </div>
+    `,
+  });
+}
