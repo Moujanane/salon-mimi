@@ -20,9 +20,9 @@ const titles: Record<string, string> = {
 };
 
 const descriptions: Record<string, string> = {
-  fr: "Salon de coiffure Rasta et Africaine à Marrakech. Tresses africaines, box braids, locks, knotless — Place Jamaa El Fna, Médina. Réservez en ligne.",
-  en: "Rasta and African hair salon in Marrakech. African braids, box braids, locks, knotless — Jamaa El Fna Square, Medina. Book online.",
-  es: "Salón de coiffure Rasta y Africano en Marrakech. Trenzas africanas, box braids, locks, knotless — Plaza Jamaa El Fna, Medina. Reserva en línea.",
+  fr: "Salon de coiffure Rasta et Africaine à Marrakech, Place Jamaa El Fna — la place la plus touristique de la ville. Tresses africaines, box braids, locks, knotless. Réservez en ligne.",
+  en: "Rasta and African hair salon in Marrakech, Jamaa El Fna Square — the most iconic square in the city. African braids, box braids, locks, knotless. Book online.",
+  es: "Salón de coiffure Rasta y Africano en Marrakech, Plaza Jamaa El Fna — la plaza más turística de la ciudad. Trenzas africanas, box braids, locks, knotless. Reserva en línea.",
 };
 
 export async function generateMetadata({
