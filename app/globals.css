@@ -7,6 +7,13 @@
     @apply bg-nuit text-white font-inter;
   }
 
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  button:focus-visible {
+    @apply outline-none ring-2 ring-ocre ring-offset-1 ring-offset-nuit;
+  }
+
   .animate-scroll-up {
     animation: scrollUp 22s linear infinite;
   }

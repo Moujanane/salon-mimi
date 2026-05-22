@@ -213,7 +213,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
                 value={activeIndex}
                 onChange={(e) => setActiveIndex(Number(e.target.value))}
                 required
-                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter appearance-none cursor-pointer"
+                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none cursor-pointer"
                 style={{ background: "rgba(255,255,255,0.06)" }}
               >
                 {SERVICES.map((s, i) => (
@@ -240,7 +240,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
                   type="text"
                   placeholder="Fatima Zahra..."
                   required
-                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter placeholder:text-white/25"
+                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-white/25"
                   style={{ background: "rgba(255,255,255,0.06)" }}
                 />
               </div>
@@ -253,7 +253,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
                   type="tel"
                   placeholder="+212 6..."
                   required
-                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter placeholder:text-white/25"
+                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-white/25"
                   style={{ background: "rgba(255,255,255,0.06)" }}
                 />
               </div>
@@ -270,7 +270,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
                   name="date"
                   type="date"
                   required
-                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter"
+                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter"
                   style={{ background: "rgba(255,255,255,0.06)" }}
                 />
               </div>
@@ -282,7 +282,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
                   name="time"
                   type="time"
                   required
-                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter"
+                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter"
                   style={{ background: "rgba(255,255,255,0.06)" }}
                 />
               </div>
@@ -294,7 +294,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
               </label>
               <select
                 name="persons"
-                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter appearance-none"
+                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none"
                 style={{ background: "rgba(255,255,255,0.06)" }}
               >
                 <option style={{ background: "#2d1005" }}>1 personne</option>
@@ -314,7 +314,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
                 name="message"
                 rows={3}
                 placeholder="Précisions sur le style, longueur souhaitée..."
-                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 outline-none transition-colors font-inter placeholder:text-white/25 resize-none"
+                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-white/25 resize-none"
                 style={{ background: "rgba(255,255,255,0.06)" }}
               />
             </div>
