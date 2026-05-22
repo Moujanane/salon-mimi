@@ -336,7 +336,7 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
 
                 <Link
                   href={`/${locale}/reservation?service=${encodeURIComponent(cat.bookId)}`}
-                  className="inline-flex items-center gap-3 bg-white text-brun text-sm font-medium px-7 py-3 rounded-full hover:bg-fond transition-colors duration-200 shadow-sm"
+                  className="inline-flex items-center gap-3 bg-fond text-brun text-sm font-medium px-7 py-3 rounded-full hover:bg-fond transition-colors duration-200 shadow-sm"
                 >
                   {ui.book}
                   <svg
@@ -373,7 +373,7 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
         </div>
 
         {/* Onglets catégories */}
-        <div className="flex gap-2 px-4 py-4 overflow-x-auto bg-white border-b border-or/10">
+        <div className="flex gap-2 px-4 py-4 overflow-x-auto bg-brun border-b border-ocre/10">
           {CATEGORIES.map((c, idx) => (
             <button
               key={c.id}
@@ -435,7 +435,7 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
               </p>
               <Link
                 href={`/${locale}/reservation?service=${encodeURIComponent(cat.bookId)}`}
-                className="inline-flex items-center gap-2 bg-white text-brun text-sm font-medium px-6 py-2.5 rounded-full"
+                className="inline-flex items-center gap-2 bg-fond text-brun text-sm font-medium px-6 py-2.5 rounded-full"
               >
                 {ui.book}
               </Link>
