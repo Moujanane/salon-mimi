@@ -1,7 +1,7 @@
 // app/sitemap.ts
 import { MetadataRoute } from "next";
 
-const BASE_URL = "https://salonmimi-marrakech.com";
+const BASE_URL = "https://mimi-coiffure.com";
 const locales = ["fr", "en", "es"];
 const pages = [
   "",

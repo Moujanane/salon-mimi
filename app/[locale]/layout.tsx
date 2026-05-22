@@ -27,7 +27,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const BASE_URL = "https://salonmimi-marrakech.com";
+const BASE_URL = "https://mimi-coiffure.com";
 
 const titles: Record<string, string> = {
   fr: "Salon Mimi — Tresses Rasta & Africaines Marrakech | Jamaa El Fna",

@@ -25,12 +25,12 @@ export async function generateMetadata({
     title: titles[locale] ?? titles.fr,
     description: descriptions[locale] ?? descriptions.fr,
     alternates: {
-      canonical: `https://salonmimi-marrakech.com/${locale}/services`,
+      canonical: `https://mimi-coiffure.com/${locale}/services`,
       languages: {
-        fr: "https://salonmimi-marrakech.com/fr/services",
-        en: "https://salonmimi-marrakech.com/en/services",
-        es: "https://salonmimi-marrakech.com/es/services",
-        "x-default": "https://salonmimi-marrakech.com/fr/services",
+        fr: "https://mimi-coiffure.com/fr/services",
+        en: "https://mimi-coiffure.com/en/services",
+        es: "https://mimi-coiffure.com/es/services",
+        "x-default": "https://mimi-coiffure.com/fr/services",
       },
     },
   };
