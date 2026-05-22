@@ -87,27 +87,27 @@ export default async function ContactPage({
         <h1 className="font-playfair text-5xl text-or">{data.title}</h1>
       </div>
       <div className="max-w-3xl mx-auto px-4 py-16 space-y-10">
-        <div className="bg-white rounded-2xl p-8 border border-or/20">
+        <div className="bg-panneau rounded-2xl p-8 border border-ocre/15">
           <p className="text-xl font-playfair text-brun mb-2">
             📍 {data.address}
           </p>
           <p className="text-brun mt-6 font-medium">{data.hours}</p>
-          <p className="text-gray-600">{data.hoursDetail}</p>
+          <p className="text-white/60">{data.hoursDetail}</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-4">
           <a
             href={`https://wa.me/${settings.whatsapp_number}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-[#25D366] text-white text-center py-4 rounded-full font-medium hover:bg-[#128C7E] transition-colors"
+            className="flex-1 bg-whatsapp text-white text-center py-4 rounded-full font-medium hover:bg-whatsapp-hover transition-colors"
           >
             {data.waLabel}
           </a>
           <a
-            href="https://www.instagram.com/"
+            href="https://www.instagram.com/salon.mimi.marrakech"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-center py-4 rounded-full font-medium hover:opacity-90 transition-opacity"
+            className="flex-1 bg-panneau border border-ocre/20 text-white text-center py-4 rounded-full font-medium hover:border-ocre/50 transition-colors"
           >
             {data.igLabel}
           </a>
