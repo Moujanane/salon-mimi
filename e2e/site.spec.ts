@@ -25,6 +25,11 @@ test.describe("Page d'accueil", () => {
 test.describe("Navigation", () => {
   test("le menu contient les liens principaux", async ({ page }) => {
     await page.goto("/fr");
+    // Sur mobile, les liens sont dans un drawer burger — on l'ouvre d'abord
+    const burger = page.getByRole("button", { name: /menu/i });
+    if (await burger.isVisible()) {
+      await burger.click();
+    }
     await expect(
       page.getByRole("link", { name: /services/i }).first(),
     ).toBeVisible();
