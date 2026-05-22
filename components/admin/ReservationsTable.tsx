@@ -133,7 +133,7 @@ export default function ReservationsTable({
                       disabled={updating === r.id}
                       value={r.statut}
                       onChange={(e) => updateStatut(r.id, e.target.value)}
-                      className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-ocre disabled:opacity-50"
+                      className="border border-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-ocre focus-visible:ring-2 focus-visible:ring-ocre focus-visible:ring-offset-1 disabled:opacity-50"
                     >
                       {STATUTS.map((s) => (
                         <option key={s} value={s}>
