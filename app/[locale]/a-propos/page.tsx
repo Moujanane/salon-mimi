@@ -1,3 +1,39 @@
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  const titles: Record<string, string> = {
+    fr: "À propos — Salon Mimi, coiffeuse africaine à Marrakech | Jamaa El Fna",
+    en: "About — Salon Mimi, African hairstylist in Marrakech | Jamaa El Fna",
+    es: "Sobre nosotros — Salon Mimi, peluquera africana en Marrakech | Jamaa El Fna",
+  };
+
+  const descriptions: Record<string, string> = {
+    fr: "Mimi, coiffeuse ivoirienne à Marrakech, spécialiste des tresses africaines, locks et knotless braids. Produits naturels : huile d'argan, karité, henné. Place Jamaa El Fna.",
+    en: "Mimi, Ivorian hairstylist in Marrakech, specialist in African braids, locks and knotless braids. Natural products: argan oil, shea butter, henna. Jamaa El Fna Square.",
+    es: "Mimi, peluquera marfileña en Marrakech, especialista en trenzas africanas, locks y knotless braids. Productos naturales: aceite de argán, karité, henna. Plaza Jamaa El Fna.",
+  };
+
+  return {
+    title: titles[locale] ?? titles.fr,
+    description: descriptions[locale] ?? descriptions.fr,
+    alternates: {
+      canonical: `https://mimi-coiffure.com/${locale}/a-propos`,
+      languages: {
+        fr: "https://mimi-coiffure.com/fr/a-propos",
+        en: "https://mimi-coiffure.com/en/a-propos",
+        es: "https://mimi-coiffure.com/es/a-propos",
+        "x-default": "https://mimi-coiffure.com/fr/a-propos",
+      },
+    },
+  };
+}
+
 const content: Record<string, { title: string; body: string[] }> = {
   fr: {
     title: "À propos de Salon Mimi",

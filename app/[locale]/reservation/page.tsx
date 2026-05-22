@@ -3,6 +3,41 @@ import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import ReservationLayout from "@/components/sections/ReservationLayout";
 import { getSettings } from "@/lib/settings";
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  const titles: Record<string, string> = {
+    fr: "Réserver au Salon Mimi Marrakech — Tresses africaines en ligne",
+    en: "Book at Salon Mimi Marrakech — African braids online booking",
+    es: "Reservar en Salon Mimi Marrakech — Trenzas africanas reserva online",
+  };
+
+  const descriptions: Record<string, string> = {
+    fr: "Prenez rendez-vous en ligne au Salon Mimi Marrakech. Tresses africaines, knotless braids, box braids, locks. Confirmation par WhatsApp. Place Jamaa El Fna.",
+    en: "Book online at Salon Mimi Marrakech. African braids, knotless braids, box braids, locks. WhatsApp confirmation. Jamaa El Fna Square.",
+    es: "Reserva online en Salon Mimi Marrakech. Trenzas africanas, knotless braids, box braids, locks. Confirmación por WhatsApp. Plaza Jamaa El Fna.",
+  };
+
+  return {
+    title: titles[locale] ?? titles.fr,
+    description: descriptions[locale] ?? descriptions.fr,
+    alternates: {
+      canonical: `https://mimi-coiffure.com/${locale}/reservation`,
+      languages: {
+        fr: "https://mimi-coiffure.com/fr/reservation",
+        en: "https://mimi-coiffure.com/en/reservation",
+        es: "https://mimi-coiffure.com/es/reservation",
+        "x-default": "https://mimi-coiffure.com/fr/reservation",
+      },
+    },
+  };
+}
 
 export default async function ReservationPage({
   params,
