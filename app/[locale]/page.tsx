@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import HeroHome from "@/components/sections/HeroHome";
 import TrustBadge from "@/components/sections/TrustBadge";
+import GoogleReviews from "@/components/sections/GoogleReviews";
 import ServicesGrid from "@/components/sections/ServicesGrid";
 import PackageSignature from "@/components/sections/PackageSignature";
 import CTAFinal from "@/components/sections/CTAFinal";
@@ -38,6 +39,7 @@ export default async function HomePage({
         ctaServices={t("cta_services")}
       />
       <TrustBadge locale={locale} />
+      <GoogleReviews locale={locale} />
       <ServicesGrid
         services={featuredServices}
         locale={locale}
