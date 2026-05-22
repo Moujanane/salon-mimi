@@ -146,7 +146,7 @@ export default function ServicesLookbook({
                 <span className="font-medium text-sm">
                   {getServiceName(service, locale)}
                 </span>
-                <span className="block text-xs text-brun/40 mt-0.5">
+                <span className="block text-xs text-brun/65 mt-0.5">
                   {getServiceDuration(service, locale)}
                 </span>
               </button>
@@ -167,7 +167,7 @@ export default function ServicesLookbook({
                 <span className="font-medium text-sm">
                   {getServiceName(service, locale)}
                 </span>
-                <span className="block text-xs text-brun/40 mt-0.5">
+                <span className="block text-xs text-brun/65 mt-0.5">
                   {getServiceDuration(service, locale)}
                 </span>
               </button>
@@ -188,7 +188,7 @@ export default function ServicesLookbook({
                 <span className="font-medium text-sm">
                   {getServiceName(service, locale)}
                 </span>
-                <span className="block text-xs text-brun/40 mt-0.5">
+                <span className="block text-xs text-brun/65 mt-0.5">
                   {getServiceDuration(service, locale)}
                 </span>
               </button>
@@ -209,7 +209,7 @@ export default function ServicesLookbook({
                 <span className="font-medium text-sm">
                   {getServiceName(pkg, locale)}
                 </span>
-                <span className="block text-xs text-brun/40 mt-0.5">
+                <span className="block text-xs text-brun/65 mt-0.5">
                   {getPackageDuration(pkg, locale)}
                 </span>
               </button>
@@ -283,7 +283,7 @@ export default function ServicesLookbook({
           return (
             <div
               key={item.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-sm border border-or/10"
+              className="bg-panneau rounded-2xl overflow-hidden border border-ocre/15"
             >
               <div className="relative h-48">
                 <Image
@@ -294,11 +294,11 @@ export default function ServicesLookbook({
                 />
               </div>
               <div className="p-5">
-                <h3 className="font-playfair text-lg text-brun mb-1">
+                <h3 className="font-playfair text-lg text-white mb-1">
                   {getServiceName(item, locale)}
                 </h3>
                 {isPackage && (
-                  <p className="text-brun/60 text-xs mb-3">
+                  <p className="text-white/60 text-xs mb-3">
                     {getPackageDescription(item as Package, locale)}
                   </p>
                 )}
@@ -306,7 +306,7 @@ export default function ServicesLookbook({
                   <span className="text-xl font-bold text-vert">
                     {item.priceMad} MAD
                   </span>
-                  <span className="text-brun/40 text-sm">
+                  <span className="text-white/50 text-sm">
                     ~{item.priceEur}€
                   </span>
                 </div>
