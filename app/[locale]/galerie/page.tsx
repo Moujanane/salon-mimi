@@ -36,8 +36,14 @@ export async function generateMetadata({
 }
 
 const images = [
-  { src: "/images/coiffure-1.jpg", alt: "Box Braids Salon Mimi Marrakech" },
-  { src: "/images/hero-salon.jpg", alt: "Salon Mimi Médina Marrakech" },
+  {
+    src: "/images/coiffure-1.jpg",
+    alt: "Box braids knotless réalisation Salon Mimi Marrakech — tresses africaines Place Jamaa El Fna",
+  },
+  {
+    src: "/images/hero-salon.jpg",
+    alt: "Salon Mimi Marrakech — coiffeuse africaine spécialiste tresses, Médina Place Jamaa El Fna",
+  },
 ];
 
 const titles: Record<string, string> = {

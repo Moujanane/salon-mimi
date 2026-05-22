@@ -69,18 +69,53 @@ export default async function AProposPage({
   const { locale } = await params;
   const data = content[locale] ?? content.fr;
 
+  const personLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Mimi",
+    jobTitle:
+      locale === "fr"
+        ? "Coiffeuse spécialiste tresses africaines"
+        : locale === "en"
+          ? "African braids specialist hairstylist"
+          : "Peluquera especialista en trenzas africanas",
+    worksFor: {
+      "@type": "HairSalon",
+      name: "Salon Mimi",
+      url: "https://mimi-coiffure.com",
+    },
+    knowsAbout: [
+      "tresses africaines",
+      "knotless braids",
+      "box braids",
+      "locks",
+      "dreads",
+    ],
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Marrakech",
+      addressCountry: "MA",
+    },
+  };
+
   return (
-    <div className="bg-fond min-h-screen">
-      <div className="bg-nuit py-16 text-center">
-        <h1 className="font-playfair text-5xl text-or">{data.title}</h1>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(personLd) }}
+      />
+      <div className="bg-fond min-h-screen">
+        <div className="bg-nuit py-16 text-center">
+          <h1 className="font-playfair text-5xl text-or">{data.title}</h1>
+        </div>
+        <div className="max-w-3xl mx-auto px-4 py-16 space-y-8">
+          {data.body.map((para, i) => (
+            <p key={i} className="text-brun text-lg leading-relaxed">
+              {para}
+            </p>
+          ))}
+        </div>
       </div>
-      <div className="max-w-3xl mx-auto px-4 py-16 space-y-8">
-        {data.body.map((para, i) => (
-          <p key={i} className="text-brun text-lg leading-relaxed">
-            {para}
-          </p>
-        ))}
-      </div>
-    </div>
+    </>
   );
 }
