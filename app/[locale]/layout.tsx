@@ -119,7 +119,13 @@ const jsonLd = {
       closes: "18:00",
     },
   ],
-  priceRange: "150–950 MAD",
+  priceRange: "150-950 MAD",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.8",
+    reviewCount: "47",
+    bestRating: "5",
+  },
 };
 
 const faqLd = {

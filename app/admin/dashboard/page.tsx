@@ -1,5 +1,9 @@
 // app/admin/dashboard/page.tsx
 import { cookies } from "next/headers";
+
+export const metadata = {
+  robots: { index: false, follow: false },
+};
 import { redirect } from "next/navigation";
 import { createServerClient } from "@supabase/ssr";
 import ReservationsTable from "@/components/admin/ReservationsTable";

@@ -5,6 +5,10 @@ import { createServerClient } from "@supabase/ssr";
 import { getSettings } from "@/lib/settings";
 import SettingsForm from "@/components/admin/SettingsForm";
 
+export const metadata = {
+  robots: { index: false, follow: false },
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {

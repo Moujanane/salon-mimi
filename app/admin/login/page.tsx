@@ -1,6 +1,10 @@
 // app/admin/login/page.tsx
 import LoginForm from "@/components/admin/LoginForm";
 
+export const metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default function LoginPage() {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center">
