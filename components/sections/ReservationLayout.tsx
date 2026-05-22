@@ -169,7 +169,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block bg-[#25D366] hover:bg-[#1ebe5d] text-white text-sm font-inter font-medium px-8 py-3.5 rounded-full transition-colors"
+              className="inline-block bg-whatsapp hover:bg-whatsapp-hover text-white text-sm font-inter font-medium px-8 py-3.5 rounded-full transition-colors"
             >
               WhatsApp non ouvert ? Cliquer ici
             </a>

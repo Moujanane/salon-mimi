@@ -145,7 +145,7 @@ export default function ReservationsTable({
                       href={`https://wa.me/${r.telephone.replace(/[^0-9]/g, "")}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-[#25D366] text-white text-xs px-3 py-1 rounded-lg hover:bg-[#128C7E] transition-colors"
+                      className="bg-whatsapp text-white text-xs px-3 py-1 rounded-lg hover:bg-whatsapp-hover transition-colors"
                     >
                       WA
                     </a>

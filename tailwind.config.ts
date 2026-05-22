@@ -16,6 +16,9 @@ const config: Config = {
         nuit: "#1A0D05",
         brun: "#2C1508",
         panneau: "#3D1A06",
+        whatsapp: "#25D366",
+        "whatsapp-hover": "#1ebe5d",
+        "select-bg": "#2d1005",
       },
       fontFamily: {
         playfair: ["var(--font-playfair)", "serif"],
