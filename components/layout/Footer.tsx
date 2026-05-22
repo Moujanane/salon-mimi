@@ -7,8 +7,8 @@ export default async function Footer() {
       <div className="max-w-6xl mx-auto px-4 text-center">
         <p className="font-playfair text-or text-xl mb-2">Salon Mimi</p>
         <p className="text-sm text-white/55">{t("address")}</p>
-        <p className="text-xs text-white/45 mt-4">
-          © {new Date().getFullYear()} Salon Mimi — {t("rights")}
+        <p className="text-xs text-white/55 mt-4">
+          © {new Date().getFullYear()} Salon Mimi. {t("rights")}
         </p>
       </div>
     </footer>
