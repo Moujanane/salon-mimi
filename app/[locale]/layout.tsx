@@ -68,7 +68,7 @@ export async function generateMetadata({
       url: `${BASE_URL}/${locale}`,
       images: [
         {
-          url: `${BASE_URL}/og-image.jpg`,
+          url: `${BASE_URL}/${locale}/opengraph-image`,
           width: 1200,
           height: 630,
           alt: "Salon Mimi — Tresses africaines Marrakech",
