@@ -20,14 +20,14 @@ export default function ServiceCard({
   bookLabel,
 }: ServiceCardProps) {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-or/20 shadow-sm hover:shadow-md transition-shadow">
-      <h3 className="font-playfair text-lg text-brun mb-2">{name}</h3>
+    <div className="bg-panneau rounded-2xl p-6 border border-ocre/20 hover:border-ocre/40 transition-colors">
+      <h3 className="font-playfair text-lg text-white mb-2">{name}</h3>
       {duration !== "—" && (
-        <p className="text-sm text-gray-500 mb-4">{duration}</p>
+        <p className="text-sm text-white/55 mb-4">{duration}</p>
       )}
       <div className="flex items-baseline gap-2 mb-4">
-        <span className="text-2xl font-bold text-vert">{priceMad} MAD</span>
-        <span className="text-sm text-gray-400">~{priceEur}€</span>
+        <span className="text-2xl font-bold text-ocre">{priceMad} MAD</span>
+        <span className="text-sm text-white/50">~{priceEur}€</span>
       </div>
       <Link
         href={`/${locale}/reservation?service=${encodeURIComponent(serviceId)}`}
