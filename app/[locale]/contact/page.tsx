@@ -1,4 +1,39 @@
+import type { Metadata } from "next";
 import { getSettings } from "@/lib/settings";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  const titles: Record<string, string> = {
+    fr: "Contact & Accès — Salon Mimi Marrakech | Place Jamaa El Fna",
+    en: "Contact & Location — Salon Mimi Marrakech | Jamaa El Fna",
+    es: "Contacto y Ubicación — Salon Mimi Marrakech | Plaza Jamaa El Fna",
+  };
+
+  const descriptions: Record<string, string> = {
+    fr: "Contactez le Salon Mimi à Marrakech. Situé Place Jamaa El Fna, Médina. WhatsApp, Instagram, horaires et itinéraire. Réservation en ligne disponible.",
+    en: "Contact Salon Mimi in Marrakech. Located at Jamaa El Fna Square, Medina. WhatsApp, Instagram, opening hours and directions. Online booking available.",
+    es: "Contacta con el Salon Mimi en Marrakech. Ubicado en la Plaza Jamaa El Fna, Medina. WhatsApp, Instagram, horarios e indicaciones. Reserva online disponible.",
+  };
+
+  return {
+    title: titles[locale] ?? titles.fr,
+    description: descriptions[locale] ?? descriptions.fr,
+    alternates: {
+      canonical: `https://mimi-coiffure.com/${locale}/contact`,
+      languages: {
+        fr: "https://mimi-coiffure.com/fr/contact",
+        en: "https://mimi-coiffure.com/en/contact",
+        es: "https://mimi-coiffure.com/es/contact",
+        "x-default": "https://mimi-coiffure.com/fr/contact",
+      },
+    },
+  };
+}
 
 const content: Record<
   string,
