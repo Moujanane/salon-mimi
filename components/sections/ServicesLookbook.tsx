@@ -114,10 +114,10 @@ export default function ServicesLookbook({
   }
 
   const listItemClass = (isActive: boolean) =>
-    `w-full text-left px-8 py-4 transition-all duration-150 border-l-2 ${
+    `w-full text-left px-6 py-4 rounded-lg transition-all duration-150 ${
       isActive
-        ? "border-ocre bg-ocre/5 text-brun"
-        : "border-transparent hover:bg-ocre/5 hover:border-ocre/40 text-brun/70"
+        ? "bg-ocre/10 text-ocre font-medium"
+        : "text-brun/70 hover:bg-ocre/5 hover:text-brun"
     }`;
 
   return (
