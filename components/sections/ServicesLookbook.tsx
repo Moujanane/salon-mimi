@@ -255,12 +255,12 @@ export default function ServicesLookbook({
                 </span>
                 <span className="text-white/50">~{active.item.priceEur}€</span>
                 {active.type === "service" && (
-                  <span className="text-white/40 text-sm">
+                  <span className="text-white/55 text-sm">
                     · {getServiceDuration(active.item, locale)}
                   </span>
                 )}
                 {active.type === "package" && (
-                  <span className="text-white/40 text-sm">
+                  <span className="text-white/55 text-sm">
                     · {getPackageDuration(active.item, locale)}
                   </span>
                 )}

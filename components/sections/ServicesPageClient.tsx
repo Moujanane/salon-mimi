@@ -147,7 +147,7 @@ export default function ServicesPageClient({
           Des services pensés pour{" "}
           <em className="text-ocre italic">chaque texture</em>
         </h1>
-        <p className="text-white/45 text-[12px] max-w-lg mx-auto mt-1 leading-relaxed font-inter">
+        <p className="text-white/60 text-[12px] max-w-lg mx-auto mt-1 leading-relaxed font-inter">
           Que tu veuilles des{" "}
           <strong className="text-ocre">tresses africaines</strong>, des{" "}
           <strong className="text-white">knotless braids</strong>, des locks ou
@@ -167,7 +167,7 @@ export default function ServicesPageClient({
 
       <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-4 p-4 pt-3">
         <div className="w-full md:w-[36%] bg-panneau rounded-2xl border border-ocre/20 p-4 md:p-6 flex flex-col gap-3 md:flex-shrink-0 overflow-y-auto">
-          <div className="text-[9px] tracking-[4px] uppercase text-white/35 font-inter mb-1">
+          <div className="text-[9px] tracking-[4px] uppercase text-white/55 font-inter mb-1">
             Choisir un service
           </div>
           {SERVICES.map((s, i) => (

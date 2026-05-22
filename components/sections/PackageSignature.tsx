@@ -37,7 +37,7 @@ export default function PackageSignature({
               {pkg.priceMad} MAD
             </span>
             <span className="text-white/50">~{pkg.priceEur}€</span>
-            <span className="text-white/40 text-sm">· {duration}</span>
+            <span className="text-white/55 text-sm">· {duration}</span>
           </div>
           <Link
             href={`/${locale}/reservation?service=${pkg.id}`}

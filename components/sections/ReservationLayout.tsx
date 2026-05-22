@@ -199,7 +199,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
               <div className="font-georgia text-[15px] font-bold text-white mb-0.5">
                 Tes informations
               </div>
-              <div className="text-[10px] text-white/35 font-inter tracking-wide">
+              <div className="text-[10px] text-white/55 font-inter tracking-wide">
                 Tous les champs * sont obligatoires
               </div>
             </div>
@@ -330,7 +330,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
               → Confirmer la réservation
             </button>
 
-            <p className="text-center text-white/30 text-[10px] font-inter leading-relaxed">
+            <p className="text-center text-white/50 text-[10px] font-inter leading-relaxed">
               Confirmation par WhatsApp sous 24h · Aucun paiement requis
               maintenant
             </p>
