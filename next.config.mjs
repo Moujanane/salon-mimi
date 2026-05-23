@@ -31,6 +31,10 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Cible ES2017+ — supprime les polyfills inutiles pour navigateurs modernes
+  experimental: {
+    browsersListForSwc: true,
+  },
   async headers() {
     return [
       {

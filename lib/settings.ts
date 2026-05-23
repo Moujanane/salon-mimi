@@ -1,5 +1,6 @@
 // lib/settings.ts
 import { createClient } from "@supabase/supabase-js";
+import { unstable_cache } from "next/cache";
 
 export type Settings = {
   whatsapp_number: string;
@@ -31,17 +32,11 @@ const DEFAULTS: Settings = {
   price_ongles_soins_epilation: "50",
 };
 
-export async function getSettings(): Promise<Settings> {
+async function fetchSettings(): Promise<Settings> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !key) {
-    console.error(
-      "[getSettings] Variables manquantes — url:",
-      !!url,
-      "key:",
-      !!key,
-    );
     return DEFAULTS;
   }
 
@@ -49,14 +44,14 @@ export async function getSettings(): Promise<Settings> {
   const { data, error } = await client.from("settings").select("key, value");
 
   if (error || !data || data.length === 0) {
-    console.error(
-      "[getSettings] Erreur ou table vide:",
-      error?.message ?? "data.length=" + (data?.length ?? "null"),
-    );
     return DEFAULTS;
   }
 
   const map = Object.fromEntries(data.map((r) => [r.key, r.value]));
-  console.log("[getSettings] data:", JSON.stringify(map));
   return { ...DEFAULTS, ...map } as Settings;
 }
+
+export const getSettings = unstable_cache(fetchSettings, ["settings"], {
+  revalidate: 3600,
+  tags: ["settings"],
+});
