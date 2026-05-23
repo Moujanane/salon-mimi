@@ -6,30 +6,45 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 2. État actuel du code
+## 2. État actuel du code — mis à jour le 24 mai 2026
 
 ### Ce qui marche
 
 - Homepage : hero split 50/50, 3 colonnes photo animées, titre "Tresses africaines & Rasta / Marrakech", badge "Place Jamaa El Fna" en ocre
-- Page Services : 10 services en français, pills cliquables, panneau photo dynamique, tient sur une page
+- Page Services : 10 services en français, pills cliquables, panneau photo dynamique, responsive corrigé (useEffect + window.innerWidth)
 - Page Réservation : formulaire complet (nom, téléphone, service, date, heure, nombre de personnes, message), insertion Supabase validée, bouton WhatsApp affiché après soumission
 - Header : nav fixe, hamburger mobile, bouton RDV ocre
-- Footer, LocationSection, CTAFinal : OK
-- SEO : JSON-LD HairSalon, hreflang fr/en/es, og:image
-- Sécurité : headers HTTP (X-Frame-Options, HSTS, etc.), rate limiting API dans les routes, validation serveur
-- Middleware i18n : /admin exclu correctement
+- Footer : liens Mentions légales + Politique de confidentialité en fr/en/es
+- SEO minimum complet : title unique, meta description, alt images, sitemap, Search Console connectée, canonical toutes pages
+- SEO : JSON-LD HairSalon + FAQ schema, hreflang fr/en/es, og:image
+- Sécurité : headers HTTP (CSP, X-Frame-Options, HSTS), rate limiting API, validation serveur, XSS emails corrigé, email admin masqué dans l'API publique
+- Middleware i18n : /admin exclu correctement, redirections 307→308, www→non-www
 - Images : 14 photos réelles du salon dans /public/images/
 - Dashboard admin : affiche les réservations (RLS Supabase corrigée)
 - Page admin /settings : WhatsApp et prix paramétrables, sauvegarde en Supabase
+- PWA mobile `/mimi.html` avec PIN pour planning Mimi
+- Notifications email Resend à chaque réservation
+- Pages légales RGPD : `/mentions-legales` et `/politique-de-confidentialite` en fr/en/es
+- Bandeau cookies conforme RGPD (cookie technique NEXT_LOCALE, pas de consentement obligatoire)
 
 ### Ce qui reste fragile
 
-- Page /admin/settings : les champs prix s'affichent vides visuellement (problème de couleur CSS réglé pour WhatsApp mais pas encore confirmé pour les prix)
-- Le titre hero sur desktop déborde légèrement selon la résolution — ajuster `clamp` si nécessaire
+- Page /admin/settings : les champs prix s'affichent vides visuellement (couleur CSS non confirmée pour les prix)
+- Le titre hero sur desktop peut déborder légèrement selon la résolution — ajuster `clamp` si nécessaire
 
 ### Ce qui ne marche pas
 
-- Rien de bloquant connu au moment du handoff
+- Rien de bloquant connu
+
+### Ce qui reste à faire
+
+- **Cloudflare Cache Rule** (priorité haute) : configurer la règle de cache dans Cloudflare pour bypasser le `no-store` Railway et faire passer PageSpeed de 74 à 85+. Voir section 7 pour les instructions exactes.
+- **Vérification indexation Google** : attendre 2-4 semaines après la mise en ligne de Cloudflare et vérifier dans Search Console que les pages /fr, /fr/services etc. sont bien indexées (plus d'erreur canonique)
+- **Traductions EN et ES** : le contenu des pages services, galerie, homepage est en français uniquement dans les composants — les balises SEO sont traduites mais pas le contenu visible
+- **Fiche Google Business Profile** : créer ou réclamer la fiche GMB du salon (essentiel pour le SEO local Marrakech)
+- **Fiche TripAdvisor** : en attente de validation depuis session 18 mai
+- **Test email Resend en prod** : vérifier que les notifications arrivent bien après une vraie réservation
+- **Vérifier /admin/settings prix** : confirmer visuellement que les champs prix sont lisibles (fond clair vs texte)
 
 ---
 
@@ -178,6 +193,87 @@ Si le serveur rend des données A et que le client reçoit des données B via fe
 ### `window.open` bloqué par navigateur
 
 Ne pas appeler `window.open()` dans un bloc `async/await` après une requête réseau. Le navigateur considère que ce n'est pas un geste utilisateur direct et bloque la popup.
+
+---
+
+## 7. Session 23-24 mai 2026 — Cloudflare + SEO + Sécurité + Responsive
+
+### Problème d'indexation Google résolu
+
+- Redirections 307 → 308 (permanent) dans le middleware pour le SEO
+- Redirection www → non-www corrigée (le port interne Railway :8080 s'ajoutait dans l'URL)
+- Sitemap corrigé : ajout de la racine `/` manquante, revalidate 86400
+- Sitemap soumis à Google Search Console (était en erreur 18/18)
+- `revalidate = 3600` ajouté sur toutes les pages publiques
+
+### Audit sécurité — 3 failles corrigées
+
+- `notification_email` exposée dans l'API GET publique `/api/settings` → masquée via whitelist `PUBLIC_KEYS`
+- Brute-force PIN sur `/api/mimi` → rate limiting ajouté (5 tentatives / 15 min par IP)
+- XSS dans les emails de notification → fonction `esc()` pour sanitiser tous les champs HTML
+
+### Responsive — bug critique page Services résolu
+
+- `md:hidden` / `hidden md:flex` ne fonctionnait pas : Next.js SSR rendait `isMobile=false` au premier rendu, les deux blocs coexistaient
+- Fix : `useEffect + window.innerWidth` côté client uniquement dans `ServicesPageClient.tsx`
+- Layout mobile : pills horizontales scrollables + photo 420px (inline styles)
+- Layout desktop : 2 colonnes original préservé (Tailwind)
+
+### Performance — score PageSpeed 74/100 (objectif 80+)
+
+- Cause racine : TTFB 1,880ms (Railway cold start) + `cache-control: no-store` forcé par next-intl via cookie `NEXT_LOCALE`
+- Next.js force automatiquement `no-store` dès qu'une réponse contient `Set-Cookie`
+- Tentative `localeCookie: false` abandonnée : TBT 450ms → 3,120ms, score 74 → 39. **Ne jamais retenter.**
+- Fixes déployés : `unstable_cache` sur settings, `.browserslistrc` (élimine 11 KiB polyfills), `revalidate` pages
+
+### Cloudflare — configuration en cours (propagation en attente)
+
+**Objectif :** bypasser le `no-store` de Railway via cache CDN edge → TTFB ~100ms → score 85-90/100
+
+**État au 24 mai 2026 :**
+
+- Domaine ajouté sur Cloudflare (plan Free)
+- DNS importés et configurés :
+  - `A` : `mimi-coiffure.com` → `66.33.22.222` (Proxied)
+  - `CNAME` : `www` → `7v3u8tks.up.railway.app` (Proxied)
+  - `CNAME` : `webmail` → `webmail.gandi.net` (**DNS only** — important, ne pas proxier)
+- Nameservers changés chez Gandi :
+  - `meiling.ns.cloudflare.com`
+  - `thomas.ns.cloudflare.com`
+- Propagation DNS en cours (15 min à 24h)
+
+**Étape restante obligatoire — Cache Rule Cloudflare :**
+
+Sans cette règle, Cloudflare respecte le `no-store` de Railway et ne cache rien.
+
+Dans Cloudflare > Rules > Cache Rules > + Create rule :
+
+Nom : `Cache HTML public pages`
+
+Conditions (toutes en AND) :
+
+- Hostname equals `mimi-coiffure.com`
+- URI Path does not start with `/mimi`
+- URI Path does not start with `/api`
+- URI Path does not start with `/admin`
+
+Actions :
+
+- Eligible for cache : ON
+- Edge TTL : Override origin → 2 hours (7200s)
+- Browser TTL : Override → 30 minutes
+
+**Comment vérifier que Cloudflare est actif :**
+
+```bash
+curl -I https://mimi-coiffure.com | grep -i "cf-ray\|server"
+```
+
+Si tu vois `cf-ray:` dans les headers → Cloudflare est actif. Alors configurer la Cache Rule.
+
+### Leçon critique — `localeCookie: false` à ne jamais retenter
+
+Supprimer le cookie `NEXT_LOCALE` pour obtenir `cache-control: public` est une fausse bonne idée. next-intl recalcule la locale côté client sans cookie → TBT explose × 7. La seule solution viable est Cloudflare CDN qui cache malgré le `no-store`.
 
 ---
 
