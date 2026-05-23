@@ -9,10 +9,11 @@ export default function middleware(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
 
   // Redirection www -> non-www en 301 permanent
+  // On reconstruit l'URL avec le hostname public uniquement (sans port Railway interne)
   if (host.startsWith("www.")) {
-    const nonWwwUrl = new URL(request.url);
-    nonWwwUrl.host = host.replace(/^www\./, "");
-    return NextResponse.redirect(nonWwwUrl.toString(), 301);
+    const nonWwwHost = host.replace(/^www\./, "").replace(/:\d+$/, "");
+    const { pathname: p, search } = request.nextUrl;
+    return NextResponse.redirect(`https://${nonWwwHost}${p}${search}`, 301);
   }
 
   if (pathname.startsWith("/mimi")) {
