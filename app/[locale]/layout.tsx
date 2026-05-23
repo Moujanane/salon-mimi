@@ -5,6 +5,7 @@ import { getMessages } from "next-intl/server";
 import { Playfair_Display, Inter } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import CookieBanner from "@/components/ui/CookieBanner";
 import "../globals.css";
 
 const playfair = Playfair_Display({
@@ -194,6 +195,7 @@ export default async function LocaleLayout({
           <Header />
           <main>{children}</main>
           <Footer />
+          <CookieBanner locale={locale} />
         </NextIntlClientProvider>
       </body>
     </html>
