@@ -136,16 +136,16 @@ export default function ServicesPageClient({
   }
 
   return (
-    <div className="h-screen flex flex-col bg-nuit overflow-hidden">
+    <div className="min-h-screen flex flex-col bg-nuit">
       <div className="h-[57px] flex-shrink-0" />
 
-      <div className="flex-shrink-0 text-center px-12 py-4 border-b border-ocre/10">
+      <div className="flex-shrink-0 text-center px-6 md:px-12 py-4 border-b border-ocre/10">
         <span className="text-ocre text-[9px] tracking-[5px] uppercase font-inter block mb-1">
           Ce qu&apos;on fait · ce qu&apos;on maîtrise
         </span>
-        <h1 className="font-georgia text-[clamp(20px,2.5vw,30px)] font-bold text-white">
-          Des services pensés pour{" "}
-          <em className="text-ocre italic">chaque texture</em>
+        <h1 className="font-georgia text-[clamp(18px,2.5vw,30px)] font-bold text-white">
+          Tresses africaines à Marrakech —{" "}
+          <em className="text-ocre italic">Box braids, Knotless, Locks</em>
         </h1>
         <p className="text-white/60 text-[12px] max-w-lg mx-auto mt-1 leading-relaxed font-inter">
           Que tu veuilles des{" "}
@@ -165,8 +165,86 @@ export default function ServicesPageClient({
         </div>
       </div>
 
-      <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-4 p-4 pt-3">
-        <div className="w-full md:w-[36%] bg-panneau rounded-2xl border border-ocre/20 p-4 md:p-6 flex flex-col gap-3 md:flex-shrink-0 overflow-y-auto">
+      {/* Mobile : pills horizontales scrollables + photo en dessous */}
+      <div className="md:hidden flex flex-col flex-1 gap-4 p-4 pt-3">
+        <div className="text-[9px] tracking-[4px] uppercase text-white/55 font-inter mb-1">
+          Choisir un service
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
+          {SERVICES.map((s, i) => (
+            <button
+              key={s.id}
+              onClick={() => goTo(i)}
+              className={`flex-shrink-0 snap-start flex items-center gap-2 px-4 py-2.5 rounded-full border text-[10px] tracking-[1.5px] uppercase font-inter transition-all ${
+                i === active
+                  ? "bg-ocre border-ocre text-white"
+                  : "border-white/15 text-white/65"
+              }`}
+            >
+              <span>{s.icon}</span>
+              {s.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="relative rounded-2xl border border-ocre/20 overflow-hidden h-[420px]">
+          {SERVICES.map((s, i) => (
+            <div
+              key={s.id}
+              className="absolute inset-0 transition-opacity duration-500"
+              style={{
+                opacity: i === active ? 1 : 0,
+                pointerEvents: i === active ? "auto" : "none",
+              }}
+            >
+              <Image
+                src={s.image}
+                alt={s.imageAlt}
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority={i === 0}
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(to bottom, rgba(10,4,0,0.1) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.95) 100%)",
+                }}
+              />
+              <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
+                <span className="inline-block bg-white/12 backdrop-blur-sm border border-white/20 text-white text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
+                  {s.label}
+                </span>
+                <p className="font-georgia text-[14px] text-white leading-relaxed mb-2">
+                  {s.subServices}
+                </p>
+                <p className="text-[10px] tracking-[3px] uppercase text-white/55 font-inter mb-4">
+                  À partir de{" "}
+                  <span className="text-ocre font-bold">
+                    {prices[s.id] != null
+                      ? `${prices[s.id]} MAD`
+                      : s.price.replace("dès ", "")}
+                  </span>
+                </p>
+                <Link
+                  href={`/${locale}/reservation?service=${s.id}`}
+                  className="inline-flex items-center gap-2 bg-white hover:bg-ocre text-nuit hover:text-white text-[10px] tracking-[3px] uppercase px-5 py-2.5 rounded-full font-bold transition-colors font-inter"
+                >
+                  → Réserver ce service
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop : layout 2 colonnes original */}
+      <div
+        className="hidden md:flex flex-row flex-1 min-h-0 gap-4 p-4 pt-3"
+        style={{ height: "calc(100vh - 57px - 120px)" }}
+      >
+        <div className="w-[36%] bg-panneau rounded-2xl border border-ocre/20 p-6 flex flex-col gap-3 flex-shrink-0 overflow-y-auto">
           <div className="text-[9px] tracking-[4px] uppercase text-white/55 font-inter mb-1">
             Choisir un service
           </div>
@@ -186,7 +264,7 @@ export default function ServicesPageClient({
           ))}
         </div>
 
-        <div className="flex-1 min-h-[400px] md:min-h-0 bg-panneau rounded-2xl border border-ocre/20 overflow-hidden relative">
+        <div className="flex-1 bg-panneau rounded-2xl border border-ocre/20 overflow-hidden relative">
           {SERVICES.map((s, i) => (
             <div
               key={s.id}
