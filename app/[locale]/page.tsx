@@ -1,6 +1,42 @@
 export const revalidate = 3600;
 
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+
+const BASE_URL = "https://mimi-coiffure.com";
+
+const titles: Record<string, string> = {
+  fr: "Salon Mimi — Tresses Rasta & Africaines Marrakech | Jamaa El Fna",
+  en: "Salon Mimi — Rasta & African Braids Marrakech | Jamaa El Fna",
+  es: "Salon Mimi — Trenzas Rasta y Africanas Marrakech | Jamaa El Fna",
+};
+
+const descriptions: Record<string, string> = {
+  fr: "Salon de coiffure Rasta et Africaine à Marrakech, Place Jamaa El Fna. Tresses africaines, box braids, locks, knotless. Réservez en ligne.",
+  en: "Rasta and African hair salon in Marrakech, Jamaa El Fna Square. African braids, box braids, locks, knotless. Book online.",
+  es: "Salón de coiffure Rasta y Africano en Marrakech, Plaza Jamaa El Fna. Trenzas africanas, box braids, locks, knotless. Reserva en línea.",
+};
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return {
+    title: titles[locale] ?? titles.fr,
+    description: descriptions[locale] ?? descriptions.fr,
+    alternates: {
+      canonical: `${BASE_URL}/${locale}`,
+      languages: {
+        fr: `${BASE_URL}/fr`,
+        en: `${BASE_URL}/en`,
+        es: `${BASE_URL}/es`,
+        "x-default": `${BASE_URL}/fr`,
+      },
+    },
+  };
+}
 import HeroHome from "@/components/sections/HeroHome";
 import TrustBadge from "@/components/sections/TrustBadge";
 import GoogleReviews from "@/components/sections/GoogleReviews";
