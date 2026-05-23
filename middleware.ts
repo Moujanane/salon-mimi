@@ -6,6 +6,14 @@ const intlMiddleware = createMiddleware(routing);
 
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const host = request.headers.get("host") ?? "";
+
+  // Redirection www -> non-www en 301 permanent
+  if (host.startsWith("www.")) {
+    const nonWwwUrl = new URL(request.url);
+    nonWwwUrl.host = host.replace(/^www\./, "");
+    return NextResponse.redirect(nonWwwUrl.toString(), 301);
+  }
 
   if (pathname.startsWith("/mimi")) {
     return;
