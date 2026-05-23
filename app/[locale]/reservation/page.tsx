@@ -1,4 +1,6 @@
 // app/[locale]/reservation/page.tsx
+export const revalidate = 3600;
+
 import { getTranslations } from "next-intl/server";
 import { Suspense } from "react";
 import ReservationLayout from "@/components/sections/ReservationLayout";

@@ -1,6 +1,8 @@
 // app/sitemap.ts
 import { MetadataRoute } from "next";
 
+export const revalidate = 86400;
+
 const BASE_URL = "https://mimi-coiffure.com";
 const locales = ["fr", "en", "es"];
 const pages = [
@@ -13,7 +15,7 @@ const pages = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return locales.flatMap((locale) =>
+  const localePages = locales.flatMap((locale) =>
     pages.map((page) => ({
       url: `${BASE_URL}/${locale}${page}`,
       lastModified: new Date(),
@@ -21,4 +23,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: page === "" ? 1.0 : 0.8,
     })),
   );
+
+  return [
+    {
+      url: BASE_URL,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 1.0,
+    },
+    ...localePages,
+  ];
 }

@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import type { Metadata } from "next";
 import Image from "next/image";
 
@@ -9,9 +11,9 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles: Record<string, string> = {
-    fr: "Galerie tresses africaines Marrakech — Box braids, Locks, Knotless | Salon Mimi",
-    en: "African braids gallery Marrakech — Box braids, Locks, Knotless | Salon Mimi",
-    es: "Galería trenzas africanas Marrakech — Box braids, Locks, Knotless | Salon Mimi",
+    fr: "Galerie — Tresses africaines & Locks Marrakech | Salon Mimi",
+    en: "Gallery — African braids & Locks Marrakech | Salon Mimi",
+    es: "Galería — Trenzas africanas y Locks Marrakech | Salon Mimi",
   };
 
   const descriptions: Record<string, string> = {

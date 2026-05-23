@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import { getTranslations } from "next-intl/server";
 import HeroHome from "@/components/sections/HeroHome";
 import TrustBadge from "@/components/sections/TrustBadge";

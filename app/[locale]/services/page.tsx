@@ -1,3 +1,5 @@
+export const revalidate = 3600;
+
 import type { Metadata } from "next";
 import ServicesPageClient from "@/components/sections/ServicesPageClient";
 import { getSettings } from "@/lib/settings";
@@ -10,9 +12,9 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles: Record<string, string> = {
-    fr: "Tresses africaines Marrakech — Knotless, Box braids, Locks | Salon Mimi",
-    en: "African Braids Marrakech — Knotless, Box braids, Locks | Salon Mimi",
-    es: "Trenzas africanas Marrakech — Knotless, Box braids, Locks | Salon Mimi",
+    fr: "Tresses africaines Marrakech — Box braids, Knotless, Locks",
+    en: "African Braids Marrakech — Box braids, Knotless, Locks",
+    es: "Trenzas africanas Marrakech — Box braids, Knotless, Locks",
   };
 
   const descriptions: Record<string, string> = {
