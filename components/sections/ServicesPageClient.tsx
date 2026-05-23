@@ -121,6 +121,14 @@ export default function ServicesPageClient({
 }: ServicesPageClientProps) {
   const [active, setActive] = useState(0);
   const [leaving, setLeaving] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -165,163 +173,268 @@ export default function ServicesPageClient({
         </div>
       </div>
 
-      {/* Mobile : pills horizontales scrollables + photo en dessous */}
-      <div className="md:hidden flex flex-col flex-1 gap-4 p-4 pt-3">
-        <div className="text-[9px] tracking-[4px] uppercase text-white/55 font-inter mb-1">
-          Choisir un service
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none snap-x">
-          {SERVICES.map((s, i) => (
-            <button
-              key={s.id}
-              onClick={() => goTo(i)}
-              className={`flex-shrink-0 snap-start flex items-center gap-2 px-4 py-2.5 rounded-full border text-[10px] tracking-[1.5px] uppercase font-inter transition-all ${
-                i === active
-                  ? "bg-ocre border-ocre text-white"
-                  : "border-white/15 text-white/65"
-              }`}
-            >
-              <span>{s.icon}</span>
-              {s.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="relative rounded-2xl border border-ocre/20 overflow-hidden h-[420px]">
-          {SERVICES.map((s, i) => (
-            <div
-              key={s.id}
-              className="absolute inset-0 transition-opacity duration-500"
-              style={{
-                opacity: i === active ? 1 : 0,
-                pointerEvents: i === active ? "auto" : "none",
-              }}
-            >
-              <Image
-                src={s.image}
-                alt={s.imageAlt}
-                fill
-                className="object-cover"
-                sizes="100vw"
-                priority={i === 0}
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(to bottom, rgba(10,4,0,0.1) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.95) 100%)",
-                }}
-              />
-              <div className="absolute bottom-0 left-0 right-0 p-5 z-10">
-                <span className="inline-block bg-white/12 backdrop-blur-sm border border-white/20 text-white text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
-                  {s.label}
-                </span>
-                <p className="font-georgia text-[14px] text-white leading-relaxed mb-2">
-                  {s.subServices}
-                </p>
-                <p className="text-[10px] tracking-[3px] uppercase text-white/55 font-inter mb-4">
-                  À partir de{" "}
-                  <span className="text-ocre font-bold">
-                    {prices[s.id] != null
-                      ? `${prices[s.id]} MAD`
-                      : s.price.replace("dès ", "")}
-                  </span>
-                </p>
-                <Link
-                  href={`/${locale}/reservation?service=${s.id}`}
-                  className="inline-flex items-center gap-2 bg-white hover:bg-ocre text-nuit hover:text-white text-[10px] tracking-[3px] uppercase px-5 py-2.5 rounded-full font-bold transition-colors font-inter"
-                >
-                  → Réserver ce service
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Desktop : layout 2 colonnes original */}
-      <div
-        className="hidden md:flex flex-row flex-1 min-h-0 gap-4 p-4 pt-3"
-        style={{ height: "calc(100vh - 57px - 120px)" }}
-      >
-        <div className="w-[36%] bg-panneau rounded-2xl border border-ocre/20 p-6 flex flex-col gap-3 flex-shrink-0 overflow-y-auto">
-          <div className="text-[9px] tracking-[4px] uppercase text-white/55 font-inter mb-1">
+      {isMobile ? (
+        /* Mobile : pills horizontales scrollables + photo en dessous */
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 16,
+            padding: 16,
+            paddingTop: 12,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 9,
+              letterSpacing: "4px",
+              textTransform: "uppercase",
+              color: "rgba(255,255,255,0.55)",
+              fontFamily: "var(--font-inter)",
+              marginBottom: 4,
+            }}
+          >
             Choisir un service
           </div>
-          {SERVICES.map((s, i) => (
-            <button
-              key={s.id}
-              onClick={() => goTo(i)}
-              className={`flex items-center gap-3 px-5 py-3.5 rounded-full border text-[11px] tracking-[2px] uppercase font-inter text-left transition-all ${
-                i === active
-                  ? "bg-ocre border-ocre text-white"
-                  : "border-white/15 text-white/65 hover:border-ocre/50 hover:text-white"
-              }`}
-            >
-              <span className="text-base">{s.icon}</span>
-              {s.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex-1 bg-panneau rounded-2xl border border-ocre/20 overflow-hidden relative">
-          {SERVICES.map((s, i) => (
-            <div
-              key={s.id}
-              className="absolute inset-0 transition-all duration-700"
-              style={{
-                opacity: i === active ? 1 : 0,
-                pointerEvents: i === active ? "auto" : "none",
-                transform:
-                  i === active
-                    ? "perspective(1400px) rotateY(0deg)"
-                    : i === leaving
-                      ? "perspective(1400px) rotateY(-12deg)"
-                      : "perspective(1400px) rotateY(8deg)",
-                transformOrigin: "left center",
-              }}
-            >
-              <Image
-                src={s.image}
-                alt={s.imageAlt}
-                fill
-                className="object-cover"
-                sizes="55vw"
-                priority={i === 0}
-              />
-              <div
-                className="absolute inset-0"
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              overflowX: "auto",
+              paddingBottom: 8,
+            }}
+          >
+            {SERVICES.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => goTo(i)}
                 style={{
-                  background:
-                    "linear-gradient(to bottom, rgba(10,4,0,0.15) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.95) 100%)",
+                  flexShrink: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "10px 16px",
+                  borderRadius: 9999,
+                  border:
+                    i === active
+                      ? "1px solid #c9a96e"
+                      : "1px solid rgba(255,255,255,0.15)",
+                  background: i === active ? "#c9a96e" : "transparent",
+                  color: i === active ? "white" : "rgba(255,255,255,0.65)",
+                  fontSize: 10,
+                  letterSpacing: "1.5px",
+                  textTransform: "uppercase",
+                  fontFamily: "var(--font-inter)",
+                  whiteSpace: "nowrap",
+                  cursor: "pointer",
                 }}
-              />
-              <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
-                <span className="inline-block bg-white/12 backdrop-blur-sm border border-white/20 text-white text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
-                  {s.label}
-                </span>
-                <p className="font-georgia text-[15px] text-white leading-relaxed mb-2">
-                  {s.subServices}
-                </p>
-                <p className="text-[10px] tracking-[3px] uppercase text-white/55 font-inter mb-4">
-                  À partir de{" "}
-                  <span className="text-ocre font-bold">
-                    {prices[s.id] != null
-                      ? `${prices[s.id]} MAD`
-                      : s.price.replace("dès ", "")}
-                  </span>
-                </p>
-                <Link
-                  href={`/${locale}/reservation?service=${s.id}`}
-                  className="inline-flex items-center gap-2 bg-white hover:bg-ocre text-nuit hover:text-white text-[10px] tracking-[3px] uppercase px-6 py-3 rounded-full font-bold transition-colors font-inter"
+              >
+                <span>{s.icon}</span>
+                {s.label}
+              </button>
+            ))}
+          </div>
+
+          <div
+            style={{
+              position: "relative",
+              borderRadius: 16,
+              border: "1px solid rgba(201,169,110,0.2)",
+              overflow: "hidden",
+              height: 420,
+            }}
+          >
+            {SERVICES.map((s, i) => (
+              <div
+                key={s.id}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  opacity: i === active ? 1 : 0,
+                  pointerEvents: i === active ? "auto" : "none",
+                  transition: "opacity 0.5s",
+                }}
+              >
+                <Image
+                  src={s.image}
+                  alt={s.imageAlt}
+                  fill
+                  className="object-cover"
+                  sizes="100vw"
+                  priority={i === 0}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    background:
+                      "linear-gradient(to bottom, rgba(10,4,0,0.1) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.95) 100%)",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    padding: 20,
+                    zIndex: 10,
+                  }}
                 >
-                  → Réserver ce service
-                </Link>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      background: "rgba(255,255,255,0.12)",
+                      border: "1px solid rgba(255,255,255,0.2)",
+                      color: "white",
+                      fontSize: 9,
+                      letterSpacing: "3px",
+                      textTransform: "uppercase",
+                      padding: "6px 12px",
+                      borderRadius: 9999,
+                      marginBottom: 12,
+                    }}
+                  >
+                    {s.label}
+                  </span>
+                  <p
+                    style={{
+                      fontFamily: "Georgia, serif",
+                      fontSize: 14,
+                      color: "white",
+                      lineHeight: 1.6,
+                      marginBottom: 8,
+                    }}
+                  >
+                    {s.subServices}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: 10,
+                      letterSpacing: "3px",
+                      textTransform: "uppercase",
+                      color: "rgba(255,255,255,0.55)",
+                      fontFamily: "var(--font-inter)",
+                      marginBottom: 16,
+                    }}
+                  >
+                    À partir de{" "}
+                    <span style={{ color: "#c9a96e", fontWeight: "bold" }}>
+                      {prices[s.id] != null
+                        ? `${prices[s.id]} MAD`
+                        : s.price.replace("dès ", "")}
+                    </span>
+                  </p>
+                  <Link
+                    href={`/${locale}/reservation?service=${s.id}`}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 8,
+                      background: "white",
+                      color: "#1a0a00",
+                      fontSize: 10,
+                      letterSpacing: "3px",
+                      textTransform: "uppercase",
+                      padding: "10px 20px",
+                      borderRadius: 9999,
+                      fontWeight: "bold",
+                      fontFamily: "var(--font-inter)",
+                      textDecoration: "none",
+                    }}
+                  >
+                    → Réserver ce service
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
+      ) : (
+        /* Desktop : layout 2 colonnes original */
+        <div
+          className="flex flex-row flex-1 min-h-0 gap-4 p-4 pt-3"
+          style={{ height: "calc(100vh - 57px - 120px)" }}
+        >
+          <div className="w-[36%] bg-panneau rounded-2xl border border-ocre/20 p-6 flex flex-col gap-3 flex-shrink-0 overflow-y-auto">
+            <div className="text-[9px] tracking-[4px] uppercase text-white/55 font-inter mb-1">
+              Choisir un service
+            </div>
+            {SERVICES.map((s, i) => (
+              <button
+                key={s.id}
+                onClick={() => goTo(i)}
+                className={`flex items-center gap-3 px-5 py-3.5 rounded-full border text-[11px] tracking-[2px] uppercase font-inter text-left transition-all ${
+                  i === active
+                    ? "bg-ocre border-ocre text-white"
+                    : "border-white/15 text-white/65 hover:border-ocre/50 hover:text-white"
+                }`}
+              >
+                <span className="text-base">{s.icon}</span>
+                {s.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex-1 bg-panneau rounded-2xl border border-ocre/20 overflow-hidden relative">
+            {SERVICES.map((s, i) => (
+              <div
+                key={s.id}
+                className="absolute inset-0 transition-all duration-700"
+                style={{
+                  opacity: i === active ? 1 : 0,
+                  pointerEvents: i === active ? "auto" : "none",
+                  transform:
+                    i === active
+                      ? "perspective(1400px) rotateY(0deg)"
+                      : i === leaving
+                        ? "perspective(1400px) rotateY(-12deg)"
+                        : "perspective(1400px) rotateY(8deg)",
+                  transformOrigin: "left center",
+                }}
+              >
+                <Image
+                  src={s.image}
+                  alt={s.imageAlt}
+                  fill
+                  className="object-cover"
+                  sizes="55vw"
+                  priority={i === 0}
+                />
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(to bottom, rgba(10,4,0,0.15) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.95) 100%)",
+                  }}
+                />
+                <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
+                  <span className="inline-block bg-white/12 backdrop-blur-sm border border-white/20 text-white text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
+                    {s.label}
+                  </span>
+                  <p className="font-georgia text-[15px] text-white leading-relaxed mb-2">
+                    {s.subServices}
+                  </p>
+                  <p className="text-[10px] tracking-[3px] uppercase text-white/55 font-inter mb-4">
+                    À partir de{" "}
+                    <span className="text-ocre font-bold">
+                      {prices[s.id] != null
+                        ? `${prices[s.id]} MAD`
+                        : s.price.replace("dès ", "")}
+                    </span>
+                  </p>
+                  <Link
+                    href={`/${locale}/reservation?service=${s.id}`}
+                    className="inline-flex items-center gap-2 bg-white hover:bg-ocre text-nuit hover:text-white text-[10px] tracking-[3px] uppercase px-6 py-3 rounded-full font-bold transition-colors font-inter"
+                  >
+                    → Réserver ce service
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
