@@ -17,6 +17,21 @@ async function getAuthUser() {
   return user;
 }
 
+// Clés accessibles sans authentification (affichage public : prix, WhatsApp)
+const PUBLIC_KEYS = [
+  "whatsapp_number",
+  "price_tresses_africaines",
+  "price_tresses_et_nattes",
+  "price_box_braids",
+  "price_tresses_fulani",
+  "price_tresses_boho",
+  "price_locks_dreads",
+  "price_cheveux_attaches",
+  "price_perruques_tissage",
+  "price_colorations",
+  "price_ongles_soins_epilation",
+];
+
 export async function GET() {
   const { data, error } = await supabaseAdmin
     .from("settings")
@@ -24,7 +39,11 @@ export async function GET() {
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const settings = Object.fromEntries(data.map((r) => [r.key, r.value]));
+  const settings = Object.fromEntries(
+    data
+      .filter((r) => PUBLIC_KEYS.includes(r.key))
+      .map((r) => [r.key, r.value]),
+  );
   return NextResponse.json(settings);
 }
 
