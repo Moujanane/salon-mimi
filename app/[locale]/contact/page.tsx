@@ -2,6 +2,7 @@ export const revalidate = 3600;
 
 import type { Metadata } from "next";
 import { getSettings } from "@/lib/settings";
+import ContactForm from "@/components/sections/ContactForm";
 
 export async function generateMetadata({
   params,
@@ -126,6 +127,7 @@ export default async function ContactPage({
             title="Salon Mimi — Place Jemaa el-Fna Marrakech"
           />
         </div>
+        <ContactForm locale={locale} />
       </div>
     </div>
   );
