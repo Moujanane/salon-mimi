@@ -53,12 +53,12 @@ export async function generateMetadata({
     title: titles[locale] ?? titles.fr,
     description: descriptions[locale] ?? descriptions.fr,
     alternates: {
-      canonical: `${BASE_URL}/${locale}`,
+      canonical: `${BASE_URL}/${locale}/`,
       languages: {
-        fr: `${BASE_URL}/fr`,
-        en: `${BASE_URL}/en`,
-        es: `${BASE_URL}/es`,
-        "x-default": `${BASE_URL}/fr`,
+        fr: `${BASE_URL}/fr/`,
+        en: `${BASE_URL}/en/`,
+        es: `${BASE_URL}/es/`,
+        "x-default": `${BASE_URL}/fr/`,
       },
     },
     openGraph: {
@@ -66,7 +66,7 @@ export async function generateMetadata({
       description: descriptions[locale] ?? descriptions.fr,
       locale,
       type: "website",
-      url: `${BASE_URL}/${locale}`,
+      url: `${BASE_URL}/${locale}/`,
       images: [
         {
           url: `${BASE_URL}/${locale}/opengraph-image`,

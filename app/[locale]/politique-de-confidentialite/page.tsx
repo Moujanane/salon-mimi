@@ -24,7 +24,7 @@ export async function generateMetadata({
     title: titles[locale] ?? titles.fr,
     description: descriptions[locale] ?? descriptions.fr,
     alternates: {
-      canonical: `${BASE_URL}/${locale}/politique-de-confidentialite`,
+      canonical: `${BASE_URL}/${locale}/politique-de-confidentialite/`,
     },
   };
 }

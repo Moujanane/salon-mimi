@@ -27,7 +27,7 @@ export async function generateMetadata({
     title: titles[locale] ?? titles.fr,
     description: descriptions[locale] ?? descriptions.fr,
     alternates: {
-      canonical: `${BASE_URL}/${locale}`,
+      canonical: `${BASE_URL}/${locale}/`,
       languages: {
         fr: `${BASE_URL}/fr`,
         en: `${BASE_URL}/en`,

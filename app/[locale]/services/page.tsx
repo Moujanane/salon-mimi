@@ -27,7 +27,7 @@ export async function generateMetadata({
     title: titles[locale] ?? titles.fr,
     description: descriptions[locale] ?? descriptions.fr,
     alternates: {
-      canonical: `https://mimi-coiffure.com/${locale}/services`,
+      canonical: `https://mimi-coiffure.com/${locale}/services/`,
       languages: {
         fr: "https://mimi-coiffure.com/fr/services",
         en: "https://mimi-coiffure.com/en/services",
