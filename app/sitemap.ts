@@ -12,6 +12,8 @@ const pages = [
   "/reservation",
   "/a-propos",
   "/contact",
+  "/mentions-legales",
+  "/politique-de-confidentialite",
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

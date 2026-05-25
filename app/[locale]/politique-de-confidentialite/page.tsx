@@ -15,9 +15,14 @@ export async function generateMetadata({
     en: "Privacy Policy — Salon Mimi Marrakech",
     es: "Política de privacidad — Salon Mimi Marrakech",
   };
+  const descriptions: Record<string, string> = {
+    fr: "Politique de confidentialité du Salon Mimi Marrakech. Données collectées, finalité, durée de conservation, vos droits selon la loi marocaine 09-08.",
+    en: "Privacy policy for Salon Mimi Marrakech. Data collected, purpose, retention period and your rights under Moroccan law 09-08.",
+    es: "Política de privacidad del Salon Mimi Marrakech. Datos recopilados, finalidad, conservación y sus derechos según la ley marroquí 09-08.",
+  };
   return {
     title: titles[locale] ?? titles.fr,
-    robots: { index: false },
+    description: descriptions[locale] ?? descriptions.fr,
     alternates: {
       canonical: `${BASE_URL}/${locale}/politique-de-confidentialite`,
     },

@@ -15,9 +15,14 @@ export async function generateMetadata({
     en: "Legal Notice — Salon Mimi Marrakech",
     es: "Aviso legal — Salon Mimi Marrakech",
   };
+  const descriptions: Record<string, string> = {
+    fr: "Mentions légales du Salon Mimi, salon de coiffure afro à Marrakech. Éditeur, hébergeur, propriété intellectuelle et droit applicable.",
+    en: "Legal notice for Salon Mimi, afro hair salon in Marrakech. Publisher, hosting, intellectual property and applicable law.",
+    es: "Aviso legal del Salon Mimi, salón de peluquería afro en Marrakech. Editor, alojamiento, propiedad intelectual y legislación aplicable.",
+  };
   return {
     title: titles[locale] ?? titles.fr,
-    robots: { index: false },
+    description: descriptions[locale] ?? descriptions.fr,
     alternates: {
       canonical: `${BASE_URL}/${locale}/mentions-legales`,
     },
@@ -62,6 +67,10 @@ function LegalFr() {
             Téléphone : +212 7 10 38 82 04
             <br />
             Email : contact@mimi-coiffure.com
+            <br />
+            <br />
+            Responsable de publication :{" "}
+            <strong className="text-white">Moujahid ANANE</strong>
           </p>
         </section>
 
@@ -139,6 +148,10 @@ function LegalEn() {
             Phone: +212 7 10 38 82 04
             <br />
             Email: contact@mimi-coiffure.com
+            <br />
+            <br />
+            Publication manager:{" "}
+            <strong className="text-white">Moujahid ANANE</strong>
           </p>
         </section>
 
@@ -204,6 +217,10 @@ function LegalEs() {
             Teléfono: +212 7 10 38 82 04
             <br />
             Email: contact@mimi-coiffure.com
+            <br />
+            <br />
+            Responsable de publicación:{" "}
+            <strong className="text-white">Moujahid ANANE</strong>
           </p>
         </section>
 
