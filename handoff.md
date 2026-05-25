@@ -368,7 +368,39 @@ app/sitemap.ts                                           — ajout mentions-lega
 
 ---
 
-## 6. Délégation — protocole agent
+## 6. Outils et services utilisés dans le projet
+
+| Outil / Service             | Rôle                                                              | URL / Accès                                          |
+| --------------------------- | ----------------------------------------------------------------- | ---------------------------------------------------- |
+| **Railway**                 | Hébergement du site + Umami. Déploiement auto sur push `main`     | railway.app                                          |
+| **GitHub**                  | Repo source du site                                               | github.com/Moujanane/salon-mimi                      |
+| **Supabase**                | Base de données PostgreSQL — stockage réservations + settings     | supabase.com                                         |
+| **Resend**                  | Envoi des emails (notifications réservation + formulaire contact) | resend.com — clé `RESEND_API_KEY` dans Railway       |
+| **Cloudflare**              | DNS + CDN. Nameservers : `meiling` + `thomas.ns.cloudflare.com`   | dash.cloudflare.com                                  |
+| **Gandi**                   | Registrar du domaine `mimi-coiffure.com`                          | gandi.net                                            |
+| **Namecheap Private Email** | Boîte mail `contact@mimi-coiffure.com` — plan Starter, €12.83/an  | privateemail.com — webmail : mail.privateemail.com   |
+| **Umami**                   | Analytics sans cookie (alternative GA4). Hébergé sur Railway      | umami-production-2141.up.railway.app — login : admin |
+| **Google Search Console**   | Indexation SEO, suivi des erreurs de crawl                        | search.google.com/search-console                     |
+| **Google Maps**             | Iframe carte sur la page contact                                  | Embed dans `/fr/contact`                             |
+| **WhatsApp**                | Canal de confirmation des réservations                            | Numéro configurable dans `/admin/settings`           |
+| **TripAdvisor**             | Fiche établissement (en attente validation)                       | tripadvisor.com                                      |
+| **Playwright**              | Tests de non-régression (11 tests E2E)                            | `npx playwright test`                                |
+
+### Variables d'environnement Railway (site salon-mimi)
+
+| Variable                        | Rôle                                                             |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `RESEND_API_KEY`                | Envoi emails Resend                                              |
+| `RESEND_FROM_EMAIL`             | Adresse expéditeur (optionnel, fallback `onboarding@resend.dev`) |
+| `MIMI_PIN`                      | PIN d'accès à la PWA `/mimi.html` (actuellement `1993`)          |
+| `SUPABASE_URL`                  | URL du projet Supabase                                           |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Clé service Supabase (accès total)                               |
+| `NEXT_PUBLIC_SUPABASE_URL`      | URL Supabase côté client                                         |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clé anon Supabase côté client                                    |
+
+---
+
+## 6b. Délégation — protocole agent
 
 Pour tout diagnostic ou correction, déléguer à un agent avec le prompt suivant :
 
