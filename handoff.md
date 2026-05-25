@@ -6,13 +6,14 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 2. État actuel du code — mis à jour le 25 mai 2026
+## 2. État actuel du code — mis à jour le 25 mai 2026 (fin de session)
 
 ### Ce qui marche
 
 - Homepage : hero split 50/50, 3 colonnes photo animées, titre "Tresses africaines & Rasta / Marrakech", badge "Place Jamaa El Fna" en ocre
 - Page Services : 10 services en français, pills cliquables, panneau photo dynamique, responsive corrigé (useEffect + window.innerWidth)
 - Page Réservation : formulaire complet (nom, téléphone, service, date, heure, nombre de personnes, message), insertion Supabase validée, bouton WhatsApp affiché après soumission
+- Page Contact : formulaire de demande (prénom, nom, téléphone, email, demande) — email envoyé à contact@mimi-coiffure.com via Resend, trilingue FR/EN/ES, rate limiting, XSS protégé
 - Header : nav fixe, hamburger mobile, bouton RDV ocre
 - Footer : liens Mentions légales + Politique de confidentialité en fr/en/es
 - SEO minimum complet : title unique, meta description, alt images, sitemap (8 pages), Search Console connectée, canonical toutes pages avec slash final
@@ -27,10 +28,12 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 - Pages légales RGPD conformes : `/mentions-legales` et `/politique-de-confidentialite` en fr/en/es, indexables, avec responsable de publication (Moujahid ANANE)
 - Bandeau cookies conforme RGPD (cookie technique NEXT_LOCALE, pas de consentement obligatoire)
 - Email `contact@mimi-coiffure.com` opérationnel via Private Email (Namecheap), DNS Cloudflare configuré
+- Analytics Umami : installé sur Railway, script intégré dans le layout, CSP corrigé — dashboard sur `umami-production-2141.up.railway.app`
 
 ### Ce qui reste fragile
 
 - Le titre hero sur desktop peut déborder légèrement selon la résolution — ajuster `clamp` si nécessaire
+- Email formulaire contact : dépend de `RESEND_API_KEY` dans Railway — si absente, le formulaire renvoie une erreur 500
 
 ### Ce qui ne marche pas
 
@@ -39,12 +42,14 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 ### Ce qui reste à faire
 
 - **Cloudflare Cache Rule** (priorité haute) : configurer la règle de cache dans Cloudflare pour bypasser le `no-store` Railway et faire passer PageSpeed de 74 à 85+. Voir section 7 pour les instructions exactes.
-- **Email de notification** : dans `/admin/settings`, remplacer l'adresse par `contact@mimi-coiffure.com` et sauvegarder
-- **Test email Resend en prod** : soumettre une réservation de test et vérifier les logs Railway (`[email notification]`) + la boîte `contact@mimi-coiffure.com`
+- **Email de notification réservations** : dans `/admin/settings`, remplacer l'adresse par `contact@mimi-coiffure.com` et sauvegarder
+- **Test formulaire contact en prod** : soumettre une demande depuis `/fr/contact` et vérifier la réception à `contact@mimi-coiffure.com`
+- **Test email Resend réservations** : soumettre une réservation de test et vérifier les logs Railway + la boîte `contact@mimi-coiffure.com`
 - **Vérification indexation Google** : attendre 2-4 semaines et vérifier dans Search Console que les erreurs canoniques ont disparu. Cliquer "Valider la correction" sur les 2 lignes d'erreur.
 - **Traductions EN et ES** : le contenu des pages services, galerie, homepage est en français uniquement dans les composants — les balises SEO sont traduites mais pas le contenu visible
 - **Fiche Google Business Profile** : créer ou réclamer la fiche GMB du salon (essentiel pour le SEO local Marrakech)
 - **Fiche TripAdvisor** : en attente de validation depuis session 18 mai
+- **Mot de passe Umami** : changer le mot de passe admin par défaut (`umami`) dans le dashboard Umami
 
 ---
 
@@ -274,6 +279,39 @@ Si tu vois `cf-ray:` dans les headers → Cloudflare est actif. Alors configurer
 ### Leçon critique — `localeCookie: false` à ne jamais retenter
 
 Supprimer le cookie `NEXT_LOCALE` pour obtenir `cache-control: public` est une fausse bonne idée. next-intl recalcule la locale côté client sans cookie → TBT explose × 7. La seule solution viable est Cloudflare CDN qui cache malgré le `no-store`.
+
+---
+
+## 9. Session 25 mai 2026 (soir) — Analytics + Formulaire contact
+
+### Analytics Umami
+
+- Template Umami déployé sur Railway dans le même projet (3 services : umami + Postgres-MqJ4 + Valkey)
+- URL dashboard : `umami-production-2141.up.railway.app` — login : `admin` / mot de passe à changer
+- Website ID `mimi-coiffure.com` : `a779a13d-9789-46fc-95c2-958ead141b9d`
+- Script intégré dans `app/[locale]/layout.tsx` (balise `<script defer>` dans `<head>`)
+- CSP corrigé dans `next.config.mjs` : `umami-production-2141.up.railway.app` ajouté dans `script-src` et `connect-src` — le script était bloqué par le Content Security Policy
+- Sans cookie, conforme RGPD, pas de mise à jour du bandeau cookies requise
+- **À faire** : changer le mot de passe admin Umami (actuellement `umami` par défaut)
+
+### Formulaire de contact
+
+- Route API : `app/api/contact/route.ts` — POST, validation tous champs, rate limiting 3 req/min/IP, XSS sanitisé
+- Composant : `components/sections/ContactForm.tsx` — client component, trilingue FR/EN/ES
+- Champs : prénom, nom, téléphone, email, demande
+- Email envoyé à `contact@mimi-coiffure.com` via Resend
+- Intégré dans `app/[locale]/contact/page.tsx` sous la carte Google Maps
+- **Dépendance** : `RESEND_API_KEY` doit être présente dans Railway
+
+### Fichiers touchés (session 25 mai soir)
+
+```
+app/[locale]/layout.tsx              — script Umami dans <head>
+next.config.mjs                      — CSP : ajout Umami dans script-src + connect-src
+app/api/contact/route.ts             — nouvelle route API contact (créé)
+components/sections/ContactForm.tsx  — nouveau composant formulaire (créé)
+app/[locale]/contact/page.tsx        — import + intégration ContactForm
+```
 
 ---
 
