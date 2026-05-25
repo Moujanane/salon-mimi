@@ -6,7 +6,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 2. État actuel du code — mis à jour le 24 mai 2026
+## 2. État actuel du code — mis à jour le 25 mai 2026
 
 ### Ce qui marche
 
@@ -15,21 +15,21 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 - Page Réservation : formulaire complet (nom, téléphone, service, date, heure, nombre de personnes, message), insertion Supabase validée, bouton WhatsApp affiché après soumission
 - Header : nav fixe, hamburger mobile, bouton RDV ocre
 - Footer : liens Mentions légales + Politique de confidentialité en fr/en/es
-- SEO minimum complet : title unique, meta description, alt images, sitemap, Search Console connectée, canonical toutes pages
+- SEO minimum complet : title unique, meta description, alt images, sitemap (8 pages), Search Console connectée, canonical toutes pages avec slash final
 - SEO : JSON-LD HairSalon + FAQ schema, hreflang fr/en/es, og:image
 - Sécurité : headers HTTP (CSP, X-Frame-Options, HSTS), rate limiting API, validation serveur, XSS emails corrigé, email admin masqué dans l'API publique
 - Middleware i18n : /admin exclu correctement, redirections 307→308, www→non-www
 - Images : 14 photos réelles du salon dans /public/images/
 - Dashboard admin : affiche les réservations (RLS Supabase corrigée)
-- Page admin /settings : WhatsApp et prix paramétrables, sauvegarde en Supabase
+- Page admin /settings : WhatsApp, email de notification et prix paramétrables — champs visibles (bg-white + text-gray-900 corrigés)
 - PWA mobile `/mimi.html` avec PIN pour planning Mimi
-- Notifications email Resend à chaque réservation
-- Pages légales RGPD : `/mentions-legales` et `/politique-de-confidentialite` en fr/en/es
+- Notifications email Resend à chaque réservation — adresse from configurable via `RESEND_FROM_EMAIL`
+- Pages légales RGPD conformes : `/mentions-legales` et `/politique-de-confidentialite` en fr/en/es, indexables, avec responsable de publication (Moujahid ANANE)
 - Bandeau cookies conforme RGPD (cookie technique NEXT_LOCALE, pas de consentement obligatoire)
+- Email `contact@mimi-coiffure.com` opérationnel via Private Email (Namecheap), DNS Cloudflare configuré
 
 ### Ce qui reste fragile
 
-- Page /admin/settings : les champs prix s'affichent vides visuellement (couleur CSS non confirmée pour les prix)
 - Le titre hero sur desktop peut déborder légèrement selon la résolution — ajuster `clamp` si nécessaire
 
 ### Ce qui ne marche pas
@@ -39,12 +39,12 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 ### Ce qui reste à faire
 
 - **Cloudflare Cache Rule** (priorité haute) : configurer la règle de cache dans Cloudflare pour bypasser le `no-store` Railway et faire passer PageSpeed de 74 à 85+. Voir section 7 pour les instructions exactes.
-- **Vérification indexation Google** : attendre 2-4 semaines après la mise en ligne de Cloudflare et vérifier dans Search Console que les pages /fr, /fr/services etc. sont bien indexées (plus d'erreur canonique)
+- **Email de notification** : dans `/admin/settings`, remplacer l'adresse par `contact@mimi-coiffure.com` et sauvegarder
+- **Test email Resend en prod** : soumettre une réservation de test et vérifier les logs Railway (`[email notification]`) + la boîte `contact@mimi-coiffure.com`
+- **Vérification indexation Google** : attendre 2-4 semaines et vérifier dans Search Console que les erreurs canoniques ont disparu. Cliquer "Valider la correction" sur les 2 lignes d'erreur.
 - **Traductions EN et ES** : le contenu des pages services, galerie, homepage est en français uniquement dans les composants — les balises SEO sont traduites mais pas le contenu visible
 - **Fiche Google Business Profile** : créer ou réclamer la fiche GMB du salon (essentiel pour le SEO local Marrakech)
 - **Fiche TripAdvisor** : en attente de validation depuis session 18 mai
-- **Test email Resend en prod** : vérifier que les notifications arrivent bien après une vraie réservation
-- **Vérifier /admin/settings prix** : confirmer visuellement que les champs prix sont lisibles (fond clair vs texte)
 
 ---
 
@@ -64,9 +64,9 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 - Lib : `lib/sendNotificationEmail.ts` — utilise Resend
 - Appelé dans `app/api/reservations/route.ts` après INSERT réussi
-- Expéditeur : `onboarding@resend.dev` (domaine Resend gratuit, 1 domaine custom déjà utilisé par atlas-swincar)
-- Destinataire : configurable dans `/admin/settings` > champ "Email de notification"
-- Variable Railway requise : `RESEND_API_KEY`
+- Expéditeur : lit `process.env.RESEND_FROM_EMAIL` avec fallback `onboarding@resend.dev`
+- Destinataire : configurable dans `/admin/settings` > champ "Email de notification" → mettre `contact@mimi-coiffure.com`
+- Variables Railway requises : `RESEND_API_KEY` + `RESEND_FROM_EMAIL` (optionnel)
 - La valeur est stockée dans Supabase table `settings`, clé `notification_email`
 
 ### Settings admin — champ notification_email
@@ -274,6 +274,59 @@ Si tu vois `cf-ray:` dans les headers → Cloudflare est actif. Alors configurer
 ### Leçon critique — `localeCookie: false` à ne jamais retenter
 
 Supprimer le cookie `NEXT_LOCALE` pour obtenir `cache-control: public` est une fausse bonne idée. next-intl recalcule la locale côté client sans cookie → TBT explose × 7. La seule solution viable est Cloudflare CDN qui cache malgré le `no-store`.
+
+---
+
+## 8. Session 25 mai 2026 — Email + Légal + SEO canonicals
+
+### Email `contact@mimi-coiffure.com`
+
+- Abonnement Private Email Starter acheté sur Namecheap pour `mimi-coiffure.com` (€12.83/an)
+- Boîte `contact@mimi-coiffure.com` créée, Catch-All activé, 5 GB
+- DNS Cloudflare configuré :
+  - MX `mx1.privateemail.com` priorité 10
+  - MX `mx2.privateemail.com` priorité 10
+  - TXT `v=spf1 include:privateemail.com ~all`
+  - Anciens enregistrements Gandi supprimés (spool, fb, SRV imap/pop3/submission, SPF Gandi)
+- Webmail : `mail.privateemail.com` avec `contact@mimi-coiffure.com`
+- **À faire** : aller dans `/admin/settings` et mettre `contact@mimi-coiffure.com` comme email de notification
+
+### Mentions légales + RGPD conformes
+
+- Responsable de publication ajouté : **Moujahid ANANE** (FR/EN/ES) dans `/mentions-legales`
+- `robots: index: false` retiré des deux pages légales — elles sont maintenant indexables
+- Meta description ajoutée sur les deux pages
+- `/mentions-legales` et `/politique-de-confidentialite` ajoutées au sitemap (3 locales chacune)
+- Bandeau cookies confirmé opérationnel dans le layout
+
+### Fix inputs /admin/settings invisibles
+
+- Cause : `globals.css` applique `text-white` sur le `body`, les inputs héritaient cette couleur
+- Fix : `bg-white` + `ring-offset-white` ajoutés sur les 3 inputs (WhatsApp, email, prix) dans `SettingsForm.tsx`
+
+### SEO — canonicals avec slash final
+
+- Problème : Google signalait `mimi-coiffure.com/fr` comme doublon car le canonical déclarait `/fr` sans slash mais Next.js sert `/fr/` avec slash
+- Fix : slash final ajouté sur tous les canonicals de toutes les pages publiques (8 fichiers)
+- Fix appliqué aussi sur les hreflang dans `app/[locale]/layout.tsx`
+- **Action Search Console** : cliquer "Valider la correction" sur les 2 lignes d'erreur (redirection + doublon canonique)
+
+### Fichiers touchés (session 25 mai)
+
+```
+components/admin/SettingsForm.tsx                        — bg-white + ring-offset-white sur inputs
+lib/sendNotificationEmail.ts                             — from dynamique via RESEND_FROM_EMAIL
+app/[locale]/mentions-legales/page.tsx                   — Moujahid ANANE + indexable + meta desc
+app/[locale]/politique-de-confidentialite/page.tsx       — indexable + meta description
+app/[locale]/layout.tsx                                  — canonical + hreflang avec slash final
+app/[locale]/page.tsx                                    — canonical avec slash final
+app/[locale]/contact/page.tsx                            — canonical avec slash final
+app/[locale]/galerie/page.tsx                            — canonical avec slash final
+app/[locale]/reservation/page.tsx                        — canonical avec slash final
+app/[locale]/a-propos/page.tsx                           — canonical avec slash final
+app/[locale]/services/page.tsx                           — canonical avec slash final
+app/sitemap.ts                                           — ajout mentions-legales + politique
+```
 
 ---
 
