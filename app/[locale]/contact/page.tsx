@@ -89,45 +89,58 @@ export default async function ContactPage({
       <div className="bg-nuit py-16 text-center">
         <h1 className="font-playfair text-5xl text-or">{data.title}</h1>
       </div>
-      <div className="max-w-3xl mx-auto px-4 py-16 space-y-10">
-        <div className="bg-panneau rounded-2xl p-8 border border-ocre/15">
+      <div className="max-w-6xl mx-auto px-4 py-16">
+        {/* Adresse + horaires */}
+        <div className="bg-panneau rounded-2xl p-8 border border-ocre/15 mb-10">
           <p className="text-xl font-playfair text-brun mb-2">
             📍 {data.address}
           </p>
           <p className="text-brun mt-6 font-medium">{data.hours}</p>
           <p className="text-white/60">{data.hoursDetail}</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <a
-            href={`https://wa.me/${settings.whatsapp_number}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 bg-whatsapp text-white text-center py-4 rounded-full font-medium hover:bg-whatsapp-hover transition-colors"
-          >
-            {data.waLabel}
-          </a>
-          <a
-            href="https://www.instagram.com/Salonmimi.marrakech"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 bg-panneau border border-ocre/20 text-white text-center py-4 rounded-full font-medium hover:border-ocre/50 transition-colors"
-          >
-            {data.igLabel}
-          </a>
+
+        {/* Disposition 2 colonnes : formulaire à gauche, boutons + carte à droite */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+          {/* Colonne gauche — formulaire */}
+          <div className="lg:col-span-3">
+            <ContactForm locale={locale} />
+          </div>
+
+          {/* Colonne droite — boutons + carte */}
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            <a
+              href={`https://wa.me/${settings.whatsapp_number}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-whatsapp text-white text-center py-4 rounded-full font-medium hover:bg-whatsapp-hover transition-colors"
+            >
+              {data.waLabel}
+            </a>
+            <a
+              href="https://www.instagram.com/Salonmimi.marrakech"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-panneau border border-ocre/20 text-white text-center py-4 rounded-full font-medium hover:border-ocre/50 transition-colors"
+            >
+              {data.igLabel}
+            </a>
+            <div
+              className="rounded-2xl overflow-hidden bg-gray-200"
+              style={{ height: "320px" }}
+            >
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3397.3462!2d-7.989167!3d31.625956!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xdafee443af05f15%3A0x8ba8a7c0b3ba6da3!2sJemaa%20el-Fna!5e0!3m2!1sfr!2sma!4v1715700000000!5m2!1sfr!2sma"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Salon Mimi — Place Jemaa el-Fna Marrakech"
+              />
+            </div>
+          </div>
         </div>
-        <div className="rounded-2xl overflow-hidden h-72 bg-gray-200">
-          <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3397.3462!2d-7.989167!3d31.625956!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xdafee443af05f15%3A0x8ba8a7c0b3ba6da3!2sJemaa%20el-Fna!5e0!3m2!1sfr!2sma!4v1715700000000!5m2!1sfr!2sma"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title="Salon Mimi — Place Jemaa el-Fna Marrakech"
-          />
-        </div>
-        <ContactForm locale={locale} />
       </div>
     </div>
   );
