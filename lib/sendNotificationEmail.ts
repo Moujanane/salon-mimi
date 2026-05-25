@@ -41,7 +41,7 @@ export async function sendNotificationEmail(
   const messageClient = reservation.message ?? "—";
 
   await resend.emails.send({
-    from: "Mimi Coiffure <onboarding@resend.dev>",
+    from: process.env.RESEND_FROM_EMAIL ?? "Mimi Coiffure <onboarding@resend.dev>",
     to,
     subject: `Nouvelle réservation — ${esc(reservation.nom)} · ${esc(reservation.service)}`,
     html: `
