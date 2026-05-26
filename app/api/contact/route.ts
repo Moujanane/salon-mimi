@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 function esc(str: string | undefined): string {
   if (!str) return "";
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Champs manquants" }, { status: 400 });
   }
 
-  if (!process.env.BREVO_SMTP_USER || !process.env.BREVO_SMTP_PASS) {
+  if (!process.env.RESEND_API_KEY) {
     return NextResponse.json(
       { error: "Service email non configuré" },
       { status: 500 },
@@ -42,19 +44,9 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.BREVO_SMTP_USER,
-        pass: process.env.BREVO_SMTP_PASS,
-      },
-    });
-
-    await transporter.sendMail({
-      from: "Mimi Coiffure <contact@mimi-coiffure.com>",
-      to: "contact@mimi-coiffure.com",
+    await resend.emails.send({
+      from: "Mimi Coiffure <onboarding@resend.dev>",
+      to: "moujanane@free.fr",
       subject: `Nouvelle demande de contact — ${esc(prenom)} ${esc(nom)}`,
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border:1px solid #eee;border-radius:12px;">
@@ -75,7 +67,7 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({ ok: true });
   } catch (err) {
-    console.error("SMTP error:", err);
+    console.error("Resend error:", err);
     return NextResponse.json(
       { error: "Erreur envoi email", detail: String(err) },
       { status: 500 },

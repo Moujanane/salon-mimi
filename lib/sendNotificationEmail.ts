@@ -1,4 +1,6 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 function esc(str: string | undefined): string {
   if (!str) return "";
@@ -8,18 +10,6 @@ function esc(str: string | undefined): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#x27;");
-}
-
-function createTransporter() {
-  return nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.BREVO_SMTP_USER,
-      pass: process.env.BREVO_SMTP_PASS,
-    },
-  });
 }
 
 interface ReservationData {
@@ -36,8 +26,7 @@ export async function sendNotificationEmail(
   to: string,
   reservation: ReservationData,
 ) {
-  if (!to || !process.env.BREVO_SMTP_USER || !process.env.BREVO_SMTP_PASS)
-    return;
+  if (!to || !process.env.RESEND_API_KEY) return;
 
   const date = reservation.date_souhaitee
     ? new Date(reservation.date_souhaitee).toLocaleDateString("fr-FR", {
@@ -51,10 +40,9 @@ export async function sendNotificationEmail(
   const personnes = reservation.nombre_personnes ?? "1";
   const messageClient = reservation.message ?? "—";
 
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from: "Mimi Coiffure <contact@mimi-coiffure.com>",
-    to,
+  await resend.emails.send({
+    from: "Mimi Coiffure <onboarding@resend.dev>",
+    to: "moujanane@free.fr",
     subject: `Nouvelle réservation — ${esc(reservation.nom)} · ${esc(reservation.service)}`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border:1px solid #eee;border-radius:12px;">
