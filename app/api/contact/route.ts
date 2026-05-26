@@ -74,7 +74,11 @@ export async function POST(req: NextRequest) {
       `,
     });
     return NextResponse.json({ ok: true });
-  } catch {
-    return NextResponse.json({ error: "Erreur envoi email" }, { status: 500 });
+  } catch (err) {
+    console.error("SMTP error:", err);
+    return NextResponse.json(
+      { error: "Erreur envoi email", detail: String(err) },
+      { status: 500 },
+    );
   }
 }
