@@ -33,7 +33,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 ### Ce qui reste fragile
 
 - Le titre hero sur desktop peut déborder légèrement selon la résolution — ajuster `clamp` si nécessaire
-- Email formulaire contact : dépend de `RESEND_API_KEY` dans Railway — si absente, le formulaire renvoie une erreur 500
+- Email formulaire contact : fonctionne via Resend API, emails reçus sur `moujanane@free.fr`
 
 ### Ce qui ne marche pas
 
@@ -42,9 +42,6 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 ### Ce qui reste à faire
 
 - **Cloudflare Cache Rule** (priorité haute) : configurer la règle de cache dans Cloudflare pour bypasser le `no-store` Railway et faire passer PageSpeed de 74 à 85+. Voir section 7 pour les instructions exactes.
-- **Email de notification réservations** : dans `/admin/settings`, remplacer l'adresse par `contact@mimi-coiffure.com` et sauvegarder
-- **Test formulaire contact en prod** : soumettre une demande depuis `/fr/contact` et vérifier la réception à `contact@mimi-coiffure.com`
-- **Test email Resend réservations** : soumettre une réservation de test et vérifier les logs Railway + la boîte `contact@mimi-coiffure.com`
 - **Vérification indexation Google** : attendre 2-4 semaines et vérifier dans Search Console que les erreurs canoniques ont disparu. Cliquer "Valider la correction" sur les 2 lignes d'erreur.
 - **Traductions EN et ES** : le contenu des pages services, galerie, homepage est en français uniquement dans les composants — les balises SEO sont traduites mais pas le contenu visible
 - **Fiche Google Business Profile** : créer ou réclamer la fiche GMB du salon (essentiel pour le SEO local Marrakech)
@@ -388,15 +385,45 @@ app/sitemap.ts                                           — ajout mentions-lega
 
 ### Variables d'environnement Railway (site salon-mimi)
 
-| Variable                        | Rôle                                                             |
-| ------------------------------- | ---------------------------------------------------------------- |
-| `RESEND_API_KEY`                | Envoi emails Resend                                              |
-| `RESEND_FROM_EMAIL`             | Adresse expéditeur (optionnel, fallback `onboarding@resend.dev`) |
-| `MIMI_PIN`                      | PIN d'accès à la PWA `/mimi.html` (actuellement `1993`)          |
-| `SUPABASE_URL`                  | URL du projet Supabase                                           |
-| `SUPABASE_SERVICE_ROLE_KEY`     | Clé service Supabase (accès total)                               |
-| `NEXT_PUBLIC_SUPABASE_URL`      | URL Supabase côté client                                         |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clé anon Supabase côté client                                    |
+| Variable                        | Rôle                                                    |
+| ------------------------------- | ------------------------------------------------------- |
+| `RESEND_API_KEY`                | Envoi emails via Resend API (clé commence par `re_`)    |
+| `MIMI_PIN`                      | PIN d'accès à la PWA `/mimi.html` (actuellement `1993`) |
+| `SUPABASE_URL`                  | URL du projet Supabase                                  |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Clé service Supabase (accès total)                      |
+| `NEXT_PUBLIC_SUPABASE_URL`      | URL Supabase côté client                                |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Clé anon Supabase côté client                           |
+
+---
+
+## 10. Session 26 mai 2026 — Emails formulaire contact
+
+### Problème résolu : emails formulaire contact n'arrivaient pas
+
+Diagnostic par étapes :
+
+1. `RESEND_API_KEY` absente de Railway → erreur 500
+2. Clé ajoutée mais invalide (sans préfixe `re_`) → Resend retournait `{"ok":true}` mais n'envoyait rien silencieusement
+3. Nouvelle clé créée sur resend.com (commence par `re_`) → emails arrivés sur `moujanane@free.fr`
+
+### Leçons critiques
+
+- Railway bloque les ports SMTP 465 et 587 — ne jamais utiliser Nodemailer/SMTP depuis Railway. Toujours passer par une API HTTP (Resend, etc.)
+- Resend ne retourne pas d'erreur si la clé API est invalide — toujours vérifier dans le dashboard Resend > Emails que les envois apparaissent bien
+- Les clés Resend commencent obligatoirement par `re_`
+- Instancier Resend dans le handler (pas au niveau module) pour s'assurer que la variable est lue au moment de l'appel
+
+### Destination des emails (état actuel)
+
+- Formulaire contact : `moujanane@free.fr` (sender : `onboarding@resend.dev`)
+- Notifications réservations : adresse configurée dans `/admin/settings`
+
+### Fichiers touchés
+
+```
+app/api/contact/route.ts        — Resend instancié dans le handler
+lib/sendNotificationEmail.ts    — Resend (Nodemailer supprimé)
+```
 
 ---
 
