@@ -12,12 +12,12 @@ function esc(str: string | undefined): string {
 
 function createTransporter() {
   return nodemailer.createTransport({
-    host: "mail.privateemail.com",
-    port: 465,
-    secure: true,
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: process.env.BREVO_SMTP_USER,
+      pass: process.env.BREVO_SMTP_PASS,
     },
   });
 }
@@ -36,7 +36,8 @@ export async function sendNotificationEmail(
   to: string,
   reservation: ReservationData,
 ) {
-  if (!to || !process.env.SMTP_USER || !process.env.SMTP_PASS) return;
+  if (!to || !process.env.BREVO_SMTP_USER || !process.env.BREVO_SMTP_PASS)
+    return;
 
   const date = reservation.date_souhaitee
     ? new Date(reservation.date_souhaitee).toLocaleDateString("fr-FR", {
