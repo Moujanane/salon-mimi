@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 function esc(str: string | undefined): string {
   if (!str) return "";
@@ -10,7 +10,17 @@ function esc(str: string | undefined): string {
     .replace(/'/g, "&#x27;");
 }
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function createTransporter() {
+  return nodemailer.createTransport({
+    host: "mail.privateemail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+}
 
 interface ReservationData {
   nom: string;
@@ -26,7 +36,7 @@ export async function sendNotificationEmail(
   to: string,
   reservation: ReservationData,
 ) {
-  if (!to || !process.env.RESEND_API_KEY) return;
+  if (!to || !process.env.SMTP_USER || !process.env.SMTP_PASS) return;
 
   const date = reservation.date_souhaitee
     ? new Date(reservation.date_souhaitee).toLocaleDateString("fr-FR", {
@@ -40,8 +50,9 @@ export async function sendNotificationEmail(
   const personnes = reservation.nombre_personnes ?? "1";
   const messageClient = reservation.message ?? "—";
 
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL ?? "Mimi Coiffure <onboarding@resend.dev>",
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from: "Mimi Coiffure <contact@mimi-coiffure.com>",
     to,
     subject: `Nouvelle réservation — ${esc(reservation.nom)} · ${esc(reservation.service)}`,
     html: `
