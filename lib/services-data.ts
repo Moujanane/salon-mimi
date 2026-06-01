@@ -4,6 +4,7 @@ export interface Service {
   nameFr: string;
   nameEn: string;
   nameEs: string;
+  descFr?: string;
   durationFr: string;
   durationEn: string;
   durationEs: string;
@@ -34,6 +35,7 @@ export const services: Service[] = [
     nameFr: "Box Braids medium",
     nameEn: "Box Braids medium",
     nameEs: "Box Braids medianas",
+    descFr: "Tresses torsadées taille moyenne, avec ou sans extensions",
     durationFr: "3–4h",
     durationEn: "3–4h",
     durationEs: "3–4h",
@@ -59,6 +61,7 @@ export const services: Service[] = [
     nameFr: "Knotless Braids",
     nameEn: "Knotless Braids",
     nameEs: "Knotless Braids",
+    descFr: "Tresses sans nœuds, légères et sans tension sur le cuir chevelu",
     durationFr: "4–5h",
     durationEn: "4–5h",
     durationEs: "4–5h",
@@ -72,6 +75,7 @@ export const services: Service[] = [
     nameFr: "Boho / Goddess Braids",
     nameEn: "Boho / Goddess Braids",
     nameEs: "Boho / Goddess Braids",
+    descFr: "Tresses bohème ondulées, effet naturel et volumineux",
     durationFr: "3–4h",
     durationEn: "3–4h",
     durationEs: "3–4h",
@@ -97,6 +101,7 @@ export const services: Service[] = [
     nameFr: "Cornrows full head",
     nameEn: "Cornrows full head",
     nameEs: "Cornrows cabeza completa",
+    descFr: "Tresses plaquées tête entière, style et tenue garantis",
     durationFr: "1–2h",
     durationEn: "1–2h",
     durationEs: "1–2h",

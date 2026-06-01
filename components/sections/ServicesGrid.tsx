@@ -38,7 +38,7 @@ export default function ServicesGrid({
             <ServiceCard
               key={service.id}
               name={getServiceName(service, locale)}
-              nameFr={service.nameFr}
+              descFr={service.descFr}
               duration={getServiceDuration(service, locale)}
               priceMad={featuredPrices?.[service.id] ?? service.priceMad}
               priceEur={service.priceEur}
