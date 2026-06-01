@@ -42,7 +42,7 @@ const texts = {
 };
 
 const inputClass =
-  "w-full bg-nuit border border-ocre/20 rounded-xl px-4 py-3 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-ocre transition-colors";
+  "w-full bg-fond border border-ocre/30 rounded-xl px-4 py-3 text-sm text-brun placeholder:text-brun/40 focus:outline-none focus:border-ocre transition-colors";
 
 export default function ContactForm({ locale }: { locale: string }) {
   const t = texts[locale as keyof typeof texts] ?? texts.fr;
@@ -78,16 +78,16 @@ export default function ContactForm({ locale }: { locale: string }) {
 
   if (status === "success") {
     return (
-      <div className="bg-panneau border border-ocre/20 rounded-2xl p-8 text-center">
+      <div className="bg-white border border-ocre/20 rounded-2xl p-8 text-center shadow-sm">
         <p className="text-ocre font-playfair text-xl mb-2">✓</p>
-        <p className="text-white/80 text-sm">{t.success}</p>
+        <p className="text-brun/70 text-sm">{t.success}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-panneau border border-ocre/15 rounded-2xl p-8">
-      <h2 className="font-playfair text-2xl text-or mb-6">{t.title}</h2>
+    <div className="bg-white border border-ocre/20 rounded-2xl p-8 shadow-sm">
+      <h2 className="font-playfair text-2xl text-brun mb-6">{t.title}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input
