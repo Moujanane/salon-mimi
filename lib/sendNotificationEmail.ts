@@ -1,7 +1,5 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 function esc(str: string | undefined): string {
   if (!str) return "";
   return String(str)
@@ -27,6 +25,7 @@ export async function sendNotificationEmail(
   reservation: ReservationData,
 ) {
   if (!to || !process.env.RESEND_API_KEY) return;
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const date = reservation.date_souhaitee
     ? new Date(reservation.date_souhaitee).toLocaleDateString("fr-FR", {
