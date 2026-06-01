@@ -6,47 +6,46 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 2. État actuel du code — mis à jour le 25 mai 2026 (fin de session)
+## 2. État actuel du code — mis à jour le 1er juin 2026 (fin de session)
 
 ### Ce qui marche
 
 - Homepage : hero split 50/50, 3 colonnes photo animées, titre "Tresses africaines & Rasta / Marrakech", badge "Place Jamaa El Fna" en ocre
-- Page Services : 10 services en français, pills cliquables, panneau photo dynamique, responsive corrigé (useEffect + window.innerWidth)
-- Page Réservation : formulaire complet (nom, téléphone, service, date, heure, nombre de personnes, message), insertion Supabase validée, bouton WhatsApp affiché après soumission
-- Page Contact : formulaire de demande (prénom, nom, téléphone, email, demande) — email envoyé à contact@mimi-coiffure.com via Resend, trilingue FR/EN/ES, rate limiting, XSS protégé
-- Header : nav fixe, hamburger mobile, bouton RDV ocre
+- **Services vedettes** : 4 cards avec titre EN + descriptif FR, prix éditables dans le dashboard, bloc "Package Signature" supprimé
+- **Galerie** : onglets Photos (34 photos) / Vidéos (3 vidéos Pomelli), texte indexable trilingue
+- **Page Services** : section vidéos Pomelli en bas de page (3 vidéos)
+- **Menu nav** : 5 liens dont "Galerie" ajouté, hamburger jusqu'à `lg` (1024px) pour éviter chevauchement iPad
+- Page Réservation : formulaire complet, insertion Supabase validée, bouton WhatsApp post-soumission
+- **Page Contact** : fond blanc lisible, adresse cliquable vers Google Maps, formulaire fond blanc, bouton Instagram fond nuit
+- Header : nav fixe, hamburger mobile+tablette, logo centré desktop
 - Footer : liens Mentions légales + Politique de confidentialité en fr/en/es
-- SEO minimum complet : title unique, meta description, alt images, sitemap (8 pages), Search Console connectée, canonical toutes pages avec slash final
-- SEO : JSON-LD HairSalon + FAQ schema, hreflang fr/en/es, og:image
-- Sécurité : headers HTTP (CSP, X-Frame-Options, HSTS), rate limiting API, validation serveur, XSS emails corrigé, email admin masqué dans l'API publique
-- Middleware i18n : /admin exclu correctement, redirections 307→308, www→non-www
-- Images : 14 photos réelles du salon dans /public/images/
-- Dashboard admin : affiche les réservations (RLS Supabase corrigée)
-- Page admin /settings : WhatsApp, email de notification et prix paramétrables — champs visibles (bg-white + text-gray-900 corrigés)
+- SEO : JSON-LD HairSalon complet (`image`, `sameAs`, `hasMap`, `aggregateRating` 4.5/6), FAQ schema, hreflang + sitemap avec trailing slash cohérents, og:image
+- Schema `sameAs` : Google Maps, fiche GBP (`https://share.google/t4j91V4ZgAESOoNwp`), Instagram
+- Sécurité : headers HTTP (CSP, X-Frame-Options, HSTS), rate limiting API, validation serveur
+- Dashboard admin : section "Services vedettes — Prix (MAD)" avec 4 champs éditables
 - PWA mobile `/mimi.html` avec PIN pour planning Mimi
-- Notifications email Resend à chaque réservation — adresse from configurable via `RESEND_FROM_EMAIL`
-- Pages légales RGPD conformes : `/mentions-legales` et `/politique-de-confidentialite` en fr/en/es, indexables, avec responsable de publication (Moujahid ANANE)
-- Bandeau cookies conforme RGPD (cookie technique NEXT_LOCALE, pas de consentement obligatoire)
-- Email `contact@mimi-coiffure.com` opérationnel via Private Email (Namecheap), DNS Cloudflare configuré
-- Analytics Umami : installé sur Railway, script intégré dans le layout, CSP corrigé — dashboard sur `umami-production-2141.up.railway.app`
+- Pages légales RGPD conformes, bandeau cookies opérationnel
+- Email `contact@mimi-coiffure.com` opérationnel via Private Email (Namecheap)
+- Analytics Umami actif
+- **PageSpeed mobile mesuré le 1er juin 2026 : 92/100** — FCP 2.5s, LCP 2.5s, TBT 110ms, CLS 0.002
 
 ### Ce qui reste fragile
 
 - Le titre hero sur desktop peut déborder légèrement selon la résolution — ajuster `clamp` si nécessaire
-- Email formulaire contact : fonctionne via Resend API, emails reçus sur `moujanane@free.fr`
+- Samsung A54 (412px) : légère zone vide sous les CTA du hero — acceptable, pas bloquant
 
 ### Ce qui ne marche pas
 
 - Rien de bloquant connu
 
-### Ce qui reste à faire
+### Ce qui reste à faire (par priorité)
 
-- **Cloudflare Cache Rule** (priorité haute) : configurer la règle de cache dans Cloudflare pour bypasser le `no-store` Railway et faire passer PageSpeed de 74 à 85+. Voir section 7 pour les instructions exactes.
-- **Vérification indexation Google** : attendre 2-4 semaines et vérifier dans Search Console que les erreurs canoniques ont disparu. Cliquer "Valider la correction" sur les 2 lignes d'erreur.
-- **Traductions EN et ES** : le contenu des pages services, galerie, homepage est en français uniquement dans les composants — les balises SEO sont traduites mais pas le contenu visible
-- **Fiche Google Business Profile** : créer ou réclamer la fiche GMB du salon (essentiel pour le SEO local Marrakech)
+- **Cloudflare Cache Rule** (priorité haute) : éliminerait les redirections multiples (610ms) et ferait passer PageSpeed de 92 à 95+. Instructions exactes en section 7.
+- **Demander des avis Google** : 6 avis seulement — objectif 20+ pour apparaître dans le Local Pack "coiffure africaine Marrakech"
+- **Traductions EN et ES** : balises SEO traduites mais contenu visible toujours en français
 - **Fiche TripAdvisor** : en attente de validation depuis session 18 mai
-- **Mot de passe Umami** : changer le mot de passe admin par défaut (`umami`) dans le dashboard Umami
+- **Mot de passe Umami** : changer le mot de passe admin par défaut (`umami`)
+- **Produits GBP** : ajouter 5 prestations avec prix dans l'onglet Produits de la fiche GBP
 
 ---
 
@@ -423,6 +422,111 @@ Diagnostic par étapes :
 ```
 app/api/contact/route.ts        — Resend instancié dans le handler
 lib/sendNotificationEmail.ts    — Resend (Nodemailer supprimé)
+```
+
+---
+
+## 11. Session 1er juin 2026 — Galerie, SEO, Responsive, GBP
+
+### Galerie photos + vidéos
+
+- 34 photos ajoutées dans `/public/images/` (renommées sans espaces : `salon-mimi-1.jpeg`, `pomelli-image-1.png`, etc.)
+- 3 vidéos Pomelli dans `/public/videos/` (renommées : `pomelli-video-1.mp4`, `pomelli-video-2.mp4`, `pomelli-video-3.mp4`)
+- `GalerieClient.tsx` créé — onglets Photos/Vidéos trilingues, `figure/figcaption` pour les vidéos
+- Texte descriptif trilingue indexable ajouté dans `galerie/page.tsx` (Server Component)
+- Vidéos Pomelli aussi ajoutées dans `ServicesPageClient.tsx` (section "Le salon en vidéo" en bas)
+- **Leçon** : noms de fichiers avec espaces/parenthèses cassent Next.js Image — toujours renommer en kebab-case
+
+### Menu et navigation
+
+- "Galerie" ajouté dans le menu header
+- Breakpoint hamburger passé de `md` (768px) à `lg` (1024px) — corrige le chevauchement sur iPad
+- Logo centré seulement sur desktop (`lg:absolute`)
+
+### Page Services vedettes (homepage)
+
+- Descriptif français sous le titre anglais dans chaque card (`descFr` dans `services-data.ts`)
+- Durée supprimée des cards
+- Bloc "Package Signature" supprimé de la homepage
+- Prix des 4 services vedettes éditables dans `/admin/settings` (clés `price_featured_*`)
+
+### Page Contact
+
+- Boîte adresse/horaires : fond blanc (`bg-white`), texte lisible
+- Formulaire : fond blanc, inputs `bg-fond` beige
+- Bouton Instagram : fond `bg-nuit`
+- Adresse cliquable → Google Maps `https://maps.app.goo.gl/siZDajFcmc85HF519`
+
+### SEO — Schema JSON-LD
+
+- `image` ajoutée : `https://mimi-coiffure.com/images/hero-salon.jpg`
+- `hasMap` : `https://maps.app.goo.gl/siZDajFcmc85HF519`
+- `sameAs` : Google Maps + fiche GBP + Instagram
+- `aggregateRating` corrigé : 4.5/6 (données réelles GBP)
+- Hreflang + sitemap : trailing slash ajouté sur toutes les URLs (cohérence canonicals)
+- Ouverture corrigée : Lun–Sam 09:00–19:00 (suppression du dimanche erroné)
+
+### Google Business Profile (GBP)
+
+- Fiche existante et active — 456 vues/mois, 6 avis, 4.5 étoiles
+- Site web GBP : `https://www.mimi-coiffure.com/` ✅ (était `mimihair.fr` en affichage — c'était un autre établissement)
+- Instagram GBP : `https://www.instagram.com/salonmimi.marrakech`
+- Description optimisée SEO ajoutée dans GBP
+- Fiche complétée (photos, horaires, produits à ajouter)
+- URL partage GBP : `https://share.google/t4j91V4ZgAESOoNwp`
+
+### Responsive — audit 5 tailles d'écran
+
+Pages testées : home, services, galerie, contact, réservation
+Appareils : iPhone SE (375px), iPhone 15 (393px), Samsung S21 (360px), Samsung A54 (412px), iPad (768px)
+
+Bugs corrigés :
+
+- iPad (768px) : nav liens chevauchés → hamburger jusqu'à `lg`
+- Samsung S21 (360px) : pills services coupées → `paddingRight: 16` + `scrollbarWidth: none`
+- Samsung A54 (412px) : espace vide hero → `min-h-screen` mobile + `md:h-screen` desktop
+
+### PageSpeed mobile — 1er juin 2026
+
+Score : **92/100**
+
+- FCP : 2.5s 🟡
+- LCP : 2.5s 🟡 (cible <2.5s)
+- TBT : 110ms 🟢
+- CLS : 0.002 🟢
+- TTFB : 450ms 🟢
+
+Opportunités restantes :
+
+1. **Redirections multiples — 610ms** → réglé par la Cache Rule Cloudflare (section 7)
+2. **Ressources bloquantes — 871ms** → middleware next-intl, difficile à éliminer
+3. **JS legacy — 11KB** → `.browserslistrc` partiellement efficace
+
+### Fichiers touchés (session 1er juin)
+
+```
+components/sections/GalerieClient.tsx          — créé (galerie avec onglets)
+components/sections/ServicesPageClient.tsx     — section vidéos Pomelli + pills fix
+components/sections/HeroHome.tsx               — min-h-screen mobile
+components/layout/Header.tsx                   — lg breakpoint hamburger + Galerie dans nav
+components/ui/ServiceCard.tsx                  — descFr, suppression duration
+components/sections/ServicesGrid.tsx           — passage descFr, suppression duration
+components/admin/SettingsForm.tsx              — section Services vedettes prix
+app/[locale]/galerie/page.tsx                  — GalerieClient + texte indexable
+app/[locale]/contact/page.tsx                  — fond blanc + adresse cliquable Maps
+app/[locale]/layout.tsx                        — schema image/sameAs/hasMap/aggregateRating
+app/[locale]/services/page.tsx                 — hreflang trailing slash
+app/[locale]/reservation/page.tsx              — hreflang trailing slash
+app/[locale]/a-propos/page.tsx                 — hreflang trailing slash
+app/[locale]/page.tsx                          — featuredPrices, suppression PackageSignature
+app/sitemap.ts                                 — trailing slash toutes URLs
+app/api/settings/route.ts                      — clés price_featured_*
+lib/settings.ts                                — type + defaults price_featured_*
+lib/services-data.ts                           — champ descFr sur 4 services featured
+lib/sendNotificationEmail.ts                   — Resend instancié dans handler (fix build)
+public/images/                                 — 34 photos renommées kebab-case
+public/videos/                                 — 3 vidéos Pomelli renommées kebab-case
+components/sections/ContactForm.tsx            — fond blanc inputs
 ```
 
 ---
