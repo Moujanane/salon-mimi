@@ -92,9 +92,14 @@ export default async function ContactPage({
       <div className="max-w-6xl mx-auto px-4 py-16">
         {/* Adresse + horaires */}
         <div className="bg-white rounded-2xl p-8 border border-ocre/20 mb-10 shadow-sm">
-          <p className="text-xl font-playfair text-brun mb-2">
+          <a
+            href="https://maps.app.goo.gl/siZDajFcmc85HF519"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xl font-playfair text-brun hover:text-ocre transition-colors mb-2 inline-block"
+          >
             📍 {data.address}
-          </p>
+          </a>
           <p className="text-brun mt-6 font-medium">{data.hours}</p>
           <p className="text-brun/60">{data.hoursDetail}</p>
         </div>
