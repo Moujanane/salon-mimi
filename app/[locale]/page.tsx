@@ -66,6 +66,14 @@ export default async function HomePage({
   const whatsappNumber = settings.whatsapp_number;
   const featuredServices = services.filter((s) => s.featured);
 
+  const featuredPrices: Record<string, number> = {
+    "box-braids-medium":
+      parseInt(settings.price_featured_box_braids_medium) || 550,
+    "knotless-braids": parseInt(settings.price_featured_knotless_braids) || 700,
+    "boho-braids": parseInt(settings.price_featured_boho_braids) || 650,
+    cornrows: parseInt(settings.price_featured_cornrows) || 300,
+  };
+
   return (
     <>
       <HeroHome
@@ -83,6 +91,7 @@ export default async function HomePage({
         locale={locale}
         bookLabel={tBooking("submit")}
         showAll={false}
+        featuredPrices={featuredPrices}
       />
       <PackageSignature locale={locale} bookLabel={t("cta_book")} />
       <LocationSection locale={locale} whatsappNumber={whatsappNumber} />

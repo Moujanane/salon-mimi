@@ -2,6 +2,7 @@ import Link from "next/link";
 
 interface ServiceCardProps {
   name: string;
+  nameFr?: string;
   duration: string;
   priceMad: number;
   priceEur: number;
@@ -12,6 +13,7 @@ interface ServiceCardProps {
 
 export default function ServiceCard({
   name,
+  nameFr,
   duration,
   priceMad,
   priceEur,
@@ -21,7 +23,10 @@ export default function ServiceCard({
 }: ServiceCardProps) {
   return (
     <div className="bg-panneau rounded-2xl p-6 border border-ocre/20 hover:border-ocre/40 transition-colors">
-      <h3 className="font-playfair text-lg text-white mb-2">{name}</h3>
+      <h3 className="font-playfair text-lg text-white mb-1">{name}</h3>
+      {locale !== "fr" && nameFr && nameFr !== name && (
+        <p className="text-sm text-white/40 mb-2 font-inter italic">{nameFr}</p>
+      )}
       {duration !== "—" && (
         <p className="text-sm text-white/55 mb-4">{duration}</p>
       )}

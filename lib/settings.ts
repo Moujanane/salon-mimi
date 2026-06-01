@@ -15,6 +15,10 @@ export type Settings = {
   price_perruques_tissage: string;
   price_colorations: string;
   price_ongles_soins_epilation: string;
+  price_featured_box_braids_medium: string;
+  price_featured_knotless_braids: string;
+  price_featured_boho_braids: string;
+  price_featured_cornrows: string;
 };
 
 const DEFAULTS: Settings = {
@@ -30,6 +34,10 @@ const DEFAULTS: Settings = {
   price_perruques_tissage: "150",
   price_colorations: "100",
   price_ongles_soins_epilation: "50",
+  price_featured_box_braids_medium: "550",
+  price_featured_knotless_braids: "700",
+  price_featured_boho_braids: "650",
+  price_featured_cornrows: "300",
 };
 
 async function fetchSettings(): Promise<Settings> {

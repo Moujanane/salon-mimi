@@ -10,6 +10,7 @@ interface ServicesGridProps {
   locale: string;
   bookLabel: string;
   showAll?: boolean;
+  featuredPrices?: Record<string, number>;
 }
 
 export default function ServicesGrid({
@@ -17,6 +18,7 @@ export default function ServicesGrid({
   locale,
   bookLabel,
   showAll = true,
+  featuredPrices,
 }: ServicesGridProps) {
   const title =
     {
@@ -36,8 +38,9 @@ export default function ServicesGrid({
             <ServiceCard
               key={service.id}
               name={getServiceName(service, locale)}
+              nameFr={service.nameFr}
               duration={getServiceDuration(service, locale)}
-              priceMad={service.priceMad}
+              priceMad={featuredPrices?.[service.id] ?? service.priceMad}
               priceEur={service.priceEur}
               serviceId={service.id}
               locale={locale}
