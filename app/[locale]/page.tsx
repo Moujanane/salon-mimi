@@ -93,7 +93,6 @@ export default async function HomePage({
         showAll={false}
         featuredPrices={featuredPrices}
       />
-      <PackageSignature locale={locale} bookLabel={t("cta_book")} />
       <LocationSection locale={locale} whatsappNumber={whatsappNumber} />
       <CTAFinal
         locale={locale}

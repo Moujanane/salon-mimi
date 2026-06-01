@@ -25,12 +25,9 @@ export default function ServiceCard({
     <div className="bg-panneau rounded-2xl p-6 border border-ocre/20 hover:border-ocre/40 transition-colors">
       <h3 className="font-playfair text-lg text-white mb-1">{name}</h3>
       {descFr && (
-        <p className="text-sm text-white/50 mb-2 font-inter italic leading-snug">
+        <p className="text-sm text-white/50 mb-4 font-inter italic leading-snug">
           {descFr}
         </p>
-      )}
-      {duration !== "—" && (
-        <p className="text-sm text-white/55 mb-4">{duration}</p>
       )}
       <div className="flex items-baseline gap-2 mb-4">
         <span className="text-2xl font-bold text-ocre">{priceMad} MAD</span>
