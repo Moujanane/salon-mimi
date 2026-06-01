@@ -13,7 +13,16 @@
     "subtitle": "African Hair Braiding",
     "location": "Medina de Marrakech",
     "cta_book": "Reservar",
-    "cta_services": "Nuestros servicios"
+    "cta_services": "Nuestros servicios",
+    "badge": "Salón afro · Marrakech",
+    "h1_line1": "Trenzas africanas & Rasta",
+    "h1_line2": "Marrakech",
+    "tagline": "Tu cabello merece",
+    "tagline_em": "más que un peinado ordinario.",
+    "body": "En Marrakech, Salon Mimi es especialista en trenzas africanas, knotless braids, locks y estilos naturales. Cada clienta se va con un peinado que la refleja —",
+    "body_em": "realizado por manos expertas",
+    "cta_book_label": "→ Reservar una cita",
+    "cta_services_label": "Descubrir nuestros servicios"
   },
   "booking": {
     "title": "Reserva tu cita",

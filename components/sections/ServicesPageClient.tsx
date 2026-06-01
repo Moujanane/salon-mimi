@@ -110,6 +110,67 @@ const SERVICES: ServiceData[] = [
   },
 ];
 
+const TEXTS: Record<
+  string,
+  {
+    badge: string;
+    h1: string;
+    h1em: string;
+    body1: string;
+    body1strong1: string;
+    body1strong2: string;
+    body2: string;
+    body2strong: string;
+    cta: string;
+    chooseService: string;
+    videoTitle: string;
+    videoLabels: [string, string, string];
+  }
+> = {
+  fr: {
+    badge: "Ce qu'on fait · ce qu'on maîtrise",
+    h1: "Tresses africaines à Marrakech —",
+    h1em: "Box braids, Knotless, Locks",
+    body1: "Que tu veuilles des",
+    body1strong1: "tresses africaines",
+    body1strong2: "knotless braids",
+    body2: "des locks ou un soin naturel — on a ce qu'il te faut.",
+    body2strong: "Réserve en ligne",
+    cta: "→ Réserver maintenant",
+    chooseService: "Choisir un service",
+    videoTitle: "Le salon en vidéo",
+    videoLabels: ["Tresses africaines", "Knotless braids", "Box braids"],
+  },
+  en: {
+    badge: "What we do · what we master",
+    h1: "African braids in Marrakech —",
+    h1em: "Box braids, Knotless, Locks",
+    body1: "Whether you want",
+    body1strong1: "African braids",
+    body1strong2: "knotless braids",
+    body2: "locks or a natural treatment — we have what you need.",
+    body2strong: "Book online",
+    cta: "→ Book now",
+    chooseService: "Choose a service",
+    videoTitle: "The salon in video",
+    videoLabels: ["African braids", "Knotless braids", "Box braids"],
+  },
+  es: {
+    badge: "Lo que hacemos · lo que dominamos",
+    h1: "Trenzas africanas en Marrakech —",
+    h1em: "Box braids, Knotless, Locks",
+    body1: "Tanto si quieres",
+    body1strong1: "trenzas africanas",
+    body1strong2: "knotless braids",
+    body2: "locks o un tratamiento natural — tenemos lo que necesitas.",
+    body2strong: "Reserva en línea",
+    cta: "→ Reservar ahora",
+    chooseService: "Elegir un servicio",
+    videoTitle: "El salón en vídeo",
+    videoLabels: ["Trenzas africanas", "Knotless braids", "Box braids"],
+  },
+};
+
 interface ServicesPageClientProps {
   locale: string;
   prices: Record<string, string>;
@@ -119,6 +180,7 @@ export default function ServicesPageClient({
   locale,
   prices,
 }: ServicesPageClientProps) {
+  const tx = TEXTS[locale] ?? TEXTS.fr;
   const [active, setActive] = useState(0);
   const [leaving, setLeaving] = useState<number | null>(null);
   const [isMobile, setIsMobile] = useState(false);
@@ -149,26 +211,23 @@ export default function ServicesPageClient({
 
       <div className="flex-shrink-0 text-center px-6 md:px-12 py-4 border-b border-ocre/10">
         <span className="text-ocre text-[9px] tracking-[5px] uppercase font-inter block mb-1">
-          Ce qu&apos;on fait · ce qu&apos;on maîtrise
+          {tx.badge}
         </span>
         <h1 className="font-georgia text-[clamp(18px,2.5vw,30px)] font-bold text-white">
-          Tresses africaines à Marrakech —{" "}
-          <em className="text-ocre italic">Box braids, Knotless, Locks</em>
+          {tx.h1} <em className="text-ocre italic">{tx.h1em}</em>
         </h1>
         <p className="text-white/60 text-[12px] max-w-lg mx-auto mt-1 leading-relaxed font-inter">
-          Que tu veuilles des{" "}
-          <strong className="text-ocre">tresses africaines</strong>, des{" "}
-          <strong className="text-white">knotless braids</strong>, des locks ou
-          un soin naturel — on a ce qu&apos;il te faut.{" "}
-          <strong className="text-white">Réserve en ligne</strong>, on
-          s&apos;occupe du reste.
+          {tx.body1} <strong className="text-ocre">{tx.body1strong1}</strong>,
+          des <strong className="text-white">{tx.body1strong2}</strong>,{" "}
+          {tx.body2} <strong className="text-white">{tx.body2strong}</strong>,
+          on s&apos;occupe du reste.
         </p>
         <div className="flex justify-center gap-3 mt-3">
           <Link
             href={`/${locale}/reservation`}
             className="flex items-center gap-2 bg-ocre hover:bg-or text-white text-[9px] tracking-[3px] uppercase px-5 py-2.5 rounded-full transition-colors font-inter"
           >
-            → Réserver maintenant
+            {tx.cta}
           </Link>
         </div>
       </div>
@@ -194,7 +253,7 @@ export default function ServicesPageClient({
               marginBottom: 4,
             }}
           >
-            Choisir un service
+            {tx.chooseService}
           </div>
           <div
             style={
@@ -363,7 +422,7 @@ export default function ServicesPageClient({
         >
           <div className="w-[36%] bg-panneau rounded-2xl border border-ocre/20 p-6 flex flex-col gap-3 flex-shrink-0 overflow-y-auto">
             <div className="text-[9px] tracking-[4px] uppercase text-white/55 font-inter mb-1">
-              Choisir un service
+              {tx.chooseService}
             </div>
             {SERVICES.map((s, i) => (
               <button
@@ -443,24 +502,24 @@ export default function ServicesPageClient({
       {/* Section vidéos Pomelli */}
       <div className="border-t border-ocre/10 mt-8 pt-10 px-6 md:px-12 pb-16">
         <p className="text-ocre text-[9px] tracking-[5px] uppercase font-inter mb-3 text-center">
-          Le salon en vidéo
+          {tx.videoTitle}
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {[
             {
               src: "/videos/pomelli-video-1.mp4",
               poster: "/images/pomelli-image-5.png",
-              label: "Tresses africaines",
+              label: tx.videoLabels[0],
             },
             {
               src: "/videos/pomelli-video-2.mp4",
               poster: "/images/pomelli-image-2.png",
-              label: "Knotless braids",
+              label: tx.videoLabels[1],
             },
             {
               src: "/videos/pomelli-video-3.mp4",
               poster: "/images/pomelli-image-3.png",
-              label: "Box braids",
+              label: tx.videoLabels[2],
             },
           ].map((v, i) => (
             <figure

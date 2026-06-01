@@ -82,6 +82,15 @@ export default async function HomePage({
         location={t("location")}
         ctaBook={t("cta_book")}
         ctaServices={t("cta_services")}
+        badge={t("badge")}
+        h1Line1={t("h1_line1")}
+        h1Line2={t("h1_line2")}
+        tagline={t("tagline")}
+        taglineEm={t("tagline_em")}
+        body={t("body")}
+        bodyEm={t("body_em")}
+        ctaBookLabel={t("cta_book_label")}
+        ctaServicesLabel={t("cta_services_label")}
       />
       <TrustBadge locale={locale} />
       <GoogleReviews locale={locale} />

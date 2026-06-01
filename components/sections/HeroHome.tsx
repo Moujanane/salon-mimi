@@ -8,6 +8,15 @@ interface HeroHomeProps {
   location?: string;
   ctaBook?: string;
   ctaServices?: string;
+  badge?: string;
+  h1Line1?: string;
+  h1Line2?: string;
+  tagline?: string;
+  taglineEm?: string;
+  body?: string;
+  bodyEm?: string;
+  ctaBookLabel?: string;
+  ctaServicesLabel?: string;
 }
 
 const col1 = [
@@ -79,7 +88,18 @@ function PhotoColumn({
   );
 }
 
-export default function HeroHome({ locale }: HeroHomeProps) {
+export default function HeroHome({
+  locale,
+  badge,
+  h1Line1,
+  h1Line2,
+  tagline,
+  taglineEm,
+  body,
+  bodyEm,
+  ctaBookLabel,
+  ctaServicesLabel,
+}: HeroHomeProps) {
   return (
     <section className="relative min-h-screen md:h-screen flex flex-col md:flex-row overflow-hidden bg-nuit pt-[57px]">
       {/* Halo ocre arrière-plan */}
@@ -99,32 +119,33 @@ export default function HeroHome({ locale }: HeroHomeProps) {
         <div className="flex items-center gap-3 mb-7">
           <div className="w-7 h-px bg-ocre flex-shrink-0" />
           <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter">
-            Salon afro · Marrakech
+            {badge ?? "Salon afro · Marrakech"}
           </span>
         </div>
 
         <h1 className="font-georgia text-[clamp(38px,4.5vw,68px)] font-bold uppercase leading-[0.9] text-white mb-4">
-          Tresses africaines & Rasta
-          <em className="block not-italic text-ocre italic">Marrakech</em>
+          {h1Line1 ?? "Tresses africaines & Rasta"}
+          <em className="block not-italic text-ocre italic">
+            {h1Line2 ?? "Marrakech"}
+          </em>
         </h1>
         <p className="font-georgia text-[18px] font-semibold text-white/70 leading-snug mb-4">
           Salon Mimi · <span className="text-ocre">Place Jamaa El Fna</span>
         </p>
 
         <p className="font-georgia text-[18px] font-bold text-white leading-snug mb-4 max-w-sm">
-          Tes cheveux méritent
+          {tagline ?? "Tes cheveux méritent"}
           <br />
-          <em className="text-ocre">mieux qu&apos;une coiffure ordinaire.</em>
+          <em className="text-ocre">
+            {taglineEm ?? "mieux qu'une coiffure ordinaire."}
+          </em>
         </p>
 
         <p className="text-white/55 text-[14px] leading-relaxed max-w-[360px] mb-10 font-inter">
-          À Marrakech, <strong className="text-white">Salon Mimi</strong> est le
-          spécialiste des{" "}
-          <strong className="text-ocre">tresses africaines</strong>, knotless,
-          locks et styles naturels. Chaque cliente repart avec une coiffure qui
-          lui ressemble —{" "}
+          {body ??
+            "À Marrakech, Salon Mimi est le spécialiste des tresses africaines, knotless, locks et styles naturels. Chaque cliente repart avec une coiffure qui lui ressemble —"}{" "}
           <strong className="text-white">
-            réalisée par des mains expertes
+            {bodyEm ?? "réalisée par des mains expertes"}
           </strong>
           .
         </p>
@@ -134,13 +155,13 @@ export default function HeroHome({ locale }: HeroHomeProps) {
             href={`/${locale}/reservation`}
             className="flex items-center justify-center gap-2 bg-ocre hover:bg-or text-white text-[10px] tracking-[3px] uppercase px-7 py-4 rounded-full transition-all hover:-translate-y-0.5 font-inter"
           >
-            → Prendre rendez-vous
+            {ctaBookLabel ?? "→ Prendre rendez-vous"}
           </Link>
           <Link
             href={`/${locale}/services`}
             className="flex items-center justify-center text-white border border-white/20 hover:border-ocre hover:text-ocre text-[10px] tracking-[3px] uppercase px-7 py-4 rounded-full transition-colors font-inter"
           >
-            Découvrir les services
+            {ctaServicesLabel ?? "Découvrir les services"}
           </Link>
         </div>
       </div>
