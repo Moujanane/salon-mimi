@@ -122,7 +122,7 @@ export default async function ContactPage({
               {data.waLabel}
             </a>
             <a
-              href="https://www.instagram.com/Salonmimi.marrakech"
+              href="https://www.instagram.com/salonmimi.marrakech"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-nuit border border-ocre/30 text-white text-center py-4 rounded-full font-medium hover:border-ocre transition-colors"

@@ -104,7 +104,7 @@ const jsonLd = {
   sameAs: [
     "https://maps.app.goo.gl/siZDajFcmc85HF519",
     "https://share.google/t4j91V4ZgAESOoNwp",
-    "https://www.instagram.com/Salonmimi.marrakech",
+    "https://www.instagram.com/salonmimi.marrakech",
   ],
   openingHoursSpecification: [
     {
