@@ -1,9 +1,5 @@
 import ServiceCard from "@/components/ui/ServiceCard";
-import {
-  Service,
-  getServiceName,
-  getServiceDuration,
-} from "@/lib/services-data";
+import { Service, getServiceName } from "@/lib/services-data";
 
 interface ServicesGridProps {
   services: Service[];
@@ -39,7 +35,6 @@ export default function ServicesGrid({
               key={service.id}
               name={getServiceName(service, locale)}
               descFr={service.descFr}
-              duration={getServiceDuration(service, locale)}
               priceMad={featuredPrices?.[service.id] ?? service.priceMad}
               priceEur={service.priceEur}
               serviceId={service.id}

@@ -3,7 +3,6 @@ import Link from "next/link";
 interface ServiceCardProps {
   name: string;
   descFr?: string;
-  duration: string;
   priceMad: number;
   priceEur: number;
   serviceId: string;
@@ -14,7 +13,6 @@ interface ServiceCardProps {
 export default function ServiceCard({
   name,
   descFr,
-  duration,
   priceMad,
   priceEur,
   serviceId,

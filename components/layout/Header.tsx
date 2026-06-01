@@ -25,7 +25,7 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-nuit/92 backdrop-blur-md border-b border-ocre/10">
       <div className="relative flex items-center justify-between px-5 md:px-12 py-4">
         {/* Liens gauche — masqués sur mobile */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-5">
           {links.map((l) => (
             <Link
               key={l.href}

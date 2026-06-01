@@ -41,7 +41,6 @@ import HeroHome from "@/components/sections/HeroHome";
 import TrustBadge from "@/components/sections/TrustBadge";
 import GoogleReviews from "@/components/sections/GoogleReviews";
 import ServicesGrid from "@/components/sections/ServicesGrid";
-import PackageSignature from "@/components/sections/PackageSignature";
 import CTAFinal from "@/components/sections/CTAFinal";
 import LocationSection from "@/components/sections/LocationSection";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
