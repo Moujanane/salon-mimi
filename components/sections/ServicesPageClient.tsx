@@ -197,12 +197,17 @@ export default function ServicesPageClient({
             Choisir un service
           </div>
           <div
-            style={{
-              display: "flex",
-              gap: 8,
-              overflowX: "auto",
-              paddingBottom: 8,
-            }}
+            style={
+              {
+                display: "flex",
+                gap: 8,
+                overflowX: "auto",
+                paddingBottom: 8,
+                paddingRight: 16,
+                scrollbarWidth: "none",
+                WebkitOverflowScrolling: "touch",
+              } as React.CSSProperties
+            }
           >
             {SERVICES.map((s, i) => (
               <button

@@ -25,7 +25,7 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-nuit/92 backdrop-blur-md border-b border-ocre/10">
       <div className="relative flex items-center justify-between px-5 md:px-12 py-4">
         {/* Liens gauche — masqués sur mobile */}
-        <nav className="hidden md:flex items-center gap-5">
+        <nav className="hidden lg:flex items-center gap-5">
           {links.map((l) => (
             <Link
               key={l.href}
@@ -44,7 +44,7 @@ export default function Header() {
         {/* Logo centré sur desktop, gauche sur mobile */}
         <Link
           href={`/${locale}`}
-          className="md:absolute md:left-1/2 md:-translate-x-1/2 text-[11px] tracking-[6px] uppercase text-white font-inter"
+          className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 text-[11px] tracking-[6px] uppercase text-white font-inter"
         >
           Salon Mimi
         </Link>
@@ -53,14 +53,14 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <Link
             href={`/${locale}/reservation`}
-            className="hidden sm:flex items-center gap-2 bg-ocre hover:bg-or text-white text-[10px] tracking-[2px] uppercase px-5 py-2.5 rounded-full transition-colors"
+            className="hidden lg:flex items-center gap-2 bg-ocre hover:bg-or text-white text-[10px] tracking-[2px] uppercase px-5 py-2.5 rounded-full transition-colors"
           >
             <span>→</span>
             <span>{t("book")}</span>
           </Link>
           <button
             onClick={() => setOpen(!open)}
-            className="md:hidden flex flex-col gap-1.5 p-3 min-h-[44px] min-w-[44px] items-center justify-center"
+            className="lg:hidden flex flex-col gap-1.5 p-3 min-h-[44px] min-w-[44px] items-center justify-center"
             aria-label="Menu"
           >
             <span
@@ -84,7 +84,7 @@ export default function Header() {
 
       {/* Menu mobile drawer */}
       {open && (
-        <div className="md:hidden bg-nuit/98 border-t border-ocre/10 px-5 py-6 flex flex-col gap-4">
+        <div className="lg:hidden bg-nuit/98 border-t border-ocre/10 px-5 py-6 flex flex-col gap-4">
           {links.map((l) => (
             <Link
               key={l.href}

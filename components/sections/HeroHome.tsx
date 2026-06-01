@@ -81,7 +81,7 @@ function PhotoColumn({
 
 export default function HeroHome({ locale }: HeroHomeProps) {
   return (
-    <section className="relative h-screen flex flex-col md:flex-row overflow-hidden bg-nuit pt-[57px]">
+    <section className="relative min-h-screen md:h-screen flex flex-col md:flex-row overflow-hidden bg-nuit pt-[57px]">
       {/* Halo ocre arrière-plan */}
       <div
         className="absolute inset-0 pointer-events-none"
