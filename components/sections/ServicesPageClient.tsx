@@ -443,18 +443,18 @@ export default function ServicesPageClient({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {[
             {
-              src: "/videos/pomelli_creative_video_9_16_0531.mp4",
-              poster: "/images/pomelli_creative_image_9_16_0531.png",
+              src: "/videos/pomelli-video-1.mp4",
+              poster: "/images/pomelli-image-5.png",
               label: "Tresses africaines",
             },
             {
-              src: "/videos/pomelli_creative_video_9_16_0531 (1).mp4",
-              poster: "/images/pomelli_creative_image_9_16_0531 (1).png",
+              src: "/videos/pomelli-video-2.mp4",
+              poster: "/images/pomelli-image-2.png",
               label: "Knotless braids",
             },
             {
-              src: "/videos/pomelli_creative_video_9_16_0531 (2).mp4",
-              poster: "/images/pomelli_creative_image_9_16_0531 (2).png",
+              src: "/videos/pomelli-video-3.mp4",
+              poster: "/images/pomelli-image-3.png",
               label: "Box braids",
             },
           ].map((v, i) => (

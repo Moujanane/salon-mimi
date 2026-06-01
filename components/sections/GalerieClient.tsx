@@ -4,55 +4,55 @@ import Image from "next/image";
 
 const PHOTOS = [
   {
-    src: "/images/Salon mimi1.jpeg",
+    src: "/images/salon-mimi-1.jpeg",
     alt: "Salon Mimi Marrakech — intérieur salon coiffure africaine",
   },
   {
-    src: "/images/Salon mimi2.jpeg",
+    src: "/images/salon-mimi-2.jpeg",
     alt: "Salon Mimi Marrakech — ambiance salon tresses africaines",
   },
   {
-    src: "/images/Salon mimi3.jpeg",
+    src: "/images/salon-mimi-3.jpeg",
     alt: "Salon Mimi Marrakech — coiffeuse au travail Place Jamaa El Fna",
   },
   {
-    src: "/images/Tresses mimi1.jpeg",
+    src: "/images/tresses-mimi-1.jpeg",
     alt: "Tresses africaines Salon Mimi Marrakech — réalisation knotless",
   },
   {
-    src: "/images/Tresses mimi2.jpeg",
+    src: "/images/tresses-mimi-2.jpeg",
     alt: "Box braids Salon Mimi Marrakech — tresses africaines Médina",
   },
   {
-    src: "/images/Tresses mimi3.jpeg",
+    src: "/images/tresses-mimi-3.jpeg",
     alt: "Tresses rasta Salon Mimi Marrakech — coiffure afro Marrakech",
   },
   {
-    src: "/images/Tresses mimi4.jpeg",
+    src: "/images/tresses-mimi-4.jpeg",
     alt: "Tresses africaines Salon Mimi — Place Jamaa El Fna Marrakech",
   },
   {
-    src: "/images/pomelli_creative_image_19_16_0531 (2).png",
+    src: "/images/pomelli-image-1.png",
     alt: "Coiffure africaine Marrakech — création artistique Salon Mimi",
   },
   {
-    src: "/images/pomelli_creative_image_9_16_0531 (1).png",
+    src: "/images/pomelli-image-2.png",
     alt: "Tresses africaines créatives Marrakech — Salon Mimi",
   },
   {
-    src: "/images/pomelli_creative_image_9_16_0531 (2).png",
+    src: "/images/pomelli-image-3.png",
     alt: "Box braids artistiques Marrakech — Salon Mimi coiffure afro",
   },
   {
-    src: "/images/pomelli_creative_image_9_16_0531 (3).png",
+    src: "/images/pomelli-image-4.png",
     alt: "Coiffure afro créative Salon Mimi — tresses Marrakech",
   },
   {
-    src: "/images/pomelli_creative_image_9_16_0531.png",
+    src: "/images/pomelli-image-5.png",
     alt: "Coiffure africaine Salon Mimi Marrakech — tresses et locks",
   },
   {
-    src: "/images/pomelli_photoshoot_image_9_16_0531.png",
+    src: "/images/pomelli-image-6.png",
     alt: "Photoshoot Salon Mimi Marrakech — coiffure africaine",
   },
   { src: "/images/s-boho.jpg", alt: "Tresses Boho Salon Mimi Marrakech" },
@@ -134,19 +134,19 @@ const PHOTOS = [
 
 const VIDEOS = [
   {
-    src: "/videos/pomelli_creative_video_9_16_0531.mp4",
+    src: "/videos/pomelli-video-1.mp4",
     title: "Tresses africaines",
-    poster: "/images/pomelli_creative_image_9_16_0531.png",
+    poster: "/images/pomelli-image-5.png",
   },
   {
-    src: "/videos/pomelli_creative_video_9_16_0531 (1).mp4",
+    src: "/videos/pomelli-video-2.mp4",
     title: "Knotless braids",
-    poster: "/images/pomelli_creative_image_9_16_0531 (1).png",
+    poster: "/images/pomelli-image-2.png",
   },
   {
-    src: "/videos/pomelli_creative_video_9_16_0531 (2).mp4",
+    src: "/videos/pomelli-video-3.mp4",
     title: "Box braids",
-    poster: "/images/pomelli_creative_image_9_16_0531 (2).png",
+    poster: "/images/pomelli-image-3.png",
   },
 ];
 
