@@ -435,6 +435,49 @@ export default function ServicesPageClient({
           </div>
         </div>
       )}
+      {/* Section vidéos Pomelli */}
+      <div className="border-t border-ocre/10 mt-8 pt-10 px-6 md:px-12 pb-16">
+        <p className="text-ocre text-[9px] tracking-[5px] uppercase font-inter mb-3 text-center">
+          Le salon en vidéo
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {[
+            {
+              src: "/videos/pomelli_creative_video_9_16_0531.mp4",
+              poster: "/images/pomelli_creative_image_9_16_0531.png",
+              label: "Tresses africaines",
+            },
+            {
+              src: "/videos/pomelli_creative_video_9_16_0531 (1).mp4",
+              poster: "/images/pomelli_creative_image_9_16_0531 (1).png",
+              label: "Knotless braids",
+            },
+            {
+              src: "/videos/pomelli_creative_video_9_16_0531 (2).mp4",
+              poster: "/images/pomelli_creative_image_9_16_0531 (2).png",
+              label: "Box braids",
+            },
+          ].map((v, i) => (
+            <figure
+              key={i}
+              className="rounded-2xl overflow-hidden bg-black/30 m-0"
+            >
+              <video
+                src={v.src}
+                poster={v.poster}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full aspect-[9/16] object-cover"
+              />
+              <figcaption className="text-center text-ocre text-[10px] font-inter py-3 tracking-widest uppercase">
+                {v.label}
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
