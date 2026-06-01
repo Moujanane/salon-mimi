@@ -28,10 +28,10 @@ export async function generateMetadata({
     alternates: {
       canonical: `https://mimi-coiffure.com/${locale}/galerie/`,
       languages: {
-        fr: "https://mimi-coiffure.com/fr/galerie",
-        en: "https://mimi-coiffure.com/en/galerie",
-        es: "https://mimi-coiffure.com/es/galerie",
-        "x-default": "https://mimi-coiffure.com/fr/galerie",
+        fr: "https://mimi-coiffure.com/fr/galerie/",
+        en: "https://mimi-coiffure.com/en/galerie/",
+        es: "https://mimi-coiffure.com/es/galerie/",
+        "x-default": "https://mimi-coiffure.com/fr/galerie/",
       },
     },
   };
@@ -65,6 +65,15 @@ export default async function GaleriePage({
         </h1>
         <p className="text-white/60 mt-3">
           {subtitles[displayLocale] ?? subtitles.fr}
+        </p>
+      </div>
+      <div className="max-w-2xl mx-auto px-4 pt-10 text-center">
+        <p className="text-brun/60 text-sm leading-relaxed">
+          {displayLocale === "en"
+            ? "African braids, box braids, knotless braids, cornrows, locks and rasta — all realised at Salon Mimi, Jamaa El Fna Square, Marrakech."
+            : displayLocale === "es"
+              ? "Trenzas africanas, box braids, knotless braids, cornrows, locks y rasta — realizadas en el Salon Mimi, Plaza Jamaa El Fna, Marrakech."
+              : "Tresses africaines, box braids, knotless braids, cornrows, locks et rasta — réalisées au Salon Mimi, Place Jamaa El Fna, Marrakech."}
         </p>
       </div>
       <GalerieClient locale={displayLocale} />

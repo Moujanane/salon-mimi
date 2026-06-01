@@ -32,10 +32,10 @@ export async function generateMetadata({
     alternates: {
       canonical: `https://mimi-coiffure.com/${locale}/reservation/`,
       languages: {
-        fr: "https://mimi-coiffure.com/fr/reservation",
-        en: "https://mimi-coiffure.com/en/reservation",
-        es: "https://mimi-coiffure.com/es/reservation",
-        "x-default": "https://mimi-coiffure.com/fr/reservation",
+        fr: "https://mimi-coiffure.com/fr/reservation/",
+        en: "https://mimi-coiffure.com/en/reservation/",
+        es: "https://mimi-coiffure.com/es/reservation/",
+        "x-default": "https://mimi-coiffure.com/fr/reservation/",
       },
     },
   };

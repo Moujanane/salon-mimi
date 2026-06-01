@@ -29,10 +29,10 @@ export async function generateMetadata({
     alternates: {
       canonical: `https://mimi-coiffure.com/${locale}/contact/`,
       languages: {
-        fr: "https://mimi-coiffure.com/fr/contact",
-        en: "https://mimi-coiffure.com/en/contact",
-        es: "https://mimi-coiffure.com/es/contact",
-        "x-default": "https://mimi-coiffure.com/fr/contact",
+        fr: "https://mimi-coiffure.com/fr/contact/",
+        en: "https://mimi-coiffure.com/en/contact/",
+        es: "https://mimi-coiffure.com/es/contact/",
+        "x-default": "https://mimi-coiffure.com/fr/contact/",
       },
     },
   };

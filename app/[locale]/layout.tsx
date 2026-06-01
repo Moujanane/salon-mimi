@@ -85,6 +85,7 @@ const jsonLd = {
   name: "Salon Mimi",
   url: "https://mimi-coiffure.com",
   telephone: "+212710388204",
+  image: "https://mimi-coiffure.com/images/hero-salon.jpg",
   description:
     "Salon de coiffure Rasta et Africaine à Marrakech. Spécialisé en tresses africaines, box braids, locks, knotless braids. Situé Place Jamaa El Fna, Médina de Marrakech.",
   address: {
@@ -99,6 +100,11 @@ const jsonLd = {
     latitude: 31.6258,
     longitude: -7.9892,
   },
+  hasMap: "https://maps.app.goo.gl/siZDajFcmc85HF519",
+  sameAs: [
+    "https://maps.app.goo.gl/siZDajFcmc85HF519",
+    "https://www.instagram.com/Salonmimi.marrakech",
+  ],
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",
@@ -111,13 +117,7 @@ const jsonLd = {
         "Saturday",
       ],
       opens: "09:00",
-      closes: "20:00",
-    },
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: ["Sunday"],
-      opens: "10:00",
-      closes: "18:00",
+      closes: "19:00",
     },
   ],
   priceRange: "150-950 MAD",
