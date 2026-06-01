@@ -123,8 +123,8 @@ const jsonLd = {
   priceRange: "150-950 MAD",
   aggregateRating: {
     "@type": "AggregateRating",
-    ratingValue: "4.8",
-    reviewCount: "47",
+    ratingValue: "4.5",
+    reviewCount: "6",
     bestRating: "5",
   },
 };
