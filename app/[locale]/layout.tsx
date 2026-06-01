@@ -103,6 +103,7 @@ const jsonLd = {
   hasMap: "https://maps.app.goo.gl/siZDajFcmc85HF519",
   sameAs: [
     "https://maps.app.goo.gl/siZDajFcmc85HF519",
+    "https://share.google/t4j91V4ZgAESOoNwp",
     "https://www.instagram.com/Salonmimi.marrakech",
   ],
   openingHoursSpecification: [
