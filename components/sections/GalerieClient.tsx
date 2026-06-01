@@ -180,9 +180,9 @@ export default function GalerieClient({ locale }: { locale: string }) {
 
       {tab === "photos" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PHOTOS.map((img) => (
+          {PHOTOS.map((img, i) => (
             <div
-              key={img.src}
+              key={i}
               className="relative aspect-square rounded-2xl overflow-hidden bg-gray-800"
             >
               <Image
@@ -199,10 +199,10 @@ export default function GalerieClient({ locale }: { locale: string }) {
 
       {tab === "videos" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {VIDEOS.map((v) => (
-            <div
-              key={v.src}
-              className="rounded-2xl overflow-hidden bg-gray-800"
+          {VIDEOS.map((v, i) => (
+            <figure
+              key={i}
+              className="rounded-2xl overflow-hidden bg-gray-800 m-0"
             >
               <video
                 src={v.src}
@@ -213,10 +213,10 @@ export default function GalerieClient({ locale }: { locale: string }) {
                 playsInline
                 className="w-full aspect-[9/16] object-cover"
               />
-              <p className="text-center text-ocre text-sm font-inter py-3 tracking-widest uppercase">
+              <figcaption className="text-center text-ocre text-sm font-inter py-3 tracking-widest uppercase">
                 {v.title}
-              </p>
-            </div>
+              </figcaption>
+            </figure>
           ))}
         </div>
       )}
