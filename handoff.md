@@ -6,7 +6,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 2. État actuel du code — mis à jour le 1er juin 2026 (fin de session)
+## 2. État actuel du code — mis à jour le 2 juin 2026 (fin de session)
 
 ### Ce qui marche
 
@@ -15,7 +15,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 - **Galerie** : onglets Photos (34 photos) / Vidéos (3 vidéos Pomelli), texte indexable trilingue
 - **Page Services** : section vidéos Pomelli en bas de page (3 vidéos)
 - **Menu nav** : 5 liens dont "Galerie" ajouté, hamburger jusqu'à `lg` (1024px) pour éviter chevauchement iPad
-- Page Réservation : formulaire complet, insertion Supabase validée, bouton WhatsApp post-soumission
+- Page Réservation : formulaire complet avec champ **email obligatoire** ajouté, insertion Supabase validée, bouton WhatsApp post-soumission
 - **Page Contact** : fond blanc lisible, adresse cliquable vers Google Maps, formulaire fond blanc, bouton Instagram fond nuit
 - Header : nav fixe, hamburger mobile+tablette, logo centré desktop
 - Footer : liens Mentions légales + Politique de confidentialité en fr/en/es
@@ -25,7 +25,9 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 - Dashboard admin : section "Services vedettes — Prix (MAD)" avec 4 champs éditables
 - PWA mobile `/mimi.html` avec PIN pour planning Mimi
 - Pages légales RGPD conformes, bandeau cookies opérationnel
-- Email `contact@mimi-coiffure.com` opérationnel via Private Email (Namecheap)
+- Email `contact@mimi-coiffure.com` opérationnel via Private Email (Namecheap), redirigé vers `mouj.business@gmail.com`
+- Emails formulaire contact et notifications réservations envoyés via `noreply@atlas-swincar.com` (domaine vérifié Resend) vers `mouj.business@gmail.com`
+- Email client inclus dans le corps du mail de notification réservation
 - Analytics Umami actif
 - **PageSpeed mobile mesuré le 1er juin 2026 : 92/100** — FCP 2.5s, LCP 2.5s, TBT 110ms, CLS 0.002
 
@@ -40,6 +42,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
+- **Lien avis Google + QR code** : à ajouter sur la page Contact ET dans le message de confirmation de réservation. Lien : `https://g.page/r/CXqJtbaOg9FUEBM/review`
 - **Cloudflare Cache Rule** (priorité haute) : éliminerait les redirections multiples (610ms) et ferait passer PageSpeed de 92 à 95+. Instructions exactes en section 7.
 - **Demander des avis Google** : 6 avis seulement — objectif 20+ pour apparaître dans le Local Pack "coiffure africaine Marrakech"
 - **Traductions EN et ES** : balises SEO traduites mais contenu visible toujours en français
@@ -422,6 +425,62 @@ Diagnostic par étapes :
 ```
 app/api/contact/route.ts        — Resend instancié dans le handler
 lib/sendNotificationEmail.ts    — Resend (Nodemailer supprimé)
+```
+
+---
+
+## 12. Session 2 juin 2026 — Emails, Gmail, Formulaire réservation
+
+### Infrastructure email complète
+
+- `mouj.business@gmail.com` créé — boîte Gmail dédiée aux deux projets (Salon Mimi + Atlas Swincar)
+- `contact@mimi-coiffure.com` (Namecheap Private Email) : transfert automatique → `mouj.business@gmail.com`
+- `contact@atlas-swincar.com` (Namecheap Private Email) : transfert automatique → `mouj.business@gmail.com`
+- Gmail configuré pour répondre en tant que `contact@mimi-coiffure.com` et `contact@atlas-swincar.com`
+- MCP Gmail Claude connecté à `mouj.business@gmail.com` (et non au Gmail perso)
+
+### Emails site Salon Mimi
+
+- **Problème résolu** : Resend plan gratuit n'autorise l'envoi qu'à l'adresse d'inscription (`moujanane@free.fr`). Solution : utiliser le domaine `atlas-swincar.com` déjà vérifié dans Resend comme expéditeur (`noreply@atlas-swincar.com`), ce qui permet d'envoyer vers n'importe quelle adresse.
+- Formulaire contact → `noreply@atlas-swincar.com` → `mouj.business@gmail.com`
+- Notifications réservations → `noreply@atlas-swincar.com` → adresse configurée dans `/admin/settings` (mettre `mouj.business@gmail.com`)
+
+### Leçon critique — Resend plan gratuit
+
+- `onboarding@resend.dev` ne peut envoyer qu'à l'adresse email d'inscription au compte Resend
+- Avec un domaine vérifié dans Resend, le `to` peut être n'importe quelle adresse
+- Ne jamais ajouter un 2ème domaine dans Resend sans passer au plan Pro ($20/mois)
+- Solution retenue : utiliser `atlas-swincar.com` (déjà vérifié) comme domaine expéditeur pour les deux sites
+
+### Formulaire de réservation — champ email ajouté
+
+- Champ `email` ajouté dans `ReservationLayout.tsx` (obligatoire)
+- Route API `app/api/reservations/route.ts` : email extrait et inséré en base
+- `lib/sendNotificationEmail.ts` : email client ajouté dans le corps du mail de notification
+- Table Supabase `reservations` : colonne `email text` ajoutée (`ALTER TABLE reservations ADD COLUMN IF NOT EXISTS email text`)
+
+### Lien avis Google
+
+- URL : `https://g.page/r/CXqJtbaOg9FUEBM/review`
+- À ajouter sur la page Contact et dans le message de confirmation de réservation (pas encore fait)
+
+### Gestion emails entrants avec Claude
+
+- MCP Gmail connecté à `mouj.business@gmail.com`
+- Workflow : Claude lit les emails, crée des drafts de réponse, Mouj valide et envoie
+- 2 drafts créés pour les vraies demandes clientes du jour
+- Numéro WhatsApp salon : `+212710388204`
+- Lien Maps : `https://maps.app.goo.gl/siZDajFcmc85HF519`
+- Lien avis Google : `https://g.page/r/CXqJtbaOg9FUEBM/review`
+
+### Fichiers touchés (session 2 juin)
+
+```
+components/sections/ReservationLayout.tsx   — champ email ajouté
+app/[locale]/reservation/page.tsx           — label email ajouté
+app/api/reservations/route.ts               — email extrait + inséré Supabase + passé à sendNotificationEmail
+lib/sendNotificationEmail.ts                — email client dans corps du mail
+app/api/contact/route.ts                    — from: noreply@atlas-swincar.com, to: mouj.business@gmail.com
 ```
 
 ---
