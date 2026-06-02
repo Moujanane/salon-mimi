@@ -44,8 +44,8 @@ export async function POST(req: NextRequest) {
   try {
     const resend = new Resend(process.env.RESEND_API_KEY);
     await resend.emails.send({
-      from: "Mimi Coiffure <onboarding@resend.dev>",
-      to: "moujanane@free.fr",
+      from: "Mimi Coiffure <noreply@atlas-swincar.com>",
+      to: "mouj.business@gmail.com",
       subject: `Nouvelle demande de contact — ${esc(prenom)} ${esc(nom)}`,
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border:1px solid #eee;border-radius:12px;">
