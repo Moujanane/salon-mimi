@@ -41,7 +41,7 @@ export async function sendNotificationEmail(
 
   await resend.emails.send({
     from: "Mimi Coiffure <onboarding@resend.dev>",
-    to: "moujanane@free.fr",
+    to,
     subject: `Nouvelle réservation — ${esc(reservation.nom)} · ${esc(reservation.service)}`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#fff;border:1px solid #eee;border-radius:12px;">
