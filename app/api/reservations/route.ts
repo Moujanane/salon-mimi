@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
   const {
     nom,
     telephone,
+    email,
     service,
     date_souhaitee,
     heure_souhaitee,
@@ -79,6 +80,7 @@ export async function POST(request: NextRequest) {
   const { error } = await supabaseAdmin.from("reservations").insert({
     nom,
     telephone,
+    email: email || null,
     service,
     date_souhaitee: date_souhaitee || null,
     heure_souhaitee: heure_souhaitee || null,

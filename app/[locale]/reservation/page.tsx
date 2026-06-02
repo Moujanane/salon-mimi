@@ -53,6 +53,7 @@ export default async function ReservationPage({
   const labels = {
     name: t("name"),
     phone: t("phone"),
+    email: "Email",
     service: t("service"),
     date: t("date"),
     message: t("message"),

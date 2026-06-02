@@ -94,6 +94,7 @@ interface Props {
   labels: {
     name: string;
     phone: string;
+    email: string;
     service: string;
     date: string;
     message: string;
@@ -124,6 +125,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
     const data = {
       nom: (form.elements.namedItem("name") as HTMLInputElement).value,
       telephone: (form.elements.namedItem("phone") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
       service: activeSvc.label,
       date_souhaitee: (form.elements.namedItem("date") as HTMLInputElement)
         .value,
@@ -257,6 +259,20 @@ export default function ReservationLayout({ labels, prices }: Props) {
                   style={{ background: "rgba(255,255,255,0.06)" }}
                 />
               </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                Email <span className="text-ocre">*</span>
+              </label>
+              <input
+                name="email"
+                type="email"
+                placeholder="votre@email.com"
+                required
+                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-white/25"
+                style={{ background: "rgba(255,255,255,0.06)" }}
+              />
             </div>
 
             <div className="h-px bg-ocre/15" />
