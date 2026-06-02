@@ -13,6 +13,7 @@ function esc(str: string | undefined): string {
 interface ReservationData {
   nom: string;
   telephone: string;
+  email?: string;
   service: string;
   date_souhaitee?: string;
   heure_souhaitee?: string;
@@ -51,6 +52,7 @@ export async function sendNotificationEmail(
         <table style="width:100%;font-size:14px;border-collapse:collapse;">
           <tr><td style="padding:6px 0;color:#888;width:140px;">Client</td><td style="padding:6px 0;font-weight:600;color:#1a0a00;">${esc(reservation.nom)}</td></tr>
           <tr><td style="padding:6px 0;color:#888;">Téléphone</td><td style="padding:6px 0;color:#1a0a00;">${esc(reservation.telephone)}</td></tr>
+          <tr><td style="padding:6px 0;color:#888;">Email</td><td style="padding:6px 0;color:#1a0a00;">${esc(reservation.email) || "—"}</td></tr>
           <tr><td style="padding:6px 0;color:#888;">Service</td><td style="padding:6px 0;color:#1a0a00;">${esc(reservation.service)}</td></tr>
           <tr><td style="padding:6px 0;color:#888;">Date</td><td style="padding:6px 0;color:#1a0a00;">${esc(date)}</td></tr>
           <tr><td style="padding:6px 0;color:#888;">Heure</td><td style="padding:6px 0;color:#1a0a00;">${esc(heure)}</td></tr>

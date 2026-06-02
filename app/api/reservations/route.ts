@@ -103,6 +103,7 @@ export async function POST(request: NextRequest) {
     sendNotificationEmail(settings.notification_email, {
       nom,
       telephone,
+      email,
       service,
       date_souhaitee,
       heure_souhaitee,
