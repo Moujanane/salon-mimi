@@ -6,7 +6,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 2. État actuel du code — mis à jour le 2 juin 2026 (fin de session)
+## 2. État actuel du code — mis à jour le 3 juin 2026 (fin de session)
 
 ### Ce qui marche
 
@@ -14,11 +14,12 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 - **Services vedettes** : 4 cards avec titre EN + descriptif FR, prix éditables dans le dashboard, bloc "Package Signature" supprimé
 - **Galerie** : onglets Photos (34 photos) / Vidéos (3 vidéos Pomelli), texte indexable trilingue
 - **Page Services** : section vidéos Pomelli en bas de page (3 vidéos)
-- **Menu nav** : 5 liens dont "Galerie" ajouté, hamburger jusqu'à `lg` (1024px) pour éviter chevauchement iPad
-- Page Réservation : formulaire complet avec champ **email obligatoire** ajouté, insertion Supabase validée, bouton WhatsApp post-soumission
-- **Page Contact** : fond blanc lisible, adresse cliquable vers Google Maps, formulaire fond blanc, bouton Instagram fond nuit
-- Header : nav fixe, hamburger mobile+tablette, logo centré desktop
+- **Menu nav** : 5 liens + sélecteur de langue FR/EN/ES (desktop dropdown + mobile), hamburger jusqu'à `lg` (1024px)
+- **Page Réservation** : fond beige clair, formulaire blanc, tous les textes traduits EN/ES, champ email obligatoire, bouton WhatsApp post-soumission
+- **Page Contact** : fond blanc lisible, adresse cliquable vers Google Maps, formulaire fond blanc, bouton Instagram, bouton "Laisser un avis Google ⭐"
+- **Header** : fond opaque `bg-nuit` (textes toujours visibles quelle que soit la page), nav fixe, sélecteur de langue
 - Footer : liens Mentions légales + Politique de confidentialité en fr/en/es
+- **Traductions EN/ES complètes** : toutes les pages traduites (réservation, services, location, avis Google, header)
 - SEO : JSON-LD HairSalon complet (`image`, `sameAs`, `hasMap`, `aggregateRating` 4.5/6), FAQ schema, hreflang + sitemap avec trailing slash cohérents, og:image
 - Schema `sameAs` : Google Maps, fiche GBP (`https://share.google/t4j91V4ZgAESOoNwp`), Instagram
 - Sécurité : headers HTTP (CSP, X-Frame-Options, HSTS), rate limiting API, validation serveur
@@ -27,9 +28,10 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 - Pages légales RGPD conformes, bandeau cookies opérationnel
 - Email `contact@mimi-coiffure.com` opérationnel via Private Email (Namecheap), redirigé vers `mouj.business@gmail.com`
 - Emails formulaire contact et notifications réservations envoyés via `noreply@atlas-swincar.com` (domaine vérifié Resend) vers `mouj.business@gmail.com`
-- Email client inclus dans le corps du mail de notification réservation
-- Analytics Umami actif
+- Email client inclus dans le corps du mail + bouton "⭐ Laisser un avis Google"
+- **Analytics Umami réinitialisé** — nouveau Website ID : `8e60d1e4-e51e-4ac9-896f-f641486a32eb`, URL : `umami-production-2141.up.railway.app`, login : `admin` (mot de passe changé)
 - **PageSpeed mobile mesuré le 1er juin 2026 : 92/100** — FCP 2.5s, LCP 2.5s, TBT 110ms, CLS 0.002
+- **Indexation Google Search Console** : 12 URLs EN/ES soumises le 3 juin 2026
 
 ### Ce qui reste fragile
 
@@ -42,13 +44,84 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
-- **Lien avis Google + QR code** : à ajouter sur la page Contact ET dans le message de confirmation de réservation. Lien : `https://g.page/r/CXqJtbaOg9FUEBM/review`
 - **Cloudflare Cache Rule** (priorité haute) : éliminerait les redirections multiples (610ms) et ferait passer PageSpeed de 92 à 95+. Instructions exactes en section 7.
 - **Demander des avis Google** : 6 avis seulement — objectif 20+ pour apparaître dans le Local Pack "coiffure africaine Marrakech"
-- **Traductions EN et ES** : balises SEO traduites mais contenu visible toujours en français
 - **Fiche TripAdvisor** : en attente de validation depuis session 18 mai
-- **Mot de passe Umami** : changer le mot de passe admin par défaut (`umami`)
-- **Produits GBP** : ajouter 5 prestations avec prix dans l'onglet Produits de la fiche GBP
+- **Horaires spéciaux GBP** : ajouter Aïd al-Adha (6-7 juin 2026) et Fête du Trône (30 juillet)
+
+---
+
+## 13. Session 3 juin 2026 — UX, i18n, SEO, Umami
+
+### Page réservation — fond clair
+
+- Fond `bg-nuit` → `bg-fond` (beige crème) sur toute la page
+- Panel formulaire `bg-panneau` → `bg-white` avec ombre légère
+- Tous les textes passés de `text-white` → `text-nuit`
+- Inputs/selects : fond `bg-fond`, bordure `border-nuit/15`
+
+### Header — fond opaque
+
+- `bg-nuit/92 backdrop-blur-md` → `bg-nuit` (opaque)
+- Corrige les textes invisibles sur les pages à fond clair
+
+### Sélecteur de langue FR/EN/ES
+
+- Fichier : `components/layout/Header.tsx`
+- Desktop : dropdown avec les 2 autres langues, reste sur la même page
+- Mobile : 3 liens en bas du menu hamburger, langue active en ocre
+- Logique : `pathname.replace(/${locale}, "")` pour conserver l'URL courante
+
+### Traductions EN/ES complètes
+
+- `components/sections/ReservationLayout.tsx` — objet `TEXTS` avec 20+ clés FR/EN/ES
+- `components/sections/ServicesPageClient.tsx` — ajout `startingFrom` et `bookService`
+- `components/sections/LocationSection.tsx` — ajout `labelAddress`, `labelHours`, `labelWhatsapp`
+- `components/sections/GoogleReviews.tsx` — ajout `badge` et `reviewsCount`
+- `app/[locale]/reservation/page.tsx` — passage de `locale` en prop
+
+### Lien avis Google
+
+- Page Contact : bouton "Laisser un avis Google ⭐" traduit FR/EN/ES
+- Mail de notification réservation : bouton ocre dans le HTML email
+- Lien : `https://g.page/r/CXqJtbaOg9FUEBM/review`
+
+### Suppression avertissement browsersListForSwc
+
+- Option obsolète supprimée de `next.config.mjs`
+
+### Umami — reset complet
+
+- Ancien Postgres-MqJ4 supprimé (hash corrompu impossible à résoudre)
+- Nouveau Postgres créé + Umami redéployé
+- Nouveau Website ID : `8e60d1e4-e51e-4ac9-896f-f641486a32eb`
+- Mot de passe admin changé depuis l'interface
+- Script dans `app/[locale]/layout.tsx` mis à jour
+
+### Google Business Profile
+
+- 5 produits ajoutés (en attente validation Google) : Départ de locks 200 MAD, Cornrows full head 370 MAD, Boho/Goddess Braids 420 MAD, Knotless Braids 360 MAD, Box Braids medium 550 MAD
+- Actualité postée : photo cornrows + texte FR
+- Horaires spéciaux configurés
+
+### Indexation Google Search Console
+
+- 12 URLs EN/ES soumises manuellement le 3 juin 2026
+
+### Fichiers touchés
+
+```
+components/layout/Header.tsx                    — sélecteur de langue + fond opaque
+components/sections/ReservationLayout.tsx       — fond clair + traductions EN/ES
+components/sections/ServicesPageClient.tsx      — startingFrom + bookService
+components/sections/LocationSection.tsx         — labels traduits
+components/sections/GoogleReviews.tsx           — badge + reviewsCount traduits
+app/[locale]/contact/page.tsx                   — bouton avis Google
+app/[locale]/reservation/page.tsx               — prop locale
+app/[locale]/layout.tsx                         — nouveau Website ID Umami
+lib/sendNotificationEmail.ts                    — bouton avis Google dans email
+next.config.mjs                                 — suppression browsersListForSwc
+```
 
 ---
 
