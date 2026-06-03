@@ -108,7 +108,7 @@ export default function LocationSection({
             </a>
           </div>
           <a
-            href="https://maps.google.com/?q=Jamaa+El+Fna+Marrakech"
+            href="https://maps.app.goo.gl/siZDajFcmc85HF519"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 bg-ocre hover:bg-or text-white text-[10px] tracking-[2px] uppercase px-6 py-3 rounded-full transition-colors font-inter"
