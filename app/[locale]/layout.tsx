@@ -193,7 +193,7 @@ export default async function LocaleLayout({
         <script
           defer
           src="https://umami-production-2141.up.railway.app/script.js"
-          data-website-id="a779a13d-9789-46fc-95c2-958ead141b9d"
+          data-website-id="8e60d1e4-e51e-4ac9-896f-f641486a32eb"
         />
       </head>
       <body>
