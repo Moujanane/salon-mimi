@@ -108,19 +108,35 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 - 12 URLs EN/ES soumises manuellement le 3 juin 2026
 
+### Traductions services EN/ES
+
+- Labels et sous-services des 10 services traduits EN/ES dans `ServicesPageClient.tsx`
+- Fonctions helper `getLabel()` et `getSubServices()` ajoutées
+- Fix chevauchement menu header en espagnol (tracking réduit + whitespace-nowrap)
+
+### Vidéos galerie — jsDelivr
+
+- Vidéos exclues du repo par `.gitignore` — migrées vers jsDelivr
+- Repo créé : `github.com/Moujanane/salon-mimi-media` (Public)
+- 4 vidéos : `pomelli-video-1.mp4`, `pomelli-video-2.mp4`, `pomelli-video-3.mp4`, `Tresses-2mp4.mp4`
+- URLs : `https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/[nom-fichier]`
+- CSP `next.config.mjs` : `media-src 'self' https://cdn.jsdelivr.net` ajouté
+- **Règle** : toute nouvelle vidéo → uploader dans `Moujanane/salon-mimi-media` sur GitHub, puis URL jsDelivr dans le code
+
 ### Fichiers touchés
 
 ```
-components/layout/Header.tsx                    — sélecteur de langue + fond opaque
+components/layout/Header.tsx                    — sélecteur de langue + fond opaque + fix chevauchement ES
 components/sections/ReservationLayout.tsx       — fond clair + traductions EN/ES
-components/sections/ServicesPageClient.tsx      — startingFrom + bookService
+components/sections/ServicesPageClient.tsx      — startingFrom + bookService + labels/subServices EN/ES
 components/sections/LocationSection.tsx         — labels traduits
 components/sections/GoogleReviews.tsx           — badge + reviewsCount traduits
+components/sections/GalerieClient.tsx           — URLs jsDelivr + 4ème vidéo
 app/[locale]/contact/page.tsx                   — bouton avis Google
 app/[locale]/reservation/page.tsx               — prop locale
 app/[locale]/layout.tsx                         — nouveau Website ID Umami
 lib/sendNotificationEmail.ts                    — bouton avis Google dans email
-next.config.mjs                                 — suppression browsersListForSwc
+next.config.mjs                                 — media-src jsDelivr dans CSP
 ```
 
 ---
