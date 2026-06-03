@@ -582,17 +582,17 @@ export default function ServicesPageClient({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {[
             {
-              src: "https://cdn.jsdelivr.net/gh/Moujanane/atlas-swincar-media/pomelli-1.mp4",
+              src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-1.mp4",
               poster: "/images/pomelli-image-5.png",
               label: tx.videoLabels[0],
             },
             {
-              src: "https://cdn.jsdelivr.net/gh/Moujanane/atlas-swincar-media/pomelli-2.mp4",
+              src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-2.mp4",
               poster: "/images/pomelli-image-2.png",
               label: tx.videoLabels[1],
             },
             {
-              src: "https://cdn.jsdelivr.net/gh/Moujanane/atlas-swincar-media/pomelli-3.mp4",
+              src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-3.mp4",
               poster: "/images/pomelli-image-3.png",
               label: tx.videoLabels[2],
             },

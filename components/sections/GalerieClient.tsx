@@ -134,17 +134,17 @@ const PHOTOS = [
 
 const VIDEOS = [
   {
-    src: "https://cdn.jsdelivr.net/gh/Moujanane/atlas-swincar-media/pomelli-1.mp4",
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-1.mp4",
     title: "Tresses africaines",
     poster: "/images/pomelli-image-5.png",
   },
   {
-    src: "https://cdn.jsdelivr.net/gh/Moujanane/atlas-swincar-media/pomelli-2.mp4",
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-2.mp4",
     title: "Knotless braids",
     poster: "/images/pomelli-image-2.png",
   },
   {
-    src: "https://cdn.jsdelivr.net/gh/Moujanane/atlas-swincar-media/pomelli-3.mp4",
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-3.mp4",
     title: "Box braids",
     poster: "/images/pomelli-image-3.png",
   },
