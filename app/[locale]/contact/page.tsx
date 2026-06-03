@@ -47,6 +47,7 @@ const content: Record<
     hoursDetail: string;
     waLabel: string;
     igLabel: string;
+    reviewLabel: string;
   }
 > = {
   fr: {
