@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const LOCALES = [
-  { code: "fr", label: "FR" },
-  { code: "en", label: "EN" },
-  { code: "es", label: "ES" },
+  { code: "fr", label: "FR", flag: "🇫🇷" },
+  { code: "en", label: "EN", flag: "🇬🇧" },
+  { code: "es", label: "ES", flag: "🇪🇸" },
 ];
 
 export default function Header() {
@@ -67,6 +67,7 @@ export default function Header() {
               onClick={() => setLangOpen(!langOpen)}
               className="flex items-center gap-1.5 text-[10px] tracking-[2px] uppercase text-white/60 hover:text-white transition-colors px-2 py-1"
             >
+              <span>{LOCALES.find((l) => l.code === locale)?.flag}</span>
               {locale.toUpperCase()}
               <svg
                 className={`w-2.5 h-2.5 transition-transform ${langOpen ? "rotate-180" : ""}`}
@@ -89,8 +90,9 @@ export default function Header() {
                     key={l.code}
                     href={`/${l.code}${pathWithoutLocale}`}
                     onClick={() => setLangOpen(false)}
-                    className="block px-4 py-2 text-[10px] tracking-[2px] uppercase text-white/60 hover:text-ocre hover:bg-ocre/10 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 text-[10px] tracking-[2px] uppercase text-white/60 hover:text-ocre hover:bg-ocre/10 transition-colors"
                   >
+                    <span>{l.flag}</span>
                     {l.label}
                   </Link>
                 ))}
@@ -158,12 +160,13 @@ export default function Header() {
                 key={l.code}
                 href={`/${l.code}${pathWithoutLocale}`}
                 onClick={() => setOpen(false)}
-                className={`text-[10px] tracking-[2px] uppercase transition-colors ${
+                className={`flex items-center gap-1.5 text-[10px] tracking-[2px] uppercase transition-colors ${
                   l.code === locale
                     ? "text-ocre"
                     : "text-white/50 hover:text-white"
                 }`}
               >
+                <span>{l.flag}</span>
                 {l.label}
               </Link>
             ))}
