@@ -23,6 +23,7 @@ const securityHeaders = [
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: blob: https:",
       "connect-src 'self' https://*.supabase.co https://api.resend.com https://umami-production-2141.up.railway.app",
+      "media-src 'self' https://cdn.jsdelivr.net",
       "frame-src https://www.google.com https://maps.google.com",
       "frame-ancestors 'none'",
     ].join("; "),
