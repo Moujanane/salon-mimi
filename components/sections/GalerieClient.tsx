@@ -148,11 +148,6 @@ const VIDEOS = [
     title: "Box braids",
     poster: "/images/pomelli-image-3.png",
   },
-  {
-    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/Tresses-2mp4.mp4",
-    title: "Tresses",
-    poster: "/images/pomelli-image-4.png",
-  },
 ];
 
 const TAB_LABELS: Record<string, { photos: string; videos: string }> = {
