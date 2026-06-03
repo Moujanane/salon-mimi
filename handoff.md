@@ -44,10 +44,10 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
+- **Logo header** : le logo SVG masque africain s'affiche mais le fond de la homepage est trop sombre — à éclaircir légèrement. Fichier : `components/sections/HeroHome.tsx`
 - **Cloudflare Cache Rule** (priorité haute) : éliminerait les redirections multiples (610ms) et ferait passer PageSpeed de 92 à 95+. Instructions exactes en section 7.
 - **Demander des avis Google** : 6 avis seulement — objectif 20+ pour apparaître dans le Local Pack "coiffure africaine Marrakech"
 - **Fiche TripAdvisor** : en attente de validation depuis session 18 mai
-- **Horaires spéciaux GBP** : ajouter Aïd al-Adha (6-7 juin 2026) et Fête du Trône (30 juillet)
 
 ---
 

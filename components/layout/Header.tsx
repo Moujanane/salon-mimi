@@ -54,9 +54,13 @@ export default function Header() {
         {/* Logo centré sur desktop, gauche sur mobile */}
         <Link
           href={`/${locale}`}
-          className="lg:absolute lg:left-1/2 lg:-translate-x-1/2 text-[11px] tracking-[6px] uppercase text-white font-inter"
+          className="lg:absolute lg:left-1/2 lg:-translate-x-1/2"
         >
-          Salon Mimi
+          <img
+            src="/logo-mimi.svg"
+            alt="Salon Mimi Marrakech"
+            className="h-10 w-auto"
+          />
         </Link>
 
         {/* Droite : sélecteur de langue + CTA + hamburger */}

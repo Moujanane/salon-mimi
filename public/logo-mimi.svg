@@ -1,0 +1,37 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cercle ornemental -->
+  <circle cx="20" cy="20" r="18" stroke="#C17B3F" stroke-width="0.8" opacity="0.5"/>
+  <!-- 4 losanges -->
+  <path d="M20 2 L21 5 L20 8 L19 5 Z" fill="#C17B3F" opacity="0.8"/>
+  <path d="M20 32 L21 35 L20 38 L19 35 Z" fill="#C17B3F" opacity="0.8"/>
+  <path d="M2 20 L5 19 L8 20 L5 21 Z" fill="#C17B3F" opacity="0.8"/>
+  <path d="M32 20 L35 19 L38 20 L35 21 Z" fill="#C17B3F" opacity="0.8"/>
+  <!-- Masque africain -->
+  <path d="M20 8 C26 8 29 13 29 19 C29 25 26 30 22 32 C21 33 20 33.5 20 33.5 C20 33.5 19 33 18 32 C14 30 11 25 11 19 C11 13 14 8 20 8 Z" stroke="#C17B3F" stroke-width="1.2" fill="none"/>
+  <!-- Yeux -->
+  <path d="M15 18 Q17 15.5 19 18 Q17 20.5 15 18 Z" stroke="#C17B3F" stroke-width="0.9" fill="none"/>
+  <path d="M21 18 Q23 15.5 25 18 Q23 20.5 21 18 Z" stroke="#C17B3F" stroke-width="0.9" fill="none"/>
+  <circle cx="17" cy="18" r="1" fill="#C17B3F"/>
+  <circle cx="23" cy="18" r="1" fill="#C17B3F"/>
+  <!-- 3 points front -->
+  <circle cx="20" cy="12" r="0.8" fill="#C17B3F" opacity="0.7"/>
+  <circle cx="18" cy="12" r="0.5" fill="#C17B3F" opacity="0.4"/>
+  <circle cx="22" cy="12" r="0.5" fill="#C17B3F" opacity="0.4"/>
+  <!-- Nez -->
+  <path d="M20 21 L19 26 Q20 27 21 26 L20 21 Z" stroke="#C17B3F" stroke-width="0.7" fill="none"/>
+  <!-- Bouche -->
+  <path d="M17 29 Q20 32 23 29" stroke="#C17B3F" stroke-width="0.9" fill="none" stroke-linecap="round"/>
+  <!-- Scarifications -->
+  <line x1="12" y1="19" x2="10" y2="17.5" stroke="#C17B3F" stroke-width="0.7" stroke-linecap="round" opacity="0.6"/>
+  <line x1="11.5" y1="21" x2="9.5" y2="21" stroke="#C17B3F" stroke-width="0.7" stroke-linecap="round" opacity="0.6"/>
+  <line x1="12" y1="23" x2="10" y2="24.5" stroke="#C17B3F" stroke-width="0.7" stroke-linecap="round" opacity="0.6"/>
+  <line x1="28" y1="19" x2="30" y2="17.5" stroke="#C17B3F" stroke-width="0.7" stroke-linecap="round" opacity="0.6"/>
+  <line x1="28.5" y1="21" x2="30.5" y2="21" stroke="#C17B3F" stroke-width="0.7" stroke-linecap="round" opacity="0.6"/>
+  <line x1="28" y1="23" x2="30" y2="24.5" stroke="#C17B3F" stroke-width="0.7" stroke-linecap="round" opacity="0.6"/>
+  <!-- Perles -->
+  <circle cx="17.5" cy="32" r="0.9" fill="#C17B3F" opacity="0.7"/>
+  <circle cx="19" cy="33.5" r="1" fill="#C17B3F" opacity="0.85"/>
+  <circle cx="20" cy="34" r="1.2" fill="#C17B3F"/>
+  <circle cx="21" cy="33.5" r="1" fill="#C17B3F" opacity="0.85"/>
+  <circle cx="22.5" cy="32" r="0.9" fill="#C17B3F" opacity="0.7"/>
+</svg>
