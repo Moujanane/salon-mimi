@@ -77,7 +77,7 @@ export default async function ReservationPage({
 
   return (
     <Suspense fallback={<div className="h-screen bg-nuit" />}>
-      <ReservationLayout labels={labels} prices={prices} />
+      <ReservationLayout labels={labels} prices={prices} locale={locale} />
     </Suspense>
   );
 }
