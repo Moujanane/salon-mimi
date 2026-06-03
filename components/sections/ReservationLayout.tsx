@@ -157,13 +157,13 @@ export default function ReservationLayout({ labels, prices }: Props) {
 
   if (submitted) {
     return (
-      <div className="h-screen flex items-center justify-center bg-nuit">
+      <div className="h-screen flex items-center justify-center bg-fond">
         <div className="text-center px-6">
           <div className="text-ocre text-4xl mb-4">✦</div>
-          <h2 className="font-georgia text-2xl text-white mb-3">
+          <h2 className="font-georgia text-2xl text-nuit mb-3">
             {labels.success}
           </h2>
-          <p className="text-white/50 text-sm font-inter mb-6">
+          <p className="text-nuit/60 text-sm font-inter mb-6">
             Mimi vous contacte dès que possible pour confirmer.
           </p>
           {whatsappLink && (
@@ -182,32 +182,32 @@ export default function ReservationLayout({ labels, prices }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-nuit">
+    <div className="min-h-screen flex flex-col bg-fond">
       <div className="h-[57px] flex-shrink-0" />
 
-      <div className="flex-shrink-0 px-5 md:px-12 py-3 border-b border-ocre/10">
+      <div className="flex-shrink-0 px-5 md:px-12 py-3 border-b border-ocre/20">
         <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter block mb-0.5">
           Réservation en ligne · Marrakech
         </span>
-        <h1 className="font-georgia text-[clamp(18px,2vw,26px)] font-bold text-white">
+        <h1 className="font-georgia text-[clamp(18px,2vw,26px)] font-bold text-nuit">
           Réserve ton <em className="text-ocre italic">rendez-vous</em>
         </h1>
       </div>
 
       <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-4 p-4 pt-3">
-        <div className="w-full md:w-[44%] bg-panneau rounded-2xl border border-ocre/20 p-5 md:p-6 md:flex-shrink-0 overflow-y-auto">
+        <div className="w-full md:w-[44%] bg-white rounded-2xl border border-ocre/20 shadow-sm p-5 md:p-6 md:flex-shrink-0 overflow-y-auto">
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <div className="font-georgia text-[15px] font-bold text-white mb-0.5">
+              <div className="font-georgia text-[15px] font-bold text-nuit mb-0.5">
                 Tes informations
               </div>
-              <div className="text-[10px] text-white/55 font-inter tracking-wide">
+              <div className="text-[10px] text-nuit/50 font-inter tracking-wide">
                 Tous les champs * sont obligatoires
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+              <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
                 Service <span className="text-ocre">*</span>
               </label>
               <select
@@ -215,15 +215,10 @@ export default function ReservationLayout({ labels, prices }: Props) {
                 value={activeIndex}
                 onChange={(e) => setActiveIndex(Number(e.target.value))}
                 required
-                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none cursor-pointer"
-                style={{ background: "rgba(255,255,255,0.06)" }}
+                className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none cursor-pointer bg-fond"
               >
                 {SERVICES.map((s, i) => (
-                  <option
-                    key={s.id}
-                    value={i}
-                    style={{ background: "#2d1005" }}
-                  >
+                  <option key={s.id} value={i}>
                     {s.label}
                   </option>
                 ))}
@@ -234,7 +229,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
                   Nom complet <span className="text-ocre">*</span>
                 </label>
                 <input
@@ -242,12 +237,11 @@ export default function ReservationLayout({ labels, prices }: Props) {
                   type="text"
                   placeholder="Fatima Zahra..."
                   required
-                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-white/25"
-                  style={{ background: "rgba(255,255,255,0.06)" }}
+                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
                   Téléphone / WhatsApp <span className="text-ocre">*</span>
                 </label>
                 <input
@@ -255,14 +249,13 @@ export default function ReservationLayout({ labels, prices }: Props) {
                   type="tel"
                   placeholder="+212 6..."
                   required
-                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-white/25"
-                  style={{ background: "rgba(255,255,255,0.06)" }}
+                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+              <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
                 Email <span className="text-ocre">*</span>
               </label>
               <input
@@ -270,8 +263,7 @@ export default function ReservationLayout({ labels, prices }: Props) {
                 type="email"
                 placeholder="votre@email.com"
                 required
-                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-white/25"
-                style={{ background: "rgba(255,255,255,0.06)" }}
+                className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
               />
             </div>
 
@@ -279,64 +271,58 @@ export default function ReservationLayout({ labels, prices }: Props) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
                   Date souhaitée <span className="text-ocre">*</span>
                 </label>
                 <input
                   name="date"
                   type="date"
                   required
-                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter"
-                  style={{ background: "rgba(255,255,255,0.06)" }}
+                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+                <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
                   Heure souhaitée <span className="text-ocre">*</span>
                 </label>
                 <input
                   name="time"
                   type="time"
                   required
-                  className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter"
-                  style={{ background: "rgba(255,255,255,0.06)" }}
+                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+              <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
                 Nombre de personnes
               </label>
               <select
                 name="persons"
-                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none"
-                style={{ background: "rgba(255,255,255,0.06)" }}
+                className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none bg-fond"
               >
-                <option style={{ background: "#2d1005" }}>1 personne</option>
-                <option style={{ background: "#2d1005" }}>2 personnes</option>
-                <option style={{ background: "#2d1005" }}>3 personnes</option>
-                <option style={{ background: "#2d1005" }}>
-                  4 personnes et +
-                </option>
+                <option>1 personne</option>
+                <option>2 personnes</option>
+                <option>3 personnes</option>
+                <option>4 personnes et +</option>
               </select>
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] tracking-[2px] uppercase text-white/50 font-inter">
+              <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
                 Message (optionnel)
               </label>
               <textarea
                 name="message"
                 rows={3}
                 placeholder="Précisions sur le style, longueur souhaitée..."
-                className="border border-white/12 focus:border-ocre rounded-xl text-white text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-white/25 resize-none"
-                style={{ background: "rgba(255,255,255,0.06)" }}
+                className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 resize-none bg-fond"
               />
             </div>
 
             {error && (
-              <p className="text-red-400 text-[12px] font-inter">{error}</p>
+              <p className="text-red-500 text-[12px] font-inter">{error}</p>
             )}
 
             <button
@@ -346,14 +332,14 @@ export default function ReservationLayout({ labels, prices }: Props) {
               → Confirmer la réservation
             </button>
 
-            <p className="text-center text-white/50 text-[10px] font-inter leading-relaxed">
+            <p className="text-center text-nuit/40 text-[10px] font-inter leading-relaxed">
               Confirmation par WhatsApp sous 24h · Aucun paiement requis
               maintenant
             </p>
           </form>
         </div>
 
-        <div className="hidden md:block flex-1 bg-panneau rounded-2xl border border-ocre/20 overflow-hidden relative">
+        <div className="hidden md:block flex-1 bg-nuit rounded-2xl border border-ocre/20 overflow-hidden relative">
           {SERVICES.map((s, i) => (
             <div
               key={s.id}
