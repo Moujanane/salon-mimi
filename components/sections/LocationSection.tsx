@@ -14,6 +14,9 @@ export default function LocationSection({
       address: "Médina de Marrakech, près de la Place Jamaa El Fna",
       hours: "Lun–Sam : 9h–20h · Dim : 10h–18h",
       cta: "Obtenir l'itinéraire",
+      labelAddress: "Adresse",
+      labelHours: "Horaires",
+      labelWhatsapp: "WhatsApp",
     },
     en: {
       badge: "Find us",
@@ -23,6 +26,9 @@ export default function LocationSection({
       address: "Medina of Marrakech, near Jamaa El Fna Square",
       hours: "Mon–Sat: 9am–8pm · Sun: 10am–6pm",
       cta: "Get directions",
+      labelAddress: "Address",
+      labelHours: "Opening hours",
+      labelWhatsapp: "WhatsApp",
     },
     es: {
       badge: "Encuéntranos",
@@ -32,6 +38,9 @@ export default function LocationSection({
       address: "Medina de Marrakech, cerca de la Plaza Jamaa El Fna",
       hours: "Lun–Sáb: 9h–20h · Dom: 10h–18h",
       cta: "Obtener indicaciones",
+      labelAddress: "Dirección",
+      labelHours: "Horario",
+      labelWhatsapp: "WhatsApp",
     },
   };
 
@@ -71,7 +80,7 @@ export default function LocationSection({
         <div className="lg:w-80 flex flex-col justify-center gap-6 bg-panneau rounded-2xl border border-ocre/20 p-8">
           <div>
             <div className="text-[9px] tracking-[3px] uppercase text-ocre font-inter mb-2">
-              Adresse
+              {c.labelAddress}
             </div>
             <p className="text-white text-[14px] leading-relaxed">
               {c.address}
@@ -80,7 +89,7 @@ export default function LocationSection({
           <div className="h-px bg-ocre/15" />
           <div>
             <div className="text-[9px] tracking-[3px] uppercase text-ocre font-inter mb-2">
-              Horaires
+              {c.labelHours}
             </div>
             <p className="text-white/70 text-[13px] leading-relaxed">
               {c.hours}
@@ -89,7 +98,7 @@ export default function LocationSection({
           <div className="h-px bg-ocre/15" />
           <div>
             <div className="text-[9px] tracking-[3px] uppercase text-ocre font-inter mb-2">
-              WhatsApp
+              {c.labelWhatsapp}
             </div>
             <a
               href={`https://wa.me/${whatsappNumber}`}

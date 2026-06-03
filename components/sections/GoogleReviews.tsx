@@ -30,15 +30,30 @@ export default async function GoogleReviews({ locale }: { locale: string }) {
 
   if (topReviews.length === 0) return null;
 
-  const labels: Record<string, { title: string; cta: string }> = {
-    fr: { title: "Ce que disent nos clientes", cta: "Voir tous les avis" },
-    en: { title: "What our clients say", cta: "See all reviews" },
+  const labels: Record<
+    string,
+    { title: string; cta: string; badge: string; reviewsCount: string }
+  > = {
+    fr: {
+      title: "Ce que disent nos clientes",
+      cta: "Voir tous les avis",
+      badge: "Avis Google",
+      reviewsCount: "avis",
+    },
+    en: {
+      title: "What our clients say",
+      cta: "See all reviews",
+      badge: "Google Reviews",
+      reviewsCount: "reviews",
+    },
     es: {
       title: "Lo que dicen nuestras clientas",
       cta: "Ver todas las reseñas",
+      badge: "Reseñas Google",
+      reviewsCount: "reseñas",
     },
   };
-  const { title, cta } = labels[locale] ?? labels.fr;
+  const { title, cta, badge, reviewsCount } = labels[locale] ?? labels.fr;
 
   return (
     <section className="bg-nuit py-16 px-6 md:px-14">
@@ -48,7 +63,7 @@ export default async function GoogleReviews({ locale }: { locale: string }) {
           <div className="flex items-center gap-3 mb-3">
             <div className="w-7 h-px bg-ocre flex-shrink-0" />
             <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter">
-              Avis Google
+              {badge}
             </span>
           </div>
           <h2 className="font-playfair text-2xl text-white">{title}</h2>
@@ -86,7 +101,7 @@ export default async function GoogleReviews({ locale }: { locale: string }) {
           </div>
           <Stars rating={Math.round(data.rating)} />
           <span className="text-white/40 text-[10px] font-inter group-hover:text-ocre transition-colors">
-            {data.user_ratings_total} avis
+            {data.user_ratings_total} {reviewsCount}
           </span>
         </a>
       </div>

@@ -140,6 +140,8 @@ const TEXTS: Record<
     chooseService: "Choisir un service",
     videoTitle: "Le salon en vidéo",
     videoLabels: ["Tresses africaines", "Knotless braids", "Box braids"],
+    startingFrom: "À partir de",
+    bookService: "→ Réserver ce service",
   },
   en: {
     badge: "What we do · what we master",
@@ -154,6 +156,8 @@ const TEXTS: Record<
     chooseService: "Choose a service",
     videoTitle: "The salon in video",
     videoLabels: ["African braids", "Knotless braids", "Box braids"],
+    startingFrom: "From",
+    bookService: "→ Book this service",
   },
   es: {
     badge: "Lo que hacemos · lo que dominamos",
@@ -168,6 +172,8 @@ const TEXTS: Record<
     chooseService: "Elegir un servicio",
     videoTitle: "El salón en vídeo",
     videoLabels: ["Trenzas africanas", "Knotless braids", "Box braids"],
+    startingFrom: "Desde",
+    bookService: "→ Reservar este servicio",
   },
 };
 
@@ -382,7 +388,7 @@ export default function ServicesPageClient({
                       marginBottom: 16,
                     }}
                   >
-                    À partir de{" "}
+                    {tx.startingFrom}{" "}
                     <span style={{ color: "#c9a96e", fontWeight: "bold" }}>
                       {prices[s.id] != null
                         ? `${prices[s.id]} MAD`
@@ -407,7 +413,7 @@ export default function ServicesPageClient({
                       textDecoration: "none",
                     }}
                   >
-                    → Réserver ce service
+                    {tx.bookService}
                   </Link>
                 </div>
               </div>
@@ -480,7 +486,7 @@ export default function ServicesPageClient({
                     {s.subServices}
                   </p>
                   <p className="text-[10px] tracking-[3px] uppercase text-white/55 font-inter mb-4">
-                    À partir de{" "}
+                    {tx.startingFrom}{" "}
                     <span className="text-ocre font-bold">
                       {prices[s.id] != null
                         ? `${prices[s.id]} MAD`
@@ -491,7 +497,7 @@ export default function ServicesPageClient({
                     href={`/${locale}/reservation?service=${s.id}`}
                     className="inline-flex items-center gap-2 bg-white hover:bg-ocre text-nuit hover:text-white text-[10px] tracking-[3px] uppercase px-6 py-3 rounded-full font-bold transition-colors font-inter"
                   >
-                    → Réserver ce service
+                    {tx.bookService}
                   </Link>
                 </div>
               </div>
