@@ -1,7 +1,6 @@
 import { getGoogleReviews } from "@/lib/google-reviews";
 
-const MAPS_URL =
-  "https://www.google.com/maps/place/SALON+MIMI+-+COIFFURES+AFRICAINES/data=!4m7!3m6!1s0xdafef0072c2db79:0x54d1838eb6b5897a!8m2!3d31.6258315!4d-7.9888622!16s%2Fg%2F11xnnh8tlh";
+const MAPS_URL = "https://share.google/t4j91V4ZgAESOoNwp";
 
 function Stars({ rating }: { rating: number }) {
   return (
