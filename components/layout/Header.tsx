@@ -35,12 +35,12 @@ export default function Header() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-nuit border-b border-ocre/10">
       <div className="relative flex items-center justify-between px-5 md:px-12 py-4">
         {/* Liens gauche — masqués sur mobile */}
-        <nav className="hidden lg:flex items-center gap-5">
+        <nav className="hidden lg:flex items-center gap-3">
           {links.map((l) => (
             <Link
               key={l.href}
               href={`/${locale}${l.href}`}
-              className={`text-[10px] tracking-[3px] uppercase transition-colors ${
+              className={`text-[9px] tracking-[1.5px] uppercase transition-colors whitespace-nowrap ${
                 isActive(l.href)
                   ? "text-ocre"
                   : "text-white/70 hover:text-white"

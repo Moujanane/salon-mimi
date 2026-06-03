@@ -6,8 +6,12 @@ import Image from "next/image";
 interface ServiceData {
   id: string;
   label: string;
+  labelEn: string;
+  labelEs: string;
   icon: string;
   subServices: string;
+  subServicesEn: string;
+  subServicesEs: string;
   price: string;
   image: string;
   imageAlt: string;
@@ -17,9 +21,15 @@ const SERVICES: ServiceData[] = [
   {
     id: "tresses-africaines",
     label: "Tresses africaines",
+    labelEn: "African braids",
+    labelEs: "Trenzas africanas",
     icon: "✦",
     subServices:
       "Box braids · Cornrows · Tresses tribales · Tresse frontale · Micro tresses",
+    subServicesEn:
+      "Box braids · Cornrows · Tribal braids · Front braid · Micro braids",
+    subServicesEs:
+      "Box braids · Cornrows · Trenzas tribales · Trenza frontal · Micro trenzas",
     price: "dès 150 MAD",
     image: "/images/s-tresse-fille1.png",
     imageAlt: "Tresses africaines salon Mimi Marrakech",
@@ -27,9 +37,14 @@ const SERVICES: ServiceData[] = [
   {
     id: "tresses-et-nattes",
     label: "Tresses et nattes",
+    labelEn: "Braids & plaits",
+    labelEs: "Trenzas y rastas",
     icon: "✿",
     subServices:
       "Nattes collées · Nattes libres · Nattes en couronne · Nattes enfant",
+    subServicesEn: "Flat twists · Free braids · Crown braids · Kids braids",
+    subServicesEs:
+      "Trenzas pegadas · Trenzas sueltas · Corona de trenzas · Trenzas niña",
     price: "dès 80 MAD",
     image: "/images/s-tresse-fille2.png",
     imageAlt: "Tresses et nattes salon Mimi Marrakech",
@@ -37,9 +52,15 @@ const SERVICES: ServiceData[] = [
   {
     id: "box-braids",
     label: "Box braids",
+    labelEn: "Box braids",
+    labelEs: "Box braids",
     icon: "◈",
     subServices:
       "Box braids classiques · Jumbo · Knotless · Avec couleur · Fini perles",
+    subServicesEn:
+      "Classic box braids · Jumbo · Knotless · Coloured · Pearl finish",
+    subServicesEs:
+      "Box braids clásicas · Jumbo · Knotless · Con color · Acabado perlas",
     price: "dès 200 MAD",
     image: "/images/s-knotless.jpg",
     imageAlt: "Box braids salon Mimi Marrakech",
@@ -47,8 +68,12 @@ const SERVICES: ServiceData[] = [
   {
     id: "fulani-braids",
     label: "Tresses Fulani",
+    labelEn: "Fulani braids",
+    labelEs: "Trenzas Fulani",
     icon: "❋",
     subServices: "Classiques · Avec perles · Fils de couleur · Style tribal",
+    subServicesEn: "Classic · With beads · Colour threads · Tribal style",
+    subServicesEs: "Clásicas · Con cuentas · Hilos de color · Estilo tribal",
     price: "dès 180 MAD",
     image: "/images/s-fulani.jpg",
     imageAlt: "Tresses Fulani salon afro Marrakech",
@@ -56,8 +81,12 @@ const SERVICES: ServiceData[] = [
   {
     id: "boho-braids",
     label: "Tresses Boho",
+    labelEn: "Boho braids",
+    labelEs: "Trenzas Boho",
     icon: "◉",
     subServices: "Boho knotless · Avec frisures · Jumbo · Colorées",
+    subServicesEn: "Boho knotless · With curls · Jumbo · Coloured",
+    subServicesEs: "Boho knotless · Con rizos · Jumbo · Coloridas",
     price: "dès 220 MAD",
     image: "/images/s-boho.jpg",
     imageAlt: "Tresses Boho salon Mimi Marrakech",
@@ -65,8 +94,14 @@ const SERVICES: ServiceData[] = [
   {
     id: "locks-dreads",
     label: "Locks & dreads",
+    labelEn: "Locks & dreads",
+    labelEs: "Locks & dreads",
     icon: "⟁",
     subServices: "Pose de locks · Sisterlocks · Entretien · Retouche racines",
+    subServicesEn:
+      "Lock installation · Sisterlocks · Maintenance · Root retouch",
+    subServicesEs:
+      "Instalación de locks · Sisterlocks · Mantenimiento · Retoque raíces",
     price: "dès 250 MAD",
     image: "/images/s-depart-locks.jpg",
     imageAlt: "Locks dreads salon afro Marrakech",
@@ -74,8 +109,12 @@ const SERVICES: ServiceData[] = [
   {
     id: "cheveux-attaches",
     label: "Cheveux attachés",
+    labelEn: "Updos",
+    labelEs: "Recogidos",
     icon: "◌",
     subServices: "Chignon · Queue de cheval · Updo · Bun · Twisted updo",
+    subServicesEn: "Chignon · Ponytail · Updo · Bun · Twisted updo",
+    subServicesEs: "Moño · Cola de caballo · Recogido · Bun · Twisted updo",
     price: "dès 60 MAD",
     image: "/images/s-mini-braids.jpg",
     imageAlt: "Cheveux attachés coiffure salon Mimi Marrakech",
@@ -83,8 +122,14 @@ const SERVICES: ServiceData[] = [
   {
     id: "perruques-tissage",
     label: "Perruques et tissage",
+    labelEn: "Wigs & weaves",
+    labelEs: "Pelucas y extensiones",
     icon: "◎",
     subServices: "Pose de perruque · Tissage · Rajouts · Entretien perruque",
+    subServicesEn:
+      "Wig installation · Weave · Hair extensions · Wig maintenance",
+    subServicesEs:
+      "Colocación de peluca · Cosido · Extensiones · Mantenimiento peluca",
     price: "dès 150 MAD",
     image: "/images/s-box-braids-longues.jpg",
     imageAlt: "Perruques et tissage salon Mimi Marrakech",
@@ -92,8 +137,12 @@ const SERVICES: ServiceData[] = [
   {
     id: "colorations",
     label: "Colorations capillaires",
+    labelEn: "Hair colouring",
+    labelEs: "Coloración capilar",
     icon: "✺",
     subServices: "Couleur complète · Mèches · Balayage · Décoloration · Henné",
+    subServicesEn: "Full colour · Highlights · Balayage · Bleaching · Henna",
+    subServicesEs: "Color completo · Mechas · Balayage · Decoloración · Henna",
     price: "dès 100 MAD",
     image: "/images/s-tressage-action.jpg",
     imageAlt: "Coloration capillaire salon Mimi Marrakech",
@@ -101,9 +150,15 @@ const SERVICES: ServiceData[] = [
   {
     id: "ongles-soins-epilation",
     label: "Ongles, soins & épilation",
+    labelEn: "Nails, care & waxing",
+    labelEs: "Uñas, cuidados & depilación",
     icon: "❀",
     subServices:
       "Pose d'ongles · Manucure · Soins du visage · Épilation · Sourcils",
+    subServicesEn:
+      "Nail extensions · Manicure · Facial care · Waxing · Eyebrows",
+    subServicesEs:
+      "Extensiones de uñas · Manicura · Cuidado facial · Depilación · Cejas",
     price: "dès 50 MAD",
     image: "/images/s-ongles.jpg",
     imageAlt: "Ongles soins épilation salon Mimi Marrakech",
@@ -182,6 +237,18 @@ const TEXTS: Record<
 interface ServicesPageClientProps {
   locale: string;
   prices: Record<string, string>;
+}
+
+function getLabel(s: ServiceData, locale: string) {
+  if (locale === "en") return s.labelEn;
+  if (locale === "es") return s.labelEs;
+  return s.label;
+}
+
+function getSubServices(s: ServiceData, locale: string) {
+  if (locale === "en") return s.subServicesEn;
+  if (locale === "es") return s.subServicesEs;
+  return s.subServices;
 }
 
 export default function ServicesPageClient({
@@ -302,7 +369,7 @@ export default function ServicesPageClient({
                 }}
               >
                 <span>{s.icon}</span>
-                {s.label}
+                {getLabel(s, locale)}
               </button>
             ))}
           </div>
@@ -367,7 +434,7 @@ export default function ServicesPageClient({
                       marginBottom: 12,
                     }}
                   >
-                    {s.label}
+                    {getLabel(s, locale)}
                   </span>
                   <p
                     style={{
@@ -378,7 +445,7 @@ export default function ServicesPageClient({
                       marginBottom: 8,
                     }}
                   >
-                    {s.subServices}
+                    {getSubServices(s, locale)}
                   </p>
                   <p
                     style={{
@@ -443,7 +510,7 @@ export default function ServicesPageClient({
                 }`}
               >
                 <span className="text-base">{s.icon}</span>
-                {s.label}
+                {getLabel(s, locale)}
               </button>
             ))}
           </div>
@@ -482,10 +549,10 @@ export default function ServicesPageClient({
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
                   <span className="inline-block bg-white/12 backdrop-blur-sm border border-white/20 text-white text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
-                    {s.label}
+                    {getLabel(s, locale)}
                   </span>
                   <p className="font-georgia text-[15px] text-white leading-relaxed mb-2">
-                    {s.subServices}
+                    {getSubServices(s, locale)}
                   </p>
                   <p className="text-[10px] tracking-[3px] uppercase text-white/55 font-inter mb-4">
                     {tx.startingFrom}{" "}
