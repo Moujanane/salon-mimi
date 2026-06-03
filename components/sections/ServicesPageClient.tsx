@@ -125,6 +125,8 @@ const TEXTS: Record<
     chooseService: string;
     videoTitle: string;
     videoLabels: [string, string, string];
+    startingFrom: string;
+    bookService: string;
   }
 > = {
   fr: {
