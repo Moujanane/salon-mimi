@@ -56,6 +56,7 @@ const content: Record<
     hoursDetail: "Lundi – Samedi : 9h – 19h",
     waLabel: "Contacter sur WhatsApp",
     igLabel: "Suivre sur Instagram",
+    reviewLabel: "Laisser un avis Google ⭐",
   },
   en: {
     title: "Contact & Location",
@@ -64,6 +65,7 @@ const content: Record<
     hoursDetail: "Monday – Saturday: 9am – 7pm",
     waLabel: "Contact on WhatsApp",
     igLabel: "Follow on Instagram",
+    reviewLabel: "Leave a Google review ⭐",
   },
   es: {
     title: "Contacto y Ubicación",
@@ -72,6 +74,7 @@ const content: Record<
     hoursDetail: "Lunes – Sábado: 9h – 19h",
     waLabel: "Contactar por WhatsApp",
     igLabel: "Seguir en Instagram",
+    reviewLabel: "Dejar una reseña en Google ⭐",
   },
 };
 
@@ -128,6 +131,14 @@ export default async function ContactPage({
               className="bg-nuit border border-ocre/30 text-white text-center py-4 rounded-full font-medium hover:border-ocre transition-colors"
             >
               {data.igLabel}
+            </a>
+            <a
+              href="https://g.page/r/CXqJtbaOg9FUEBM/review"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white border border-ocre/30 text-brun text-center py-4 rounded-full font-medium hover:border-ocre transition-colors"
+            >
+              {data.reviewLabel}
             </a>
             <div
               className="rounded-2xl overflow-hidden bg-gray-200"
