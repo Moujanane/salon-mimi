@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const texts = {
   fr: {
@@ -49,6 +49,16 @@ export default function ContactForm({ locale }: { locale: string }) {
   const [status, setStatus] = useState<
     "idle" | "sending" | "success" | "error"
   >("idle");
+  const successRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status === "success" && successRef.current) {
+      successRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [status]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -78,7 +88,10 @@ export default function ContactForm({ locale }: { locale: string }) {
 
   if (status === "success") {
     return (
-      <div className="bg-white border border-ocre/20 rounded-2xl p-8 text-center shadow-sm">
+      <div
+        ref={successRef}
+        className="bg-white border border-ocre/20 rounded-2xl p-8 text-center shadow-sm"
+      >
         <p className="text-ocre font-playfair text-xl mb-2">✓</p>
         <p className="text-brun/70 text-sm">{t.success}</p>
       </div>
