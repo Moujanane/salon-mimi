@@ -17,13 +17,14 @@ export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
   const now = Date.now();
   const entry = rateLimitMap.get(ip);
-  if (entry && now - entry.ts < 60_000 && entry.count >= 3) {
+  const inWindow = entry && now - entry.ts < 60_000;
+  if (inWindow && entry.count >= 3) {
     return NextResponse.json({ error: "Trop de demandes" }, { status: 429 });
   }
-  rateLimitMap.set(ip, {
-    count: (entry?.count ?? 0) + 1,
-    ts: entry?.ts ?? now,
-  });
+  rateLimitMap.set(
+    ip,
+    inWindow ? { count: entry.count + 1, ts: entry.ts } : { count: 1, ts: now },
+  );
 
   const body = await req.json().catch(() => null);
   if (!body)
@@ -67,9 +68,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error("Resend error:", err);
-    return NextResponse.json(
-      { error: "Erreur envoi email", detail: String(err) },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Erreur envoi email" }, { status: 500 });
   }
 }

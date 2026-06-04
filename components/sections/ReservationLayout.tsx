@@ -298,7 +298,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
       <div className="h-[57px] flex-shrink-0" />
 
       <div className="flex-shrink-0 px-5 md:px-12 py-3 border-b border-ocre/20">
-        <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter block mb-0.5">
+        <span className="text-ocre text-[11px] tracking-[3px] uppercase font-inter block mb-0.5">
           {tx.subheading}
         </span>
         <h1 className="font-georgia text-[clamp(18px,2vw,26px)] font-bold text-nuit">
@@ -326,7 +326,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
+              <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
                 Service <span className="text-ocre">*</span>
               </label>
               <select
@@ -348,7 +348,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
+                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
                   {tx.fullName} <span className="text-ocre">*</span>
                 </label>
                 <input
@@ -360,7 +360,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
+                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
                   {tx.phone} <span className="text-ocre">*</span>
                 </label>
                 <input
@@ -374,7 +374,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
+              <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
                 {tx.email} <span className="text-ocre">*</span>
               </label>
               <input
@@ -390,7 +390,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
+                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
                   {tx.date} <span className="text-ocre">*</span>
                 </label>
                 <input
@@ -401,7 +401,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
                 />
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
+                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
                   {tx.time} <span className="text-ocre">*</span>
                 </label>
                 <input
@@ -414,7 +414,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
+              <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
                 {tx.persons}
               </label>
               <select
@@ -429,7 +429,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
+              <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
                 {tx.message}
               </label>
               <textarea

@@ -118,7 +118,7 @@ export default function HeroHome({
       >
         <div className="flex items-center gap-3 mb-7">
           <div className="w-7 h-px bg-ocre flex-shrink-0" />
-          <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter">
+          <span className="text-ocre text-[11px] tracking-[3px] uppercase font-inter">
             {badge ?? "Salon afro · Marrakech"}
           </span>
         </div>
@@ -153,13 +153,13 @@ export default function HeroHome({
         <div className="flex flex-col gap-3 max-w-[260px]">
           <Link
             href={`/${locale}/reservation`}
-            className="flex items-center justify-center gap-2 bg-ocre hover:bg-or text-white text-[10px] tracking-[3px] uppercase px-7 py-4 rounded-full transition-all hover:-translate-y-0.5 font-inter"
+            className="flex items-center justify-center gap-2 bg-ocre hover:bg-or text-white text-[11px] tracking-[2px] uppercase px-7 py-4 rounded-full transition-all hover:-translate-y-0.5 font-inter"
           >
             {ctaBookLabel ?? "→ Prendre rendez-vous"}
           </Link>
           <Link
             href={`/${locale}/services`}
-            className="flex items-center justify-center text-white border border-white/20 hover:border-ocre hover:text-ocre text-[10px] tracking-[3px] uppercase px-7 py-4 rounded-full transition-colors font-inter"
+            className="flex items-center justify-center text-white border border-white/20 hover:border-ocre hover:text-ocre text-[11px] tracking-[2px] uppercase px-7 py-4 rounded-full transition-colors font-inter"
           >
             {ctaServicesLabel ?? "Découvrir les services"}
           </Link>

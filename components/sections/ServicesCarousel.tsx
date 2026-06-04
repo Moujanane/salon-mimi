@@ -287,7 +287,7 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
               <button
                 onClick={prev}
                 aria-label="Photo précédente"
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/50 transition-colors duration-200"
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-nuit/70 border border-ocre/30 flex items-center justify-center text-white hover:bg-nuit/90 hover:border-ocre/60 transition-colors duration-200"
               >
                 <svg
                   width="16"
@@ -306,7 +306,7 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
               <button
                 onClick={next}
                 aria-label="Photo suivante"
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 backdrop-blur-sm border border-white/20 flex items-center justify-center text-white hover:bg-black/50 transition-colors duration-200"
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-nuit/70 border border-ocre/30 flex items-center justify-center text-white hover:bg-nuit/90 hover:border-ocre/60 transition-colors duration-200"
               >
                 <svg
                   width="16"
@@ -326,7 +326,7 @@ export default function ServicesCarousel({ locale }: ServicesCarouselProps) {
                 className="absolute bottom-0 left-0 right-0 p-8 z-10 transition-opacity duration-300"
                 style={{ opacity: fading ? 0 : 1 }}
               >
-                <span className="inline-flex items-center gap-2 bg-black/30 backdrop-blur-md border border-white/20 text-white text-[10px] uppercase tracking-[0.2em] px-4 py-2 rounded-full mb-4">
+                <span className="inline-flex items-center gap-2 bg-nuit/80 border border-ocre/30 text-white text-[11px] uppercase tracking-[0.15em] px-4 py-2 rounded-full mb-4">
                   {cat.icon} {getLabel(cat, locale)}
                 </span>
 

@@ -16,13 +16,83 @@
 
   .animate-scroll-up {
     animation: scrollUp 22s linear infinite;
+    will-change: transform;
   }
   .animate-scroll-down2 {
     animation: scrollDown2 28s linear infinite;
+    will-change: transform;
   }
   .animate-scroll-up3 {
     animation: scrollUp3 19s linear infinite;
+    will-change: transform;
   }
+}
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 16px;
+  border-radius: 100px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  transition:
+    color 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    background 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  color: #e8d5b7;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 1.5px;
+  background: #d4a843;
+  transition: width 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 1px;
+}
+.nav-link:hover {
+  color: #ffffff;
+}
+.nav-link:hover::after {
+  width: calc(100% - 32px);
+}
+.nav-link.active {
+  color: #d4a843;
+  background: rgba(212, 168, 67, 0.12);
+  font-weight: 600;
+}
+.nav-link.active::after {
+  width: calc(100% - 32px);
+}
+
+.mobile-link {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 22px;
+  font-style: italic;
+  letter-spacing: -0.01em;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(193, 123, 63, 0.08);
+  transition:
+    color 250ms ease,
+    padding-left 250ms ease;
+  display: block;
+}
+.mobile-link:hover,
+.mobile-link.active {
+  color: #c17b3f;
+  padding-left: 8px;
+}
+.mobile-link.active {
+  font-style: normal;
+  font-weight: 700;
 }
 
 @keyframes scrollUp {

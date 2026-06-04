@@ -50,7 +50,7 @@ export default function LocationSection({
     <section className="bg-nuit border-t border-ocre/15 py-20 px-6 md:px-16">
       <div className="flex items-center gap-3 mb-6 justify-center">
         <div className="w-8 h-px bg-ocre" />
-        <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter">
+        <span className="text-ocre text-[11px] tracking-[3px] uppercase font-inter">
           {c.badge}
         </span>
         <div className="w-8 h-px bg-ocre" />
@@ -79,7 +79,7 @@ export default function LocationSection({
 
         <div className="lg:w-80 flex flex-col justify-center gap-6 bg-panneau rounded-2xl border border-ocre/20 p-8">
           <div>
-            <div className="text-[9px] tracking-[3px] uppercase text-ocre font-inter mb-2">
+            <div className="text-[11px] tracking-[2px] uppercase text-ocre font-inter mb-2">
               {c.labelAddress}
             </div>
             <p className="text-white text-[14px] leading-relaxed">
@@ -88,7 +88,7 @@ export default function LocationSection({
           </div>
           <div className="h-px bg-ocre/15" />
           <div>
-            <div className="text-[9px] tracking-[3px] uppercase text-ocre font-inter mb-2">
+            <div className="text-[11px] tracking-[2px] uppercase text-ocre font-inter mb-2">
               {c.labelHours}
             </div>
             <p className="text-white/70 text-[13px] leading-relaxed">
@@ -97,7 +97,7 @@ export default function LocationSection({
           </div>
           <div className="h-px bg-ocre/15" />
           <div>
-            <div className="text-[9px] tracking-[3px] uppercase text-ocre font-inter mb-2">
+            <div className="text-[11px] tracking-[2px] uppercase text-ocre font-inter mb-2">
               {c.labelWhatsapp}
             </div>
             <a
@@ -108,7 +108,7 @@ export default function LocationSection({
             </a>
           </div>
           <a
-            href="https://maps.app.goo.gl/siZDajFcmc85HF519"
+            href="https://maps.app.goo.gl/2VHUxKWpLpYFE8836"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 bg-ocre hover:bg-or text-white text-[10px] tracking-[2px] uppercase px-6 py-3 rounded-full transition-colors font-inter"

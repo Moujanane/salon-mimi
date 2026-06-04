@@ -176,6 +176,7 @@ const TEXTS: Record<
     body1strong2: string;
     body2: string;
     body2strong: string;
+    body2end: string;
     cta: string;
     chooseService: string;
     videoTitle: string;
@@ -193,6 +194,7 @@ const TEXTS: Record<
     body1strong2: "knotless braids",
     body2: "des locks ou un soin naturel — on a ce qu'il te faut.",
     body2strong: "Réserve en ligne",
+    body2end: "on s'occupe du reste.",
     cta: "→ Réserver maintenant",
     chooseService: "Choisir un service",
     videoTitle: "Le salon en vidéo",
@@ -209,6 +211,7 @@ const TEXTS: Record<
     body1strong2: "knotless braids",
     body2: "locks or a natural treatment — we have what you need.",
     body2strong: "Book online",
+    body2end: "we'll take care of the rest.",
     cta: "→ Book now",
     chooseService: "Choose a service",
     videoTitle: "The salon in video",
@@ -225,6 +228,7 @@ const TEXTS: Record<
     body1strong2: "knotless braids",
     body2: "locks o un tratamiento natural — tenemos lo que necesitas.",
     body2strong: "Reserva en línea",
+    body2end: "nosotros nos encargamos del resto.",
     cta: "→ Reservar ahora",
     chooseService: "Elegir un servicio",
     videoTitle: "El salón en vídeo",
@@ -285,7 +289,7 @@ export default function ServicesPageClient({
       <div className="h-[57px] flex-shrink-0" />
 
       <div className="flex-shrink-0 text-center px-6 md:px-12 py-4 border-b border-ocre/10">
-        <span className="text-ocre text-[9px] tracking-[5px] uppercase font-inter block mb-1">
+        <span className="text-ocre text-[11px] tracking-[3px] uppercase font-inter block mb-1">
           {tx.badge}
         </span>
         <h1 className="font-georgia text-[clamp(18px,2.5vw,30px)] font-bold text-white">
@@ -294,13 +298,13 @@ export default function ServicesPageClient({
         <p className="text-white/60 text-[12px] max-w-lg mx-auto mt-1 leading-relaxed font-inter">
           {tx.body1} <strong className="text-ocre">{tx.body1strong1}</strong>,
           des <strong className="text-white">{tx.body1strong2}</strong>,{" "}
-          {tx.body2} <strong className="text-white">{tx.body2strong}</strong>,
-          on s&apos;occupe du reste.
+          {tx.body2} <strong className="text-white">{tx.body2strong}</strong>,{" "}
+          {tx.body2end}
         </p>
         <div className="flex justify-center gap-3 mt-3">
           <Link
             href={`/${locale}/reservation`}
-            className="flex items-center gap-2 bg-ocre hover:bg-or text-white text-[9px] tracking-[3px] uppercase px-5 py-2.5 rounded-full transition-colors font-inter"
+            className="flex items-center gap-2 bg-ocre hover:bg-or text-white text-[11px] tracking-[2px] uppercase px-5 py-2.5 rounded-full transition-colors font-inter"
           >
             {tx.cta}
           </Link>
@@ -458,7 +462,7 @@ export default function ServicesPageClient({
                     }}
                   >
                     {tx.startingFrom}{" "}
-                    <span style={{ color: "#c9a96e", fontWeight: "bold" }}>
+                    <span className="text-or font-bold">
                       {prices[s.id] != null
                         ? `${prices[s.id]} MAD`
                         : s.price.replace("dès ", "")}
@@ -496,23 +500,27 @@ export default function ServicesPageClient({
           style={{ height: "calc(100vh - 57px - 120px)" }}
         >
           <div className="w-[36%] bg-panneau rounded-2xl border border-ocre/20 p-6 flex flex-col gap-3 flex-shrink-0 overflow-y-auto">
-            <div className="text-[9px] tracking-[4px] uppercase text-white/55 font-inter mb-1">
+            <div className="text-[11px] tracking-[2px] uppercase text-white/70 font-inter mb-1">
               {tx.chooseService}
             </div>
-            {SERVICES.map((s, i) => (
-              <button
-                key={s.id}
-                onClick={() => goTo(i)}
-                className={`flex items-center gap-3 px-5 py-3.5 rounded-full border text-[11px] tracking-[2px] uppercase font-inter text-left transition-all ${
-                  i === active
-                    ? "bg-ocre border-ocre text-white"
-                    : "border-white/15 text-white/65 hover:border-ocre/50 hover:text-white"
-                }`}
-              >
-                <span className="text-base">{s.icon}</span>
-                {getLabel(s, locale)}
-              </button>
-            ))}
+            <div role="tablist" aria-label="Services">
+              {SERVICES.map((s, i) => (
+                <button
+                  key={s.id}
+                  role="tab"
+                  aria-selected={i === active}
+                  onClick={() => goTo(i)}
+                  className={`flex items-center gap-3 px-5 py-3.5 rounded-full border text-[11px] tracking-[2px] uppercase font-inter text-left transition-all w-full mb-2 ${
+                    i === active
+                      ? "bg-ocre border-ocre text-white"
+                      : "border-white/15 text-white/65 hover:border-ocre/50 hover:text-white"
+                  }`}
+                >
+                  <span className="text-base">{s.icon}</span>
+                  {getLabel(s, locale)}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex-1 bg-panneau rounded-2xl border border-ocre/20 overflow-hidden relative">
@@ -548,7 +556,7 @@ export default function ServicesPageClient({
                   }}
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
-                  <span className="inline-block bg-white/12 backdrop-blur-sm border border-white/20 text-white text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
+                  <span className="inline-block bg-brun/80 border border-ocre/30 text-white text-[11px] tracking-[2px] uppercase px-3 py-1.5 rounded-full mb-3">
                     {getLabel(s, locale)}
                   </span>
                   <p className="font-georgia text-[15px] text-white leading-relaxed mb-2">
@@ -576,7 +584,7 @@ export default function ServicesPageClient({
       )}
       {/* Section vidéos Pomelli */}
       <div className="border-t border-ocre/10 mt-8 pt-10 px-6 md:px-12 pb-16">
-        <p className="text-ocre text-[9px] tracking-[5px] uppercase font-inter mb-3 text-center">
+        <p className="text-ocre text-[11px] tracking-[3px] uppercase font-inter mb-3 text-center">
           {tx.videoTitle}
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">

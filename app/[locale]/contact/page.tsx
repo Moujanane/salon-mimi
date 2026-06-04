@@ -97,7 +97,7 @@ export default async function ContactPage({
         {/* Adresse + horaires */}
         <div className="bg-white rounded-2xl p-8 border border-ocre/20 mb-10 shadow-sm">
           <a
-            href="https://maps.app.goo.gl/siZDajFcmc85HF519"
+            href="https://maps.app.goo.gl/2VHUxKWpLpYFE8836"
             target="_blank"
             rel="noopener noreferrer"
             className="text-xl font-playfair text-brun hover:text-ocre transition-colors mb-2 inline-block"

@@ -70,6 +70,12 @@ export async function POST(request: NextRequest) {
   ) {
     return NextResponse.json({ error: "Téléphone invalide" }, { status: 400 });
   }
+  if (
+    email &&
+    (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+  ) {
+    return NextResponse.json({ error: "Email invalide" }, { status: 400 });
+  }
   if (!service || !VALID_SERVICES.includes(service)) {
     return NextResponse.json({ error: "Service invalide" }, { status: 400 });
   }

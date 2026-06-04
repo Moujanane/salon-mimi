@@ -9,7 +9,6 @@ export default function middleware(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
 
   // Redirection www -> non-www en 301 permanent
-  // On reconstruit l'URL avec le hostname public uniquement (sans port Railway interne)
   if (host.startsWith("www.")) {
     const nonWwwHost = host.replace(/^www\./, "").replace(/:\d+$/, "");
     const { pathname: p, search } = request.nextUrl;
@@ -18,6 +17,16 @@ export default function middleware(request: NextRequest) {
 
   if (pathname.startsWith("/mimi")) {
     return;
+  }
+
+  // Protection /admin : rediriger vers /admin/login si aucun cookie de session Supabase
+  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
+    const hasSession = request.cookies
+      .getAll()
+      .some((c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"));
+    if (!hasSession) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
   }
 
   const response = intlMiddleware(request);
@@ -34,5 +43,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|admin|mimi|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!api|mimi|_next|_vercel|.*\\..*).*)"],
 };

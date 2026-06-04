@@ -8,7 +8,7 @@ function Stars({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map((i) => (
         <svg
           key={i}
-          className={`w-3.5 h-3.5 ${i <= rating ? "text-[#FBBC04]" : "text-white/20"}`}
+          className={`w-3.5 h-3.5 ${i <= rating ? "text-or" : "text-white/20"}`}
           viewBox="0 0 20 20"
           fill="currentColor"
         >
@@ -61,7 +61,7 @@ export default async function GoogleReviews({ locale }: { locale: string }) {
         <div>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-7 h-px bg-ocre flex-shrink-0" />
-            <span className="text-ocre text-[9px] tracking-[4px] uppercase font-inter">
+            <span className="text-ocre text-[11px] tracking-[3px] uppercase font-inter">
               {badge}
             </span>
           </div>

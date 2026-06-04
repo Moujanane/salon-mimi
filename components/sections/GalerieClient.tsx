@@ -162,10 +162,16 @@ export default function GalerieClient({ locale }: { locale: string }) {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-16">
-      <div className="flex gap-3 mb-10 justify-center">
+      <div
+        role="tablist"
+        aria-label="Galerie"
+        className="flex gap-3 mb-10 justify-center"
+      >
         {(["photos", "videos"] as const).map((t) => (
           <button
             key={t}
+            role="tab"
+            aria-selected={tab === t}
             onClick={() => setTab(t)}
             className={`px-6 py-2 rounded-full text-sm font-inter tracking-widest uppercase transition-colors ${
               tab === t
