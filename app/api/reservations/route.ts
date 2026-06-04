@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { getSettings } from "@/lib/settings";
 import { generateWhatsAppLink } from "@/lib/whatsapp";
 import { sendNotificationEmail } from "@/lib/sendNotificationEmail";
+import { sendPushToMimi } from "@/lib/sendPushToMimi";
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
@@ -117,6 +118,12 @@ export async function POST(request: NextRequest) {
       message,
     }).catch((err) => console.error("[email notification]", err));
   }
+
+  sendPushToMimi({
+    title: "Nouvelle réservation ✂️",
+    body: `${nom} — ${service}${date_souhaitee ? " · " + date_souhaitee : ""}`,
+    url: "/mimi.html",
+  }).catch((err) => console.error("[push notification]", err));
 
   const whatsappLink = generateWhatsAppLink(
     {
