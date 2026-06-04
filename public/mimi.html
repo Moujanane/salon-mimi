@@ -26,9 +26,9 @@
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         background: #faf8f5;
+        padding-bottom: 72px;
       }
 
-      /* Ecran PIN */
       #pin-screen {
         min-height: 100vh;
         background: #1a0a00;
@@ -115,7 +115,6 @@
         opacity: 0.5;
       }
 
-      /* Dashboard */
       #dashboard {
         display: none;
         min-height: 100vh;
@@ -143,7 +142,12 @@
         font-size: 12px;
         margin-top: 2px;
       }
-      #refresh-btn {
+      #header-actions {
+        display: flex;
+        gap: 8px;
+      }
+      #refresh-btn,
+      #notif-btn {
         background: rgba(255, 255, 255, 0.1);
         color: white;
         border: none;
@@ -151,6 +155,9 @@
         padding: 8px 12px;
         font-size: 13px;
         cursor: pointer;
+      }
+      #notif-btn.active {
+        background: #c9a96e;
       }
       #filters {
         display: flex;
@@ -169,6 +176,39 @@
       }
       .filter-btn.active {
         background: #c9a96e;
+      }
+
+      #bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #1a0a00;
+        border-top: 1px solid rgba(201, 169, 110, 0.2);
+        z-index: 20;
+        display: none;
+      }
+      #bottom-nav.visible {
+        display: flex;
+      }
+      #bottom-nav button {
+        flex: 1;
+        padding: 10px 0 14px;
+        background: none;
+        border: none;
+        color: rgba(255, 255, 255, 0.45);
+        font-size: 11px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+      }
+      #bottom-nav button.active {
+        color: #c9a96e;
+      }
+      .nav-icon {
+        font-size: 22px;
       }
 
       #content {
@@ -306,10 +346,113 @@
       .statut-btn:disabled {
         opacity: 0.4;
       }
+
+      #settings-panel {
+        display: none;
+        padding: 16px;
+      }
+      .settings-section {
+        background: white;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+      .settings-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #f3f4f6;
+      }
+      .settings-field {
+        margin-bottom: 12px;
+      }
+      .settings-field label {
+        display: block;
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
+      .settings-field input {
+        width: 100%;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 10px 12px;
+        font-size: 15px;
+        color: #1a0a00;
+        outline: none;
+        background: #fafafa;
+      }
+      .settings-field input:focus {
+        border-color: #c9a96e;
+        background: white;
+      }
+      .save-btn {
+        width: 100%;
+        background: #c9a96e;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 14px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 4px;
+      }
+      .save-btn:disabled {
+        opacity: 0.5;
+      }
+      .save-feedback {
+        text-align: center;
+        font-size: 13px;
+        margin-top: 10px;
+        color: #065f46;
+        font-weight: 500;
+        display: none;
+      }
+      .notif-section {
+        background: white;
+        border-radius: 16px;
+        padding: 16px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .notif-label {
+        font-size: 14px;
+        color: #1a0a00;
+        font-weight: 500;
+      }
+      .notif-sub {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 2px;
+      }
+      .notif-toggle {
+        background: #c9a96e;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .notif-toggle.off {
+        background: #e5e7eb;
+        color: #6b7280;
+      }
     </style>
   </head>
   <body>
-    <!-- Ecran PIN -->
     <div id="pin-screen">
       <div class="card">
         <div class="logo">
@@ -335,7 +478,6 @@
       </div>
     </div>
 
-    <!-- Dashboard -->
     <div id="dashboard">
       <div id="header">
         <div id="header-top">
@@ -343,9 +485,16 @@
             <h1>✂️ Mimi Coiffure</h1>
             <div id="header-date"></div>
           </div>
-          <button id="refresh-btn" onclick="loadReservations()">
-            🔄 Actualiser
-          </button>
+          <div id="header-actions">
+            <button
+              id="notif-btn"
+              onclick="toggleNotifications()"
+              title="Activer les notifications"
+            >
+              🔔
+            </button>
+            <button id="refresh-btn" onclick="loadReservations()">🔄</button>
+          </div>
         </div>
         <div id="filters">
           <button
@@ -362,14 +511,75 @@
           </button>
         </div>
       </div>
+
       <div id="content"></div>
+
+      <div id="settings-panel">
+        <div class="notif-section">
+          <div>
+            <div class="notif-label">🔔 Notifications push</div>
+            <div class="notif-sub">
+              Recevoir une alerte à chaque nouvelle réservation
+            </div>
+          </div>
+          <button
+            class="notif-toggle off"
+            id="notif-toggle-btn"
+            onclick="toggleNotifications()"
+          >
+            Activer
+          </button>
+        </div>
+        <div class="settings-section">
+          <div class="settings-title">📱 Contact</div>
+          <div class="settings-field">
+            <label>Numéro WhatsApp</label>
+            <input id="s-whatsapp" type="tel" placeholder="ex: 212600000000" />
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-title">💰 Prix vedettes (MAD)</div>
+          <div class="settings-field">
+            <label>Box Braids medium</label>
+            <input id="s-box" type="number" placeholder="ex: 250" />
+          </div>
+          <div class="settings-field">
+            <label>Knotless Braids</label>
+            <input id="s-knotless" type="number" placeholder="ex: 300" />
+          </div>
+          <div class="settings-field">
+            <label>Boho Braids</label>
+            <input id="s-boho" type="number" placeholder="ex: 280" />
+          </div>
+          <div class="settings-field">
+            <label>Cornrows</label>
+            <input id="s-cornrows" type="number" placeholder="ex: 150" />
+          </div>
+        </div>
+        <button class="save-btn" id="save-btn" onclick="saveSettings()">
+          Enregistrer les paramètres
+        </button>
+        <div class="save-feedback" id="save-feedback">
+          ✅ Paramètres sauvegardés !
+        </div>
+      </div>
+    </div>
+
+    <div id="bottom-nav">
+      <button id="nav-resa" class="active" onclick="switchTab('reservations')">
+        <span class="nav-icon">📅</span>
+        Réservations
+      </button>
+      <button id="nav-settings" onclick="switchTab('settings')">
+        <span class="nav-icon">⚙️</span>
+        Paramètres
+      </button>
     </div>
 
     <script>
       var allReservations = [];
       var currentPin = "";
       var currentFiltre = "aujourd_hui";
-
       var STATUT_LABELS = {
         en_attente: "En attente",
         confirmee: "Confirmée",
@@ -382,40 +592,11 @@
           day: "numeric",
           month: "long",
         });
-
       document
         .getElementById("pin-input")
         .addEventListener("keydown", function (e) {
           if (e.key === "Enter") submitPin();
         });
-
-      function isToday(d) {
-        if (!d) return false;
-        var today = new Date();
-        var date = new Date(d);
-        return (
-          date.getDate() === today.getDate() &&
-          date.getMonth() === today.getMonth() &&
-          date.getFullYear() === today.getFullYear()
-        );
-      }
-
-      function isThisWeek(d) {
-        if (!d) return false;
-        var today = new Date();
-        var date = new Date(d);
-        var diff = (date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-        return diff >= -1 && diff <= 7;
-      }
-
-      function formatDate(d) {
-        if (!d) return "Date non précisée";
-        return new Date(d).toLocaleDateString("fr-FR", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-        });
-      }
 
       function submitPin() {
         var pin = document.getElementById("pin-input").value.trim();
@@ -426,7 +607,7 @@
         document.getElementById("pin-error").style.display = "none";
         fetch("/api/mimi?pin=" + encodeURIComponent(pin))
           .then(function (res) {
-            if (!res.ok) throw new Error("PIN incorrect");
+            if (!res.ok) throw new Error("PIN");
             return res.json();
           })
           .then(function (data) {
@@ -434,6 +615,9 @@
             allReservations = data.reservations || [];
             document.getElementById("pin-screen").style.display = "none";
             document.getElementById("dashboard").style.display = "block";
+            document.getElementById("bottom-nav").classList.add("visible");
+            registerSW();
+            loadSettings();
             renderReservations();
           })
           .catch(function () {
@@ -441,6 +625,26 @@
             btn.disabled = false;
             btn.textContent = "Voir mes réservations";
           });
+      }
+
+      function switchTab(tab) {
+        var isResa = tab === "reservations";
+        document.getElementById("content").style.display = isResa
+          ? "block"
+          : "none";
+        document.getElementById("settings-panel").style.display = isResa
+          ? "none"
+          : "block";
+        document.getElementById("filters").style.display = isResa
+          ? "flex"
+          : "none";
+        document.getElementById("header-actions").style.display = isResa
+          ? "flex"
+          : "none";
+        document.getElementById("nav-resa").classList.toggle("active", isResa);
+        document
+          .getElementById("nav-settings")
+          .classList.toggle("active", !isResa);
       }
 
       function loadReservations() {
@@ -463,6 +667,34 @@
         renderReservations();
       }
 
+      function isToday(d) {
+        if (!d) return false;
+        var today = new Date(),
+          date = new Date(d);
+        return (
+          date.getDate() === today.getDate() &&
+          date.getMonth() === today.getMonth() &&
+          date.getFullYear() === today.getFullYear()
+        );
+      }
+
+      function isThisWeek(d) {
+        if (!d) return false;
+        var diff =
+          (new Date(d).getTime() - new Date().getTime()) /
+          (1000 * 60 * 60 * 24);
+        return diff >= -1 && diff <= 7;
+      }
+
+      function formatDate(d) {
+        if (!d) return "Date non précisée";
+        return new Date(d).toLocaleDateString("fr-FR", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+        });
+      }
+
       function renderReservations() {
         var todayList = allReservations.filter(function (r) {
           return isToday(r.date_souhaitee);
@@ -475,29 +707,25 @@
           semaineList.length;
         document.getElementById("count-tout").textContent =
           allReservations.length;
-
         var filtered =
           currentFiltre === "aujourd_hui"
             ? todayList
             : currentFiltre === "semaine"
               ? semaineList
               : allReservations;
-
         var content = document.getElementById("content");
         if (filtered.length === 0) {
-          var msg =
-            currentFiltre === "aujourd_hui"
-              ? "Aucune réservation aujourd'hui"
-              : currentFiltre === "semaine"
-                ? "Aucune réservation cette semaine"
-                : "Aucune réservation";
+          var msgs = {
+            aujourd_hui: "Aucune réservation aujourd'hui",
+            semaine: "Aucune réservation cette semaine",
+            tout: "Aucune réservation",
+          };
           content.innerHTML =
             '<div class="empty"><div class="empty-icon">🗓️</div><p>' +
-            msg +
+            msgs[currentFiltre] +
             "</p></div>";
           return;
         }
-
         content.innerHTML = filtered
           .map(function (r) {
             var tel = r.telephone.replace(/[^0-9]/g, "");
@@ -505,24 +733,19 @@
               '<div class="card-resa" id="card-' +
               r.id +
               '">' +
-              '<div class="card-date">' +
-              '<span class="card-date-text">' +
+              '<div class="card-date"><span class="card-date-text">' +
               formatDate(r.date_souhaitee) +
               (r.heure_souhaitee
-                ? '<span class="card-date-heure">à ' +
+                ? '<span class="card-date-heure"> à ' +
                   r.heure_souhaitee +
                   "</span>"
                 : "") +
-              "</span>" +
-              '<span class="badge ' +
+              '</span><span class="badge ' +
               r.statut +
               '">' +
               STATUT_LABELS[r.statut] +
-              "</span>" +
-              "</div>" +
-              '<div class="card-body">' +
-              '<div class="card-row">' +
-              '<div class="card-info">' +
+              "</span></div>" +
+              '<div class="card-body"><div class="card-row"><div class="card-info">' +
               '<div class="card-nom">' +
               escHtml(r.nom) +
               "</div>" +
@@ -532,18 +755,16 @@
               (r.nombre_personnes
                 ? '<div class="card-personnes">' +
                   r.nombre_personnes +
-                  " personne</div>"
+                  " personne(s)</div>"
                 : "") +
               (r.message
                 ? '<div class="card-message">&ldquo;' +
                   escHtml(r.message) +
                   "&rdquo;</div>"
                 : "") +
-              "</div>" +
-              '<a class="wa-btn" href="https://wa.me/' +
+              '</div><a class="wa-btn" href="https://wa.me/' +
               tel +
-              '" target="_blank" rel="noopener">📞 WA</a>' +
-              "</div>" +
+              '" target="_blank" rel="noopener">📞 WA</a></div>' +
               '<div class="card-tel">' +
               escHtml(r.telephone) +
               "</div>" +
@@ -567,9 +788,7 @@
                   );
                 })
                 .join("") +
-              "</div>" +
-              "</div>" +
-              "</div>"
+              "</div></div></div>"
             );
           })
           .join("");
@@ -586,6 +805,161 @@
               return r.id === id ? Object.assign({}, r, { statut: statut }) : r;
             });
             renderReservations();
+          }
+        });
+      }
+
+      function loadSettings() {
+        fetch("/api/mimi-settings?pin=" + encodeURIComponent(currentPin))
+          .then(function (res) {
+            return res.json();
+          })
+          .then(function (s) {
+            if (s.whatsapp_number)
+              document.getElementById("s-whatsapp").value = s.whatsapp_number;
+            if (s.price_featured_box_braids_medium)
+              document.getElementById("s-box").value =
+                s.price_featured_box_braids_medium;
+            if (s.price_featured_knotless_braids)
+              document.getElementById("s-knotless").value =
+                s.price_featured_knotless_braids;
+            if (s.price_featured_boho_braids)
+              document.getElementById("s-boho").value =
+                s.price_featured_boho_braids;
+            if (s.price_featured_cornrows)
+              document.getElementById("s-cornrows").value =
+                s.price_featured_cornrows;
+          })
+          .catch(function () {});
+      }
+
+      function saveSettings() {
+        var btn = document.getElementById("save-btn");
+        btn.disabled = true;
+        btn.textContent = "Enregistrement…";
+        fetch("/api/mimi-settings?pin=" + encodeURIComponent(currentPin), {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            whatsapp_number: document.getElementById("s-whatsapp").value,
+            price_featured_box_braids_medium:
+              document.getElementById("s-box").value,
+            price_featured_knotless_braids:
+              document.getElementById("s-knotless").value,
+            price_featured_boho_braids: document.getElementById("s-boho").value,
+            price_featured_cornrows:
+              document.getElementById("s-cornrows").value,
+          }),
+        })
+          .then(function (res) {
+            btn.disabled = false;
+            btn.textContent = "Enregistrer les paramètres";
+            if (res.ok) {
+              var fb = document.getElementById("save-feedback");
+              fb.style.display = "block";
+              setTimeout(function () {
+                fb.style.display = "none";
+              }, 3000);
+            }
+          })
+          .catch(function () {
+            btn.disabled = false;
+            btn.textContent = "Enregistrer les paramètres";
+          });
+      }
+
+      function registerSW() {
+        if (!("serviceWorker" in navigator) || !("PushManager" in window))
+          return;
+        navigator.serviceWorker
+          .register("/mimi-sw.js")
+          .then(function (reg) {
+            window._swReg = reg;
+            reg.pushManager.getSubscription().then(function (sub) {
+              if (sub) updateNotifUI(true);
+            });
+          })
+          .catch(function (err) {
+            console.warn("SW registration failed:", err);
+          });
+      }
+
+      function updateNotifUI(active) {
+        var btn = document.getElementById("notif-btn");
+        var toggleBtn = document.getElementById("notif-toggle-btn");
+        if (active) {
+          btn.classList.add("active");
+          toggleBtn.textContent = "Désactiver";
+          toggleBtn.classList.remove("off");
+        } else {
+          btn.classList.remove("active");
+          toggleBtn.textContent = "Activer";
+          toggleBtn.classList.add("off");
+        }
+      }
+
+      function urlBase64ToUint8Array(base64String) {
+        var padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+        var base64 = (base64String + padding)
+          .replace(/-/g, "+")
+          .replace(/_/g, "/");
+        var rawData = window.atob(base64);
+        var out = new Uint8Array(rawData.length);
+        for (var i = 0; i < rawData.length; ++i) out[i] = rawData.charCodeAt(i);
+        return out;
+      }
+
+      function toggleNotifications() {
+        if (!window._swReg) {
+          alert("Les notifications ne sont pas disponibles sur cet appareil.");
+          return;
+        }
+        window._swReg.pushManager.getSubscription().then(function (sub) {
+          if (sub) {
+            sub.unsubscribe().then(function (ok) {
+              if (!ok) return;
+              fetch("/api/push?pin=" + encodeURIComponent(currentPin), {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ endpoint: sub.endpoint }),
+              });
+              updateNotifUI(false);
+            });
+          } else {
+            fetch("/api/push")
+              .then(function (r) {
+                return r.json();
+              })
+              .then(function (data) {
+                return window._swReg.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: urlBase64ToUint8Array(data.publicKey),
+                });
+              })
+              .then(function (newSub) {
+                var s = newSub.toJSON();
+                return fetch(
+                  "/api/push?pin=" + encodeURIComponent(currentPin),
+                  {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      endpoint: s.endpoint,
+                      keys: s.keys,
+                    }),
+                  },
+                );
+              })
+              .then(function (res) {
+                if (res.ok) updateNotifUI(true);
+                else alert("Erreur lors de l'activation des notifications.");
+              })
+              .catch(function (err) {
+                console.error("Push error:", err);
+                alert(
+                  "Impossible d'activer les notifications. Vérifie les permissions.",
+                );
+              });
           }
         });
       }
