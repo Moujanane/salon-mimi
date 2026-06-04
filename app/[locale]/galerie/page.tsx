@@ -38,9 +38,9 @@ export async function generateMetadata({
 }
 
 const titles: Record<string, string> = {
-  fr: "Galerie",
-  en: "Gallery",
-  es: "Galería",
+  fr: "Galerie photos — Tresses africaines Marrakech",
+  en: "Photo gallery — African braids Marrakech",
+  es: "Galería de fotos — Trenzas africanas Marrakech",
 };
 
 const subtitles: Record<string, string> = {

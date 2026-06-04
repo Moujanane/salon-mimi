@@ -15,9 +15,9 @@ export async function generateMetadata({
   const { locale } = await params;
 
   const titles: Record<string, string> = {
-    fr: "Réserver au Salon Mimi Marrakech — Tresses africaines en ligne",
-    en: "Book at Salon Mimi Marrakech — African braids online booking",
-    es: "Reservar en Salon Mimi Marrakech — Trenzas africanas reserva online",
+    fr: "Réserver tresses africaines Marrakech — Salon Mimi | Jamaa El Fna",
+    en: "Book African braids Marrakech — Salon Mimi | Jamaa El Fna",
+    es: "Reservar trenzas africanas Marrakech — Salon Mimi | Jamaa El Fna",
   };
 
   const descriptions: Record<string, string> = {

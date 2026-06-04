@@ -50,6 +50,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
+    metadataBase: new URL(BASE_URL),
     title: titles[locale] ?? titles.fr,
     description: descriptions[locale] ?? descriptions.fr,
     alternates: {
@@ -100,9 +101,9 @@ const jsonLd = {
     latitude: 31.6258,
     longitude: -7.9892,
   },
-  hasMap: "https://maps.app.goo.gl/siZDajFcmc85HF519",
+  hasMap: "https://maps.app.goo.gl/2VHUxKWpLpYFE8836",
   sameAs: [
-    "https://maps.app.goo.gl/siZDajFcmc85HF519",
+    "https://maps.app.goo.gl/2VHUxKWpLpYFE8836",
     "https://share.google/t4j91V4ZgAESOoNwp",
     "https://www.instagram.com/salonmimi.marrakech",
   ],

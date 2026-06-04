@@ -51,7 +51,7 @@ const content: Record<
   }
 > = {
   fr: {
-    title: "Contact & Accès",
+    title: "Contact & Accès — Salon Mimi Marrakech",
     address: "Place Jemaa el-Fna, Médina, Marrakech 40000, Maroc",
     hours: "Horaires",
     hoursDetail: "Lundi – Samedi : 9h – 19h",
@@ -60,7 +60,7 @@ const content: Record<
     reviewLabel: "Laisser un avis Google ⭐",
   },
   en: {
-    title: "Contact & Location",
+    title: "Contact & Location — Salon Mimi Marrakech",
     address: "Jemaa el-Fna Square, Medina, Marrakech 40000, Morocco",
     hours: "Opening hours",
     hoursDetail: "Monday – Saturday: 9am – 7pm",
@@ -69,7 +69,7 @@ const content: Record<
     reviewLabel: "Leave a Google review ⭐",
   },
   es: {
-    title: "Contacto y Ubicación",
+    title: "Contacto y Ubicación — Salon Mimi Marrakech",
     address: "Plaza Jemaa el-Fna, Medina, Marrakech 40000, Marruecos",
     hours: "Horario",
     hoursDetail: "Lunes – Sábado: 9h – 19h",
