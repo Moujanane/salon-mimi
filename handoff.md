@@ -6,37 +6,37 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 2. État actuel du code — mis à jour le 3 juin 2026 (fin de session)
+## 2. État actuel du code — mis à jour le 7 juin 2026 (fin de session)
 
 ### Ce qui marche
 
 - Homepage : hero split 50/50, 3 colonnes photo animées, titre "Tresses africaines & Rasta / Marrakech", badge "Place Jamaa El Fna" en ocre
-- **Services vedettes** : 4 cards avec titre EN + descriptif FR, prix éditables dans le dashboard, bloc "Package Signature" supprimé
-- **Galerie** : onglets Photos (34 photos) / Vidéos (3 vidéos Pomelli), texte indexable trilingue
-- **Page Services** : section vidéos Pomelli en bas de page (3 vidéos)
-- **Menu nav** : 5 liens + sélecteur de langue FR/EN/ES (desktop dropdown + mobile), hamburger jusqu'à `lg` (1024px)
-- **Page Réservation** : fond beige clair, formulaire blanc, tous les textes traduits EN/ES, champ email obligatoire, bouton WhatsApp post-soumission
-- **Page Contact** : fond blanc lisible, adresse cliquable vers Google Maps, formulaire fond blanc, bouton Instagram, bouton "Laisser un avis Google ⭐"
-- **Header** : fond opaque `bg-nuit` (textes toujours visibles quelle que soit la page), nav fixe, sélecteur de langue
-- Footer : liens Mentions légales + Politique de confidentialité en fr/en/es
-- **Traductions EN/ES complètes** : toutes les pages traduites (réservation, services, location, avis Google, header)
-- SEO : JSON-LD HairSalon complet (`image`, `sameAs`, `hasMap`, `aggregateRating` 4.5/6), FAQ schema, hreflang + sitemap avec trailing slash cohérents, og:image
-- Schema `sameAs` : Google Maps, fiche GBP (`https://share.google/t4j91V4ZgAESOoNwp`), Instagram
-- Sécurité : headers HTTP (CSP, X-Frame-Options, HSTS), rate limiting API, validation serveur
-- Dashboard admin : section "Services vedettes — Prix (MAD)" avec 4 champs éditables
-- PWA mobile `/mimi.html` avec PIN pour planning Mimi
+- **Services vedettes** : 4 cards avec titre EN + descriptif FR, prix éditables dans le dashboard
+- **Galerie** : onglets Photos (34 photos) / Vidéos (5 vidéos : 3 Pomelli + 2 marketing), texte indexable trilingue
+- **Page Services** : section vidéos Pomelli en bas + JSON-LD `ItemList` avec prix des 10 services
+- **Menu nav** : Georgia 16px, fond brun `#2C1508`, grille 3 colonnes (logo centré sans chevauchement), soulignement ocre au hover, hamburger jusqu'à `lg`
+- **Header** : logo texte "Salon Mimi / Marrakech" (SVG supprimé), fond brun chaud distinct du body
+- **Page Réservation** : fond beige clair, formulaire blanc, textes traduits EN/ES, champ email obligatoire, bouton WhatsApp post-soumission, scroll auto vers confirmation après envoi
+- **Page Contact** : bouton "Ouvrir dans Maps" → fiche salon `maps.app.goo.gl/2VHUxKWpLpYFE8836`, formulaire avec scroll vers confirmation
+- **Traductions** : phrase "on s'occupe du reste." traduite EN/ES dans ServicesPageClient
+- SEO : JSON-LD HairSalon complet, FAQ schema, hreflang, sitemap 24 URLs, `metadataBase` corrigé (og:image ne pointe plus vers localhost), crawlers IA débloqués (GPTBot, ClaudeBot, Google-Extended, PerplexityBot)
+- **Score SEO : 81/100** — audit complet effectué le 4 juin 2026
+- Sécurité : headers HTTP, rate limiting, validation email, `/admin` protégé par middleware, `unsafe-eval` retiré du CSP en prod, stack d'erreur Resend supprimée
+- Dashboard admin : prix éditables, email notification, WhatsApp
+- **PWA `/mimi.html` — version 2** : navigation par onglets (Réservations / Paramètres), changement de statut, modification prix + WhatsApp depuis le téléphone, notifications push Web Push
+- Service Worker `public/mimi-sw.js` : notifications push même appli fermée
+- API `/api/push` : enregistrement abonnements VAPID, envoi push à chaque réservation
+- API `/api/mimi-settings` : lecture/écriture settings protégée par PIN (sans session Supabase)
+- Table Supabase `push_subscriptions` créée avec RLS
+- Skills globaux : 91 skills déplacés dans `~/.claude/skills/` — disponibles sur tous les projets
 - Pages légales RGPD conformes, bandeau cookies opérationnel
-- Email `contact@mimi-coiffure.com` opérationnel via Private Email (Namecheap), redirigé vers `mouj.business@gmail.com`
-- Emails formulaire contact et notifications réservations envoyés via `noreply@atlas-swincar.com` (domaine vérifié Resend) vers `mouj.business@gmail.com`
-- Email client inclus dans le corps du mail + bouton "⭐ Laisser un avis Google"
-- **Analytics Umami réinitialisé** — nouveau Website ID : `8e60d1e4-e51e-4ac9-896f-f641486a32eb`, URL : `umami-production-2141.up.railway.app`, login : `admin` (mot de passe changé)
-- **PageSpeed mobile mesuré le 1er juin 2026 : 92/100** — FCP 2.5s, LCP 2.5s, TBT 110ms, CLS 0.002
-- **Indexation Google Search Console** : 12 URLs EN/ES soumises le 3 juin 2026
+- Analytics Umami — Website ID : `8e60d1e4-e51e-4ac9-896f-f641486a32eb`
+- PageSpeed mobile : 92/100 (mesuré 1er juin 2026)
 
 ### Ce qui reste fragile
 
-- Le titre hero sur desktop peut déborder légèrement selon la résolution — ajuster `clamp` si nécessaire
 - Samsung A54 (412px) : légère zone vide sous les CTA du hero — acceptable, pas bloquant
+- Notifications push iOS : uniquement sur Safari iOS 16.4+ avec l'app installée en PWA
 
 ### Ce qui ne marche pas
 
@@ -44,10 +44,46 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
-- **Logo header** : le logo SVG masque africain s'affiche mais le fond de la homepage est trop sombre — à éclaircir légèrement. Fichier : `components/sections/HeroHome.tsx`
-- **Cloudflare Cache Rule** (priorité haute) : éliminerait les redirections multiples (610ms) et ferait passer PageSpeed de 92 à 95+. Instructions exactes en section 7.
-- **Demander des avis Google** : 6 avis seulement — objectif 20+ pour apparaître dans le Local Pack "coiffure africaine Marrakech"
-- **Fiche TripAdvisor** : en attente de validation depuis session 18 mai
+- **Avis Google** : 6 avis seulement — objectif 20+ pour déclencher les étoiles en rich results et apparaître dans le Local Pack
+- **Cloudflare Cache Rule** : éliminerait les redirections multiples (610ms), PageSpeed 92 → 95+. Instructions en section 7
+- **Fiche TripAdvisor** : en attente de validation depuis mai 2026
+
+---
+
+## 14. Session 7 juin 2026 — Vidéos marketing + Galerie
+
+### Vidéos marketing créées
+
+- `Salon-Mimi.mp4` — vidéo marketing réalisée dans CapCut (5 photos, fondu sombre, textes ocre Montserrat, musique "Chill Afro Vibe", format 9:16, 21 sec, 7.7 MB)
+- `POLLO-AI.mp4` — vidéo générée sur Pollo.ai (3 MB)
+- Les deux vidéos publiées sur TikTok via CapCut (compte `mimicoiffure700`)
+
+### Galerie vidéo — 2 nouvelles vidéos ajoutées
+
+- Fichiers uploadés sur `github.com/Moujanane/salon-mimi-media` (repo média public)
+- URLs jsDelivr ajoutées dans `GalerieClient.tsx` :
+  - `https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/Salon-Mimi.mp4`
+  - `https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/POLLO-AI.mp4`
+- Miniatures : `s-tressage-mains.jpg` et `s-box-braids-longues.jpg`
+- La galerie affiche maintenant **5 vidéos** au lieu de 3
+
+### Fix affichage vidéos dans la galerie
+
+- Problème : vidéos verticales (9:16) affichées zoomées dans le lecteur du site
+- Fix : `object-cover` → `object-contain bg-black` dans `GalerieClient.tsx` ligne 230
+- Les vidéos s'affichent maintenant en entier avec fond noir sur les côtés
+
+### Règle — toute nouvelle vidéo marketing
+
+1. Uploader dans `Moujanane/salon-mimi-media` sur GitHub
+2. Ajouter l'entrée dans le tableau `VIDEOS` de `GalerieClient.tsx` avec l'URL jsDelivr
+3. Ne jamais utiliser `object-cover` pour des vidéos verticales dans une galerie horizontale — utiliser `object-contain bg-black`
+
+### Fichiers touchés (session 7 juin)
+
+```
+components/sections/GalerieClient.tsx   — 2 nouvelles vidéos + object-contain
+```
 
 ---
 
