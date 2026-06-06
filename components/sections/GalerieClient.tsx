@@ -227,7 +227,7 @@ export default function GalerieClient({ locale }: { locale: string }) {
                 muted
                 loop
                 playsInline
-                className="w-full aspect-[9/16] object-cover"
+                className="w-full aspect-[9/16] object-contain bg-black"
               />
               <figcaption className="text-center text-ocre text-sm font-inter py-3 tracking-widest uppercase">
                 {v.title}
