@@ -148,6 +148,16 @@ const VIDEOS = [
     title: "Box braids",
     poster: "/images/pomelli-image-3.png",
   },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/Salon-Mimi.mp4",
+    title: "Salon Mimi — Marrakech",
+    poster: "/images/s-tressage-mains.jpg",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/POLLO-AI.mp4",
+    title: "Tresses & Extensions",
+    poster: "/images/s-box-braids-longues.jpg",
+  },
 ];
 
 const TAB_LABELS: Record<string, { photos: string; videos: string }> = {
