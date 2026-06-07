@@ -19,14 +19,20 @@ export default function middleware(request: NextRequest) {
     return;
   }
 
-  // Protection /admin : rediriger vers /admin/login si aucun cookie de session Supabase
-  if (pathname.startsWith("/admin") && !pathname.startsWith("/admin/login")) {
-    const hasSession = request.cookies
-      .getAll()
-      .some((c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"));
-    if (!hasSession) {
-      return NextResponse.redirect(new URL("/admin/login", request.url));
+  // Exclure /admin du middleware i18n — next-intl ne doit pas préfixer ces routes
+  if (pathname.startsWith("/admin")) {
+    // Protection : rediriger vers /admin/login si aucun cookie de session Supabase
+    if (!pathname.startsWith("/admin/login")) {
+      const hasSession = request.cookies
+        .getAll()
+        .some(
+          (c) => c.name.startsWith("sb-") && c.name.endsWith("-auth-token"),
+        );
+      if (!hasSession) {
+        return NextResponse.redirect(new URL("/admin/login", request.url));
+      }
     }
+    return NextResponse.next();
   }
 
   const response = intlMiddleware(request);
