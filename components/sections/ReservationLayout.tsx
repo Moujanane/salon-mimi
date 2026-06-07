@@ -117,6 +117,9 @@ const TEXTS: Record<
     confirmSubtitle: string;
     whatsappBtn: string;
     startingFrom: string;
+    lostTitle: string;
+    lostText: string;
+    lostCallLabel: string;
   }
 > = {
   fr: {
@@ -145,6 +148,10 @@ const TEXTS: Record<
     confirmSubtitle: "Mimi vous contacte dès que possible pour confirmer.",
     whatsappBtn: "WhatsApp non ouvert ? Cliquer ici",
     startingFrom: "À partir de",
+    lostTitle: "Vous ne trouvez pas le salon ?",
+    lostText:
+      "Rendez-vous devant le restaurant Argana, Place Jamaa El Fna. Appelez Mimi — elle viendra vous chercher.",
+    lostCallLabel: "Appeler Mimi",
   },
   en: {
     heading: "Book your",
@@ -171,6 +178,10 @@ const TEXTS: Record<
     confirmSubtitle: "Mimi will contact you as soon as possible to confirm.",
     whatsappBtn: "WhatsApp didn't open? Click here",
     startingFrom: "From",
+    lostTitle: "Can't find the salon?",
+    lostText:
+      "Head to the Argana restaurant, Jamaa El Fna Square. Call Mimi — she will come and meet you.",
+    lostCallLabel: "Call Mimi",
   },
   es: {
     heading: "Reserva tu",
@@ -197,6 +208,10 @@ const TEXTS: Record<
     confirmSubtitle: "Mimi se pondrá en contacto contigo lo antes posible.",
     whatsappBtn: "¿WhatsApp no se abrió? Haz clic aquí",
     startingFrom: "Desde",
+    lostTitle: "¿No encuentras el salón?",
+    lostText:
+      "Ve al restaurante Argana, Plaza Jamaa El Fna. Llama a Mimi — ella vendrá a buscarte.",
+    lostCallLabel: "Llamar a Mimi",
   },
 };
 
@@ -495,6 +510,33 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Section "Vous ne trouvez pas le salon ?" */}
+      <div className="mx-5 md:mx-12 mb-8 mt-4 bg-nuit rounded-2xl overflow-hidden border border-ocre/20">
+        <div className="grid grid-cols-1 md:grid-cols-2 items-center">
+          <div className="relative h-52 md:h-full min-h-[200px]">
+            <Image
+              src="/images/restaurant-argana.jpg"
+              alt="Restaurant Argana — Place Jamaa El Fna, Marrakech"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
+          <div className="p-6 flex flex-col gap-3">
+            <h2 className="font-georgia text-xl text-or">{tx.lostTitle}</h2>
+            <p className="text-white/80 text-sm leading-relaxed">
+              {tx.lostText}
+            </p>
+            <a
+              href="tel:+212710388204"
+              className="inline-block bg-ocre text-white text-center py-2.5 px-5 rounded-full text-sm font-medium hover:bg-ocre/80 transition-colors self-start"
+            >
+              📞 {tx.lostCallLabel}
+            </a>
+          </div>
         </div>
       </div>
     </div>

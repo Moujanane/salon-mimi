@@ -1,6 +1,7 @@
 export const revalidate = 3600;
 
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getSettings } from "@/lib/settings";
 import ContactForm from "@/components/sections/ContactForm";
 
@@ -48,6 +49,9 @@ const content: Record<
     waLabel: string;
     igLabel: string;
     reviewLabel: string;
+    lostTitle: string;
+    lostText: string;
+    lostCallLabel: string;
   }
 > = {
   fr: {
@@ -58,6 +62,10 @@ const content: Record<
     waLabel: "Contacter sur WhatsApp",
     igLabel: "Suivre sur Instagram",
     reviewLabel: "Laisser un avis Google ⭐",
+    lostTitle: "Vous ne trouvez pas le salon ?",
+    lostText:
+      "Rendez-vous devant le restaurant Argana, en face de la Place Jamaa El Fna. Appelez Mimi — elle viendra vous chercher.",
+    lostCallLabel: "Appeler Mimi",
   },
   en: {
     title: "Contact & Location — Salon Mimi Marrakech",
@@ -67,6 +75,10 @@ const content: Record<
     waLabel: "Contact on WhatsApp",
     igLabel: "Follow on Instagram",
     reviewLabel: "Leave a Google review ⭐",
+    lostTitle: "Can't find the salon?",
+    lostText:
+      "Head to the Argana restaurant, right at Jamaa El Fna Square. Call Mimi — she will come and meet you.",
+    lostCallLabel: "Call Mimi",
   },
   es: {
     title: "Contacto y Ubicación — Salon Mimi Marrakech",
@@ -76,6 +88,10 @@ const content: Record<
     waLabel: "Contactar por WhatsApp",
     igLabel: "Seguir en Instagram",
     reviewLabel: "Dejar una reseña en Google ⭐",
+    lostTitle: "¿No encuentras el salón?",
+    lostText:
+      "Ve al restaurante Argana, justo en la Plaza Jamaa El Fna. Llama a Mimi — ella vendrá a buscarte.",
+    lostCallLabel: "Llamar a Mimi",
   },
 };
 
@@ -106,6 +122,33 @@ export default async function ContactPage({
           </a>
           <p className="text-brun mt-6 font-medium">{data.hours}</p>
           <p className="text-brun/60">{data.hoursDetail}</p>
+        </div>
+
+        {/* Section "Vous ne trouvez pas le salon ?" */}
+        <div className="bg-nuit rounded-2xl overflow-hidden mb-10 shadow-sm border border-ocre/20">
+          <div className="grid grid-cols-1 md:grid-cols-2 items-center">
+            <div className="relative h-64 md:h-full min-h-[240px]">
+              <Image
+                src="/images/restaurant-argana.jpg"
+                alt="Restaurant Argana — Place Jamaa El Fna, Marrakech"
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+            </div>
+            <div className="p-8 flex flex-col gap-4">
+              <h2 className="font-playfair text-2xl text-or">
+                {data.lostTitle}
+              </h2>
+              <p className="text-white/80 leading-relaxed">{data.lostText}</p>
+              <a
+                href={`tel:${settings.whatsapp_number}`}
+                className="inline-block bg-ocre text-white text-center py-3 px-6 rounded-full font-medium hover:bg-ocre/80 transition-colors self-start"
+              >
+                📞 {data.lostCallLabel}
+              </a>
+            </div>
+          </div>
         </div>
 
         {/* Disposition 2 colonnes : formulaire à gauche, boutons + carte à droite */}
