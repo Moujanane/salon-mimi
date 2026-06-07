@@ -180,6 +180,26 @@ const VIDEOS = [
     title: "Coiffure afro — Marrakech",
     poster: "/images/tresses-mimi-6.jpeg",
   },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-0606-1.mp4",
+    title: "Tresses — Salon Mimi",
+    poster: "/images/tresses-mimi-7.jpeg",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-0606-2.mp4",
+    title: "Tresses africaines Marrakech",
+    poster: "/images/s-tressage-action.jpg",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-vid-1.mp4",
+    title: "Coiffure afro — Médina",
+    poster: "/images/s-fulani.jpg",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-vid-2.mp4",
+    title: "Salon Mimi — Place Jamaa El Fna",
+    poster: "/images/s-boho.jpg",
+  },
 ];
 
 const TAB_LABELS: Record<string, { photos: string; videos: string }> = {
