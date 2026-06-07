@@ -127,12 +127,12 @@ export default async function ContactPage({
         {/* Section "Vous ne trouvez pas le salon ?" */}
         <div className="bg-nuit rounded-2xl overflow-hidden mb-10 shadow-sm border border-ocre/20">
           <div className="grid grid-cols-1 md:grid-cols-2 items-center">
-            <div className="relative h-64 md:h-full min-h-[240px]">
+            <div className="relative h-64 md:h-full min-h-[240px] bg-black">
               <Image
                 src="/images/restaurant-argana.jpg"
                 alt="Restaurant Argana — Place Jamaa El Fna, Marrakech"
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="(max-width: 768px) 100vw, 50vw"
               />
             </div>

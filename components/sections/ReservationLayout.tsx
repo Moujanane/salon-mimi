@@ -516,12 +516,12 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
       {/* Section "Vous ne trouvez pas le salon ?" */}
       <div className="mx-5 md:mx-12 mb-8 mt-4 bg-nuit rounded-2xl overflow-hidden border border-ocre/20">
         <div className="grid grid-cols-1 md:grid-cols-2 items-center">
-          <div className="relative h-52 md:h-full min-h-[200px]">
+          <div className="relative h-52 md:h-full min-h-[200px] bg-black">
             <Image
               src="/images/restaurant-argana.jpg"
               alt="Restaurant Argana — Place Jamaa El Fna, Marrakech"
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
