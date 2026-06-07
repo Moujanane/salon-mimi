@@ -26,8 +26,8 @@ const col1 = [
   },
   { src: "/images/s-knotless.jpg", alt: "Knotless braids Marrakech" },
   {
-    src: "/images/s-box-braids-profil.jpg",
-    alt: "Box braids salon afro Marrakech",
+    src: "/images/tresses-mimi-5.jpeg",
+    alt: "Tresses africaines Salon Mimi Marrakech — juin 2026",
   },
   { src: "/images/s-boho.jpg", alt: "Boho braids Marrakech" },
 ];
@@ -37,8 +37,8 @@ const col2 = [
     alt: "Tresses africaines fille Marrakech",
   },
   {
-    src: "/images/s-tressage-action.jpg",
-    alt: "Tressage africain en cours salon Mimi Marrakech",
+    src: "/images/tresses-mimi-6.jpeg",
+    alt: "Tresses africaines Salon Mimi — réalisation récente",
   },
   { src: "/images/s-mini-braids.jpg", alt: "Mini braids salon Mimi Marrakech" },
   {
@@ -53,8 +53,8 @@ const col3 = [
     alt: "Retouche locks salon Mimi Marrakech",
   },
   {
-    src: "/images/s-tressage-mains.jpg",
-    alt: "Mains expertes tressage afro Marrakech",
+    src: "/images/tresses-mimi-7.jpeg",
+    alt: "Coiffure afro Salon Mimi Marrakech — tresses récentes",
   },
   { src: "/images/s-fulani.jpg", alt: "Fulani braids salon afro Marrakech" },
 ];

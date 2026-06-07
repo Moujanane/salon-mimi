@@ -32,6 +32,18 @@ const PHOTOS = [
     alt: "Tresses africaines Salon Mimi — Place Jamaa El Fna Marrakech",
   },
   {
+    src: "/images/tresses-mimi-5.jpeg",
+    alt: "Tresses africaines Salon Mimi Marrakech — juin 2026",
+  },
+  {
+    src: "/images/tresses-mimi-6.jpeg",
+    alt: "Tresses africaines Salon Mimi — réalisation récente",
+  },
+  {
+    src: "/images/tresses-mimi-7.jpeg",
+    alt: "Coiffure afro Salon Mimi Marrakech — tresses récentes",
+  },
+  {
     src: "/images/pomelli-image-1.png",
     alt: "Coiffure africaine Marrakech — création artistique Salon Mimi",
   },
@@ -157,6 +169,16 @@ const VIDEOS = [
     src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/POLLO-AI.mp4",
     title: "Tresses & Extensions",
     poster: "/images/s-box-braids-longues.jpg",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/tresses-mimi-wa-1.mp4",
+    title: "Tresses — Salon Mimi",
+    poster: "/images/tresses-mimi-5.jpeg",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/tresses-mimi-wa-2.mp4",
+    title: "Coiffure afro — Marrakech",
+    poster: "/images/tresses-mimi-6.jpeg",
   },
 ];
 
