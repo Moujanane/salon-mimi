@@ -53,3 +53,44 @@ export async function PATCH(
 
   return NextResponse.json({ success: true });
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  const cookieStore = cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+      },
+    },
+  );
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (!user || authError) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+
+  const { error } = await supabaseAdmin
+    .from("reservations")
+    .delete()
+    .eq("id", params.id);
+
+  if (error) {
+    console.error("Erreur suppression réservation:", error);
+    return NextResponse.json(
+      { error: "Erreur lors de la suppression" },
+      { status: 500 },
+    );
+  }
+
+  return NextResponse.json({ success: true });
+}
