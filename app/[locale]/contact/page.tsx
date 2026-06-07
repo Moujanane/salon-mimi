@@ -110,21 +110,7 @@ export default async function ContactPage({
         <h1 className="font-playfair text-5xl text-or">{data.title}</h1>
       </div>
       <div className="max-w-6xl mx-auto px-4 py-16">
-        {/* Adresse + horaires */}
-        <div className="bg-white rounded-2xl p-8 border border-ocre/20 mb-10 shadow-sm">
-          <a
-            href="https://maps.app.goo.gl/2VHUxKWpLpYFE8836"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xl font-playfair text-brun hover:text-ocre transition-colors mb-2 inline-block"
-          >
-            📍 {data.address}
-          </a>
-          <p className="text-brun mt-6 font-medium">{data.hours}</p>
-          <p className="text-brun/60">{data.hoursDetail}</p>
-        </div>
-
-        {/* Section "Vous ne trouvez pas le salon ?" */}
+        {/* Section "Vous ne trouvez pas le salon ?" + adresse/horaires */}
         <div className="bg-nuit rounded-2xl overflow-hidden mb-10 shadow-sm border border-ocre/20">
           <div className="grid grid-cols-1 md:grid-cols-2 items-center">
             <div className="relative h-64 md:h-full min-h-[240px] bg-black">
@@ -147,6 +133,21 @@ export default async function ContactPage({
               >
                 📞 {data.lostCallLabel}
               </a>
+            </div>
+          </div>
+          {/* Adresse + horaires — sous la photo */}
+          <div className="border-t border-ocre/20 px-8 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <a
+              href="https://maps.app.goo.gl/2VHUxKWpLpYFE8836"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/80 hover:text-ocre transition-colors font-inter text-sm"
+            >
+              📍 {data.address}
+            </a>
+            <div className="text-right">
+              <p className="text-ocre text-sm font-medium">{data.hours}</p>
+              <p className="text-white/50 text-sm">{data.hoursDetail}</p>
             </div>
           </div>
         </div>
