@@ -2,145 +2,267 @@
 import { useState } from "react";
 import Image from "next/image";
 
-const PHOTOS = [
+type Locale = "fr" | "en" | "es";
+
+interface GallerySection {
+  id: string;
+  title: Record<Locale, string>;
+  desc: Record<Locale, string>;
+  photos: { src: string; alt: string }[];
+}
+
+const SECTIONS: GallerySection[] = [
   {
-    src: "/images/salon-mimi-1.jpeg",
-    alt: "Salon Mimi Marrakech — intérieur salon coiffure africaine",
+    id: "salon",
+    title: {
+      fr: "Le salon",
+      en: "The salon",
+      es: "El salón",
+    },
+    desc: {
+      fr: "Notre salon Place Jamaa El Fna, au cœur de la médina de Marrakech.",
+      en: "Our salon on Jamaa El Fna Square, in the heart of the Marrakech medina.",
+      es: "Nuestro salón en la Plaza Jamaa El Fna, en el corazón de la medina de Marrakech.",
+    },
+    photos: [
+      {
+        src: "/images/salon-mimi-1.jpeg",
+        alt: "Salon Mimi Marrakech — intérieur salon coiffure africaine",
+      },
+      {
+        src: "/images/salon-mimi-2.jpeg",
+        alt: "Salon Mimi Marrakech — ambiance salon tresses africaines",
+      },
+      {
+        src: "/images/salon-mimi-3.jpeg",
+        alt: "Salon Mimi Marrakech — coiffeuse au travail Place Jamaa El Fna",
+      },
+      {
+        src: "/images/hero-salon.jpg",
+        alt: "Salon Mimi Marrakech — coiffeuse africaine Médina",
+      },
+    ],
   },
   {
-    src: "/images/salon-mimi-2.jpeg",
-    alt: "Salon Mimi Marrakech — ambiance salon tresses africaines",
+    id: "box-braids",
+    title: {
+      fr: "Box Braids",
+      en: "Box Braids",
+      es: "Box Braids",
+    },
+    desc: {
+      fr: "Tresses individuelles nettes, du format medium au XL, avec ou sans extensions.",
+      en: "Clean individual braids, from medium to XL, with or without extensions.",
+      es: "Trenzas individuales definidas, del tamaño medio al XL, con o sin extensiones.",
+    },
+    photos: [
+      {
+        src: "/images/s-box-braids-longues.jpg",
+        alt: "Box braids longues Salon Mimi Marrakech",
+      },
+      {
+        src: "/images/s-box-braids-profil.jpg",
+        alt: "Box braids profil Salon Mimi Marrakech",
+      },
+      {
+        src: "/images/s-box-braids-xl.jpg",
+        alt: "Box braids XL Salon Mimi Marrakech",
+      },
+      {
+        src: "/images/s-tresses-3.jpg",
+        alt: "Tresses africaines Salon Mimi Marrakech — box braids",
+      },
+      {
+        src: "/images/coiffure-1.jpg",
+        alt: "Box braids knotless Salon Mimi Marrakech — Place Jamaa El Fna",
+      },
+    ],
   },
   {
-    src: "/images/salon-mimi-3.jpeg",
-    alt: "Salon Mimi Marrakech — coiffeuse au travail Place Jamaa El Fna",
+    id: "knotless",
+    title: {
+      fr: "Knotless Braids",
+      en: "Knotless Braids",
+      es: "Knotless Braids",
+    },
+    desc: {
+      fr: "Tresses sans nœud, légères et sans tension sur le cuir chevelu.",
+      en: "Knotless braids, lightweight with no tension on the scalp.",
+      es: "Trenzas sin nudo, ligeras y sin tensión en el cuero cabelludo.",
+    },
+    photos: [
+      {
+        src: "/images/s-knotless.jpg",
+        alt: "Knotless braids Salon Mimi Marrakech",
+      },
+      {
+        src: "/images/s-tresses-4.jpg",
+        alt: "Tresses africaines Salon Mimi Marrakech — knotless",
+      },
+      {
+        src: "/images/tresses-mimi-1.jpeg",
+        alt: "Tresses africaines Salon Mimi Marrakech — réalisation knotless",
+      },
+    ],
   },
   {
-    src: "/images/tresses-mimi-1.jpeg",
-    alt: "Tresses africaines Salon Mimi Marrakech — réalisation knotless",
+    id: "cornrows-fulani",
+    title: {
+      fr: "Cornrows & Fulani",
+      en: "Cornrows & Fulani",
+      es: "Cornrows y Fulani",
+    },
+    desc: {
+      fr: "Tresses collées géométriques, ornées de perles cauris sur demande.",
+      en: "Geometric cornrows, finished with cowrie beads on request.",
+      es: "Trenzas pegadas geométricas, con perlas cauri si se desea.",
+    },
+    photos: [
+      {
+        src: "/images/s-cornrows.jpg",
+        alt: "Cornrows Salon Mimi Marrakech — tresses collées africaines",
+      },
+      {
+        src: "/images/s-fulani.jpg",
+        alt: "Tresses Fulani Salon Mimi Marrakech",
+      },
+    ],
   },
   {
-    src: "/images/tresses-mimi-2.jpeg",
-    alt: "Box braids Salon Mimi Marrakech — tresses africaines Médina",
+    id: "boho",
+    title: {
+      fr: "Boho & Goddess",
+      en: "Boho & Goddess",
+      es: "Boho y Goddess",
+    },
+    desc: {
+      fr: "Tresses bohème ondulées, effet naturel et volumineux.",
+      en: "Wavy boho braids, for a natural and voluminous look.",
+      es: "Trenzas boho onduladas, efecto natural y voluminoso.",
+    },
+    photos: [
+      { src: "/images/s-boho.jpg", alt: "Tresses Boho Salon Mimi Marrakech" },
+      {
+        src: "/images/s-tressage-mains.jpg",
+        alt: "Mains tresseuse Salon Mimi Marrakech — savoir-faire africain",
+      },
+    ],
   },
   {
-    src: "/images/tresses-mimi-3.jpeg",
-    alt: "Tresses rasta Salon Mimi Marrakech — coiffure afro Marrakech",
+    id: "locks",
+    title: {
+      fr: "Locks",
+      en: "Locs",
+      es: "Locks",
+    },
+    desc: {
+      fr: "Pose de départ, entretien des racines et faux locks.",
+      en: "Starter locs, root maintenance and faux locs.",
+      es: "Inicio de rastas, mantenimiento de raíz y faux locks.",
+    },
+    photos: [
+      {
+        src: "/images/s-depart-locks.jpg",
+        alt: "Départ locks Salon Mimi Marrakech — pose de locks",
+      },
+      {
+        src: "/images/s-retouche-locks.jpg",
+        alt: "Retouche locks Salon Mimi Marrakech — entretien locks",
+      },
+      {
+        src: "/images/s-tresses-5.jpg",
+        alt: "Tresses africaines Salon Mimi Marrakech — locks",
+      },
+    ],
   },
   {
-    src: "/images/tresses-mimi-4.jpeg",
-    alt: "Tresses africaines Salon Mimi — Place Jamaa El Fna Marrakech",
+    id: "enfants",
+    title: {
+      fr: "Enfants",
+      en: "Children",
+      es: "Niños",
+    },
+    desc: {
+      fr: "Mini braids et tresses adaptées aux enfants, en douceur.",
+      en: "Mini braids and gentle styles made for children.",
+      es: "Mini trenzas y peinados suaves pensados para niños.",
+    },
+    photos: [
+      {
+        src: "/images/s-tresse-fille1.png",
+        alt: "Tresses fille Salon Mimi Marrakech",
+      },
+      {
+        src: "/images/s-tresse-fille2.png",
+        alt: "Tresses petite fille Salon Mimi Marrakech",
+      },
+      {
+        src: "/images/s-tresse-garcon.png",
+        alt: "Tresses garçon Salon Mimi Marrakech",
+      },
+    ],
   },
   {
-    src: "/images/tresses-mimi-5.jpeg",
-    alt: "Tresses africaines Salon Mimi Marrakech — juin 2026",
+    id: "rasta-afro",
+    title: {
+      fr: "Tresses rasta & afro",
+      en: "Rasta & afro braids",
+      es: "Trenzas rasta y afro",
+    },
+    desc: {
+      fr: "Nos réalisations récentes en tresses africaines et rasta.",
+      en: "Our recent work in African and rasta braids.",
+      es: "Nuestros trabajos recientes en trenzas africanas y rasta.",
+    },
+    photos: [
+      {
+        src: "/images/tresses-mimi-2.jpeg",
+        alt: "Box braids Salon Mimi Marrakech — tresses africaines Médina",
+      },
+      {
+        src: "/images/tresses-mimi-3.jpeg",
+        alt: "Tresses rasta Salon Mimi Marrakech — coiffure afro Marrakech",
+      },
+      {
+        src: "/images/tresses-mimi-4.jpeg",
+        alt: "Tresses africaines Salon Mimi — Place Jamaa El Fna Marrakech",
+      },
+      {
+        src: "/images/tresses-mimi-5.jpeg",
+        alt: "Tresses africaines Salon Mimi Marrakech — juin 2026",
+      },
+      {
+        src: "/images/tresses-mimi-6.jpeg",
+        alt: "Tresses africaines Salon Mimi — réalisation récente",
+      },
+      {
+        src: "/images/tresses-mimi-7.jpeg",
+        alt: "Coiffure afro Salon Mimi Marrakech — tresses récentes",
+      },
+      {
+        src: "/images/s-tresses-2.jpg",
+        alt: "Tresses africaines Salon Mimi Marrakech",
+      },
+    ],
   },
   {
-    src: "/images/tresses-mimi-6.jpeg",
-    alt: "Tresses africaines Salon Mimi — réalisation récente",
-  },
-  {
-    src: "/images/tresses-mimi-7.jpeg",
-    alt: "Coiffure afro Salon Mimi Marrakech — tresses récentes",
-  },
-  {
-    src: "/images/pomelli-image-1.png",
-    alt: "Coiffure africaine Marrakech — création artistique Salon Mimi",
-  },
-  {
-    src: "/images/pomelli-image-2.png",
-    alt: "Tresses africaines créatives Marrakech — Salon Mimi",
-  },
-  {
-    src: "/images/pomelli-image-3.png",
-    alt: "Box braids artistiques Marrakech — Salon Mimi coiffure afro",
-  },
-  {
-    src: "/images/pomelli-image-4.png",
-    alt: "Coiffure afro créative Salon Mimi — tresses Marrakech",
-  },
-  {
-    src: "/images/pomelli-image-5.png",
-    alt: "Coiffure africaine Salon Mimi Marrakech — tresses et locks",
-  },
-  {
-    src: "/images/pomelli-image-6.png",
-    alt: "Photoshoot Salon Mimi Marrakech — coiffure africaine",
-  },
-  { src: "/images/s-boho.jpg", alt: "Tresses Boho Salon Mimi Marrakech" },
-  {
-    src: "/images/s-box-braids-longues.jpg",
-    alt: "Box braids longues Salon Mimi Marrakech",
-  },
-  {
-    src: "/images/s-box-braids-profil.jpg",
-    alt: "Box braids profil Salon Mimi Marrakech",
-  },
-  {
-    src: "/images/s-box-braids-xl.jpg",
-    alt: "Box braids XL Salon Mimi Marrakech",
-  },
-  {
-    src: "/images/s-cornrows.jpg",
-    alt: "Cornrows Salon Mimi Marrakech — tresses collées africaines",
-  },
-  {
-    src: "/images/s-depart-locks.jpg",
-    alt: "Départ locks Salon Mimi Marrakech — pose de locks",
-  },
-  { src: "/images/s-fulani.jpg", alt: "Tresses Fulani Salon Mimi Marrakech" },
-  {
-    src: "/images/s-knotless.jpg",
-    alt: "Knotless braids Salon Mimi Marrakech",
-  },
-  { src: "/images/s-mini-braids.jpg", alt: "Mini braids Salon Mimi Marrakech" },
-  {
-    src: "/images/s-retouche-locks.jpg",
-    alt: "Retouche locks Salon Mimi Marrakech — entretien locks",
-  },
-  {
-    src: "/images/s-tressage-action.jpg",
-    alt: "Tressage en cours Salon Mimi Marrakech",
-  },
-  {
-    src: "/images/s-tressage-mains.jpg",
-    alt: "Mains tresseuse Salon Mimi Marrakech — savoir-faire africain",
-  },
-  {
-    src: "/images/s-tresse-fille1.png",
-    alt: "Tresses fille Salon Mimi Marrakech",
-  },
-  {
-    src: "/images/s-tresse-fille2.png",
-    alt: "Tresses petite fille Salon Mimi Marrakech",
-  },
-  {
-    src: "/images/s-tresse-garcon.png",
-    alt: "Tresses garçon Salon Mimi Marrakech",
-  },
-  {
-    src: "/images/s-tresses-2.jpg",
-    alt: "Tresses africaines Salon Mimi Marrakech",
-  },
-  {
-    src: "/images/s-tresses-3.jpg",
-    alt: "Tresses africaines Salon Mimi Marrakech — box braids",
-  },
-  {
-    src: "/images/s-tresses-4.jpg",
-    alt: "Tresses africaines Salon Mimi Marrakech — knotless",
-  },
-  {
-    src: "/images/s-tresses-5.jpg",
-    alt: "Tresses africaines Salon Mimi Marrakech — locks",
-  },
-  {
-    src: "/images/coiffure-1.jpg",
-    alt: "Box braids knotless Salon Mimi Marrakech — Place Jamaa El Fna",
-  },
-  {
-    src: "/images/hero-salon.jpg",
-    alt: "Salon Mimi Marrakech — coiffeuse africaine Médina",
+    id: "en-cabine",
+    title: {
+      fr: "En cabine",
+      en: "In the chair",
+      es: "En cabina",
+    },
+    desc: {
+      fr: "Le tressage en cours — plusieurs heures de savoir-faire.",
+      en: "Braiding in progress — several hours of craftsmanship.",
+      es: "Trenzado en proceso — varias horas de oficio.",
+    },
+    photos: [
+      {
+        src: "/images/s-tressage-action.jpg",
+        alt: "Tressage en cours Salon Mimi Marrakech",
+      },
+    ],
   },
 ];
 
@@ -211,6 +333,8 @@ const TAB_LABELS: Record<string, { photos: string; videos: string }> = {
 export default function GalerieClient({ locale }: { locale: string }) {
   const [tab, setTab] = useState<"photos" | "videos">("photos");
   const labels = TAB_LABELS[locale] ?? TAB_LABELS.fr;
+  const lang: Locale =
+    locale === "en" || locale === "es" ? (locale as Locale) : "fr";
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-16">
@@ -236,24 +360,36 @@ export default function GalerieClient({ locale }: { locale: string }) {
         ))}
       </div>
 
-      {tab === "photos" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PHOTOS.map((img, i) => (
-            <div
-              key={i}
-              className="relative aspect-square rounded-2xl overflow-hidden bg-gray-800"
-            >
-              <Image
-                src={img.src}
-                alt={img.alt}
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-300"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              />
+      {tab === "photos" &&
+        SECTIONS.map((section, si) => (
+          <section key={section.id} className={si > 0 ? "mt-16" : ""}>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-7 h-px bg-ocre flex-shrink-0" />
+              <h2 className="text-brun text-[11px] tracking-[3px] uppercase font-inter">
+                {section.title[lang]}
+              </h2>
             </div>
-          ))}
-        </div>
-      )}
+            <p className="text-brun/60 text-sm font-inter mb-6 max-w-xl">
+              {section.desc[lang]}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {section.photos.map((img, i) => (
+                <div
+                  key={i}
+                  className="relative aspect-square rounded-2xl overflow-hidden bg-gray-800"
+                >
+                  <Image
+                    src={img.src}
+                    alt={img.alt}
+                    fill
+                    className="object-cover hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
 
       {tab === "videos" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
