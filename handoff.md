@@ -6,7 +6,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 2. État actuel du code — mis à jour le 7 juin 2026 (fin de session)
+## 2. État actuel du code — mis à jour le 7 juin 2026 (fin de session, soir)
 
 ### Ce qui marche
 
@@ -26,6 +26,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 - **PWA `/mimi.html` — version 2** : navigation par onglets (Réservations / Paramètres), changement de statut, modification prix + WhatsApp depuis le téléphone, notifications push Web Push
 - Service Worker `public/mimi-sw.js` : notifications push même appli fermée
 - API `/api/push` : enregistrement abonnements VAPID, envoi push à chaque réservation
+- **Notifications push opérationnelles** : Mimi (Android) + Mouj (Android + iPhone via Safari PWA) reçoivent les alertes à chaque réservation — clés VAPID configurées dans Railway le 7 juin 2026
 - API `/api/mimi-settings` : lecture/écriture settings protégée par PIN (sans session Supabase)
 - Table Supabase `push_subscriptions` créée avec RLS
 - Skills globaux : 91 skills déplacés dans `~/.claude/skills/` — disponibles sur tous les projets
@@ -44,9 +45,157 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
-- **Avis Google** : 6 avis seulement — objectif 20+ pour déclencher les étoiles en rich results et apparaître dans le Local Pack
+- **PRIORITÉ 1 — Refonte du tunnel de réservation (CRO).** C'est le levier qui transforme le trafic existant en réservations. À faire :
+  - CTA WhatsApp en action principale (header, hero, fin de page), message pré-rempli « Bonjour, je voudrais réserver [coiffure] ». Le formulaire devient l'option secondaire.
+  - Prix affiché dès le choix de la coiffure dans le sélecteur de `/reservation` (« Box Braids — dès 550 MAD »).
+  - Formulaire raccourci : idéalement 2 étapes (1. coiffure + date, 2. nom + téléphone), email optionnel.
+  - Réassurance sous le bouton : « Réponse en moins d'1 h · Annulation gratuite · Paiement sur place ».
+  - Bandeau sticky mobile « Réserver sur WhatsApp » toujours visible.
+- **Avis Google** : 13 avis / 4,2 étoiles au 28 août 2026 (était 6 le 1er juin). Objectif 30+ : QR code plastifié à la caisse + SMS/WhatsApp automatique 2 h après le RDV avec `https://g.page/r/CXqJtbaOg9FUEBM/review`. Répondre à TOUS les avis existants.
+- **Bios réseaux** : ajouter le lien `https://mimi-coiffure.com/reservation` dans les bios Instagram (`salonmimi.marrakech`) et TikTok (`@mimicoiffure700`).
 - **Cloudflare Cache Rule** : éliminerait les redirections multiples (610ms), PageSpeed 92 → 95+. Instructions en section 7
 - **Fiche TripAdvisor** : en attente de validation depuis mai 2026
+
+---
+
+## 17. Session 28 août 2026 — SEO avis, audience réseaux, accusé de réception client
+
+### Contexte
+
+Le site a du trafic (fiche Google Business ~456 vues/mois) mais peu de réservations.
+Analyse marketing faite : le point de fuite le plus probable est la **conversion**
+(le visiteur arrive mais ne réserve pas), pas l'audience. D'où la priorisation de
+la refonte du tunnel de réservation pour la prochaine session (voir « Ce qui reste
+à faire », priorité 1).
+
+### 1. SEO — note Google corrigée (commit `e75abc0`)
+
+- La fiche Google affiche **4,2 étoiles / 13 avis** (vérifié sur capture d'écran de la fiche).
+- Le JSON-LD `aggregateRating` de `app/[locale]/layout.tsx` annonçait encore `4.5` / `6`
+  (figé depuis le 1er juin). Corrigé en `4.2` / `13`.
+- Le composant `GoogleReviews.tsx` (section homepage) est déjà dynamique via l'API
+  Google Places — pas touché. À réajuster manuellement dans le JSON-LD quand le
+  compteur d'avis bougera nettement (ou le rendre dynamique un jour).
+
+### 2. Galerie → catalogue par type de coiffure (commits `caa5270`, `e342790`)
+
+- L'onglet **Photos** de `/galerie` passe d'une grille unique de 37 images en vrac à
+  **9 sections thématiques trilingues** : Le salon, Box Braids, Knotless Braids,
+  Cornrows & Fulani, Boho & Goddess, Locks, Enfants, Tresses rasta & afro, En cabine.
+  Chaque section a un titre + une phrase FR/EN/ES.
+- **30 images réelles.** Les 6 visuels `pomelli-image-*.png` (générés par IA) ont été
+  **retirés de la galerie** — fichiers conservés dans `public/images/` car utilisés
+  comme posters vidéo dans le tableau `VIDEOS`.
+- Onglet Vidéos, URL, métadonnées SEO : inchangés.
+- Fichier : `components/sections/GalerieClient.tsx` (tableau `PHOTOS` plat → `SECTIONS`).
+- Spec : `docs/superpowers/specs/2026-08-28-galerie-catalogue-par-style-design.md`.
+- **Photos écartées** : les dossiers `salon-mimi-media/Catalogue mimi/` et
+  `salon-mimi-media/Photo Site/` contiennent des images tierces récupérées sur
+  Pinterest/Instagram (watermarks visibles, captures d'écran avec flèche « retour »).
+  Non utilisables sur un site commercial (droit d'auteur + risque SEO contenu dupliqué).
+  Pour un vrai catalogue, il faut des photos prises par Mimi au salon, en bonne
+  résolution, avec accord des clientes.
+
+### 3. Sélecteur de langue en pastilles (commit `830d322`)
+
+- Avant : petit texte gris opacité 45 % + menu déroulant (desktop) ; langues cachées
+  au fond du menu hamburger (mobile). Invisible pour un visiteur pressé.
+- Après : **3 pastilles `FR EN ES` toujours affichées**, desktop ET mobile, changement
+  en un clic. Langue active en fond ocre, les autres en contour.
+- Nouveau composant `LangPills` dans `Header.tsx`. Suppression du `useState langOpen`
+  et de tout le dropdown (89 lignes en moins).
+
+### 4. Liens réseaux + SEO social (commit `978d5f8`)
+
+- **`lib/social.ts` créé** : source unique pour les URLs
+  Instagram (`salonmimi.marrakech`), TikTok (`@mimicoiffure700`), Maps, GBP.
+- **Footer** : bloc « Suivez-nous » trilingue avec icônes Instagram / TikTok / Google Maps.
+- **Header** : icônes Instagram + TikTok, visibles desktop (barre) et mobile (menu).
+- **`app/[locale]/layout.tsx`** :
+  - `openGraph.siteName: "Salon Mimi"`
+  - bloc `twitter` (`summary_large_image` + title/description/image) pour les aperçus
+    de partage sur X, Facebook, WhatsApp
+  - `sameAs` du JSON-LD complété : ajout de TikTok et de la fiche Google Business
+    canonique (`https://g.page/r/CXqJtbaOg9FUEBM`)
+
+### 5. Accusé de réception automatique au client (commit `4b6c44b`)
+
+- À chaque réservation **où le client a laissé un email**, il reçoit tout de suite un
+  accusé dans **sa langue** (FR/EN/ES) : remerciement, récap (prestation + date),
+  bloc « Vous ne trouvez pas le salon ? / restaurant Argana / appelez Mimi », bouton
+  WhatsApp vert (`wa.me/212710388204` avec message pré-rempli).
+- **`lib/sendClientConfirmationEmail.ts` créé** :
+  `from: "Salon Mimi <noreply@atlas-swincar.com>"` (domaine vérifié Resend),
+  `to` = client, **`bcc` = `contact@mimi-coiffure.com` + `mouj.business@gmail.com`**
+  (invisibles pour le client), `reply_to` = `contact@mimi-coiffure.com`.
+- `lib/sendNotificationEmail.ts` : `esc()` exporté et réutilisé (DRY).
+- `app/api/reservations/route.ts` : lit `locale` du body (défaut `fr`), déclenche
+  l'envoi client **uniquement si un email est fourni**, en `.catch()` non bloquant.
+  Un échec d'envoi ne bloque ni l'enregistrement ni la notif Mimi.
+- `components/sections/ReservationLayout.tsx` : ajoute `locale` aux données envoyées.
+- **À valider en prod** : faire une vraie réservation de test avec un email → vérifier
+  la réception des 2 copies (client + Bcc). Si rien n'arrive, vérifier
+  `RESEND_API_KEY` dans Railway (historique de clés invalides, cf. sections 10 et 12)
+  et le dashboard Resend > Emails.
+
+### Note outillage — lanceur de preview cassé sur ce Mac
+
+`preview_start` (Browser pane, mode `{name}`) échoue au démarrage avec
+`Error: EPERM: operation not permitted, uv_cwd`. C'est un problème d'environnement
+de la sandbox du preview server sur cette machine, **sans rapport avec le code**.
+
+Contournement utilisé cette session : lancer le dev server via un terminal sur un
+port libre puis piloter le navigateur dessus —
+`nohup node node_modules/.bin/next dev -p 3100 &`, puis `navigate` vers
+`http://localhost:3100`. Le navigateur intégré devient aussi instable après
+quelques minutes (timeouts, « pane hidden ») — vérifier vite, ou via `curl` sur le
+HTML rendu.
+
+---
+
+## 16. Incident résolu — 21-22 août 2026 : `mimi-coiffure.com` (apex) inaccessible — 403/404 Forbidden
+
+### Symptôme
+
+`mimi-coiffure.com` (sans www) retournait `403 Forbidden` puis `404` avec le header `x-railway-fallback: true`. `www.mimi-coiffure.com` fonctionnait normalement. Découvert par hasard le 21 août — durée réelle de l'incident inconnue, aucun déploiement n'a eu lieu entre le 7 juin et le 21 août donc ce n'est pas un déploiement qui a cassé l'apex. **Résolu le 22 août 2026 à 00h08.**
+
+### Cause racine — deux problèmes distincts et cumulatifs
+
+**1. A record obsolète sur l'apex.** Sur Cloudflare, l'enregistrement DNS de l'apex `mimi-coiffure.com` était un **A record pointant vers `66.33.22.222`** — une IP qui n'a aucun rapport avec Railway (les IPs edge attendues sont `104.21.x.x` / `172.67.x.x`). Reliquat de la config DNS d'avant la migration vers Cloudflare (session 23-24 mai 2026, nameservers changés chez Gandi), jamais nettoyé après la bascule. Le CNAME `www` avait lui été correctement configuré vers Railway, donc seul l'apex était cassé.
+
+**2. TXT de vérification tronqué (cause principale du blocage prolongé).** Railway exige un TXT `_railway-verify` pour valider chaque domaine custom. En copiant la valeur depuis la fenêtre Railway "Configure DNS Records", la valeur collée dans Cloudflare était **tronquée avec des points de suspension** (`railway-verify=83c2f91c0ea197bb85448eb97a...` au lieu du hash complet de 64 caractères `railway-verify=83c2f91c0ea197bb85448eb97ac97f73244c49efd102e6255cb68b9bbab83fbf`). Résultat : même après correction du CNAME et suppression/recréation du domaine dans Railway, la vérification échouait en boucle sans message d'erreur explicite côté Railway — juste `x-railway-fallback: true` qui persistait indéfiniment.
+
+### Fix appliqué
+
+Dans Cloudflare DNS (dash.cloudflare.com → mimi-coiffure.com → DNS → Records) :
+
+1. Suppression du A record `mimi-coiffure.com` → `66.33.22.222`
+2. Ajout/mise à jour du CNAME `mimi-coiffure.com` (`@`) → cible Railway (`*.up.railway.app`), Proxy status **Proxied**
+3. Correction du TXT `_railway-verify` avec la **valeur complète** (pas tronquée) fournie par Railway
+
+### Règles à appliquer désormais
+
+- Après toute migration de registrar, de nameservers, ou de CDN : **tester explicitement l'apex ET le www séparément** (`curl -I https://domaine.com` et `curl -I https://www.domaine.com`). Un test sur un seul des deux peut masquer un enregistrement DNS cassé pendant des mois sans que personne ne le remarque.
+- **Ne jamais copier une valeur DNS affichée tronquée dans une UI** (avec `...`). Toujours cliquer/copier via le mécanisme de copie fourni par l'interface, ou agrandir le champ pour voir la valeur en entier avant de la coller ailleurs. Une valeur TXT tronquée ne génère aucune erreur explicite côté Railway — juste un blocage silencieux qui ressemble à un problème de propagation DNS normal, ce qui fait perdre beaucoup de temps à tort.
+- Pour dater précisément une future coupure similaire : consulter Google Search Console > Couverture, qui historise les erreurs d'exploration Googlebot par URL.
+
+---
+
+## 15. Session 7 juin 2026 (soir) — Notifications push + Gestion emails
+
+### Notifications push — correction VAPID
+
+- Problème : `VAPID_PUBLIC_KEY` et `VAPID_PRIVATE_KEY` étaient vides dans Railway → `/api/push` retournait `{"publicKey":""}` → `pushManager.subscribe()` plantait avec "Impossible d'activer les notifications"
+- Fix : génération d'une nouvelle paire de clés via `npx web-push generate-vapid-keys`, ajoutées dans Railway
+- **Attention Railway** : lors du déploiement, Railway proposait aussi de supprimer `Postgres-MqJ4` (base Umami). Cliquer "Keep Service" pour annuler cette suppression avant de déployer
+- Résultat : notifications push opérationnelles sur Android (Mouj + Mimi) et iPhone (Safari PWA uniquement, iOS 16.4+)
+- **Règle iOS** : sur iPhone, les notifications push PWA ne fonctionnent que depuis l'app installée via Safari > "Sur l'écran d'accueil". Chrome iOS ne supporte pas les notifications push PWA
+
+### Gestion email client — réservation Grace Eleanor
+
+- Réservation reçue : Grace Eleanor (Espagnole, +34), tresses africaines + extensions full head, dimanche 7 juin 16h30
+- Répondu via draft Gmail (MCP Gmail connecté à `mouj.business@gmail.com`) en espagnol
+- Workflow confirmé : les notifications email de réservation arrivent sur `mouj.business@gmail.com`, on répond via draft Claude + validation manuelle avant envoi
 
 ---
 
