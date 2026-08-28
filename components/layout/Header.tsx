@@ -10,12 +10,48 @@ const LOCALES = [
   { code: "es", label: "ES", flag: "🇪🇸" },
 ];
 
+function LangPills({
+  locale,
+  pathWithoutLocale,
+  onNavigate,
+}: {
+  locale: string;
+  pathWithoutLocale: string;
+  onNavigate?: () => void;
+}) {
+  return (
+    <div
+      className="flex items-center gap-1"
+      role="group"
+      aria-label="Choix de la langue"
+    >
+      {LOCALES.map((l) => {
+        const active = l.code === locale;
+        return (
+          <Link
+            key={l.code}
+            href={`/${l.code}${pathWithoutLocale}`}
+            onClick={onNavigate}
+            aria-current={active ? "true" : undefined}
+            className={`font-inter text-xs tracking-[1px] uppercase px-2.5 py-1 rounded-full border transition-colors ${
+              active
+                ? "bg-ocre text-nuit border-ocre font-semibold"
+                : "border-ocre/40 text-white/70 hover:border-ocre hover:text-ocre"
+            }`}
+          >
+            {l.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function Header() {
   const t = useTranslations("nav");
   const locale = useLocale();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [langOpen, setLangOpen] = useState(false);
 
   const isActive = (path: string) =>
     pathname === `/${locale}${path}` || pathname === `/${locale}${path}/`;
@@ -75,72 +111,9 @@ export default function Header() {
         </Link>
 
         {/* Col 3 — Droite : langue + CTA + hamburger */}
-        <div className="flex items-center gap-3 justify-end">
-          {/* Sélecteur de langue */}
-          <div className="hidden lg:block relative">
-            <button
-              onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 font-inter text-[10px] tracking-[2px] uppercase transition-colors px-2 py-1"
-              style={{ color: "rgba(255,255,255,0.45)" }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.color = "rgba(255,255,255,0.8)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = "rgba(255,255,255,0.45)")
-              }
-            >
-              <span>{LOCALES.find((l) => l.code === locale)?.flag}</span>
-              {locale.toUpperCase()}
-              <svg
-                className={`w-2.5 h-2.5 transition-transform ${langOpen ? "rotate-180" : ""}`}
-                viewBox="0 0 10 6"
-                fill="none"
-              >
-                <path
-                  d="M1 1l4 4 4-4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </button>
-            {langOpen && (
-              <div
-                className="absolute right-0 top-full mt-1 rounded-xl overflow-hidden"
-                style={{
-                  background: "#2C1508",
-                  border: "1px solid rgba(193,123,63,0.2)",
-                  boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
-                }}
-              >
-                {LOCALES.filter((l) => l.code !== locale).map((l) => (
-                  <Link
-                    key={l.code}
-                    href={`/${l.code}${pathWithoutLocale}`}
-                    onClick={() => setLangOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 font-inter text-[10px] tracking-[2px] uppercase transition-colors"
-                    style={{ color: "rgba(255,255,255,0.55)" }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.color =
-                        "#C17B3F";
-                      (e.currentTarget as HTMLAnchorElement).style.background =
-                        "rgba(193,123,63,0.08)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.color =
-                        "rgba(255,255,255,0.55)";
-                      (e.currentTarget as HTMLAnchorElement).style.background =
-                        "transparent";
-                    }}
-                  >
-                    <span>{l.flag}</span>
-                    {l.label}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="flex items-center gap-2 md:gap-3 justify-end">
+          {/* Sélecteur de langue — pastilles toujours visibles (desktop + mobile) */}
+          <LangPills locale={locale} pathWithoutLocale={pathWithoutLocale} />
 
           {/* CTA RDV */}
           <Link
@@ -211,31 +184,10 @@ export default function Header() {
           <Link
             href={`/${locale}/reservation`}
             onClick={() => setOpen(false)}
-            className="flex items-center justify-center gap-2 bg-ocre text-white font-inter text-[11px] tracking-[2px] uppercase px-5 py-3.5 rounded-full mb-6"
+            className="flex items-center justify-center gap-2 bg-ocre text-white font-inter text-[11px] tracking-[2px] uppercase px-5 py-3.5 rounded-full"
           >
             → {t("book")}
           </Link>
-
-          <div
-            className="flex items-center gap-4 pt-4"
-            style={{ borderTop: "1px solid rgba(193,123,63,0.1)" }}
-          >
-            {LOCALES.map((l) => (
-              <Link
-                key={l.code}
-                href={`/${l.code}${pathWithoutLocale}`}
-                onClick={() => setOpen(false)}
-                className={`flex items-center gap-1.5 font-inter text-[10px] tracking-[2px] uppercase transition-colors ${
-                  l.code === locale
-                    ? "text-ocre"
-                    : "text-white/40 hover:text-white"
-                }`}
-              >
-                <span>{l.flag}</span>
-                {l.label}
-              </Link>
-            ))}
-          </div>
         </div>
       )}
     </header>
