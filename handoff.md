@@ -45,16 +45,50 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
-- **PRIORITÉ 1 — Refonte du tunnel de réservation (CRO).** C'est le levier qui transforme le trafic existant en réservations. À faire :
-  - CTA WhatsApp en action principale (header, hero, fin de page), message pré-rempli « Bonjour, je voudrais réserver [coiffure] ». Le formulaire devient l'option secondaire.
-  - Prix affiché dès le choix de la coiffure dans le sélecteur de `/reservation` (« Box Braids — dès 550 MAD »).
-  - Formulaire raccourci : idéalement 2 étapes (1. coiffure + date, 2. nom + téléphone), email optionnel.
-  - Réassurance sous le bouton : « Réponse en moins d'1 h · Annulation gratuite · Paiement sur place ».
-  - Bandeau sticky mobile « Réserver sur WhatsApp » toujours visible.
+- ~~**PRIORITÉ 1 — Refonte du tunnel de réservation (CRO).**~~ **FAIT** — branche `feat/tunnel-reservation-cro` (voir section 18). En attente de merge + déploiement.
 - **Avis Google** : 13 avis / 4,2 étoiles au 28 août 2026 (était 6 le 1er juin). Objectif 30+ : QR code plastifié à la caisse + SMS/WhatsApp automatique 2 h après le RDV avec `https://g.page/r/CXqJtbaOg9FUEBM/review`. Répondre à TOUS les avis existants.
 - **Bios réseaux** : ajouter le lien `https://mimi-coiffure.com/reservation` dans les bios Instagram (`salonmimi.marrakech`) et TikTok (`@mimicoiffure700`).
 - **Cloudflare Cache Rule** : éliminerait les redirections multiples (610ms), PageSpeed 92 → 95+. Instructions en section 7
 - **Fiche TripAdvisor** : en attente de validation depuis mai 2026
+
+---
+
+## 18. Session 28-29 août 2026 — Refonte du tunnel de réservation (CRO)
+
+Branche : `feat/tunnel-reservation-cro` (7 commits `c4fbe8e` → `543a090`). **Pas encore mergée sur `main` ni déployée.**
+
+Spec : `docs/superpowers/specs/2026-08-29-refonte-tunnel-reservation-cro-design.md`
+Plan : `docs/superpowers/plans/2026-08-29-refonte-tunnel-reservation-cro.md`
+
+### Ce qui a été livré
+
+1. **CTA WhatsApp principal sur `/reservation`** — gros bouton vert pleine largeur au-dessus du formulaire, hint « Le plus rapide — écris directement à Mimi », ligne de réassurance « Réponse rapide par WhatsApp · Annulation gratuite · Paiement sur place », puis séparateur « ou remplis ce formulaire rapide ». Ouvre `wa.me` avec message générique traduit FR/EN/ES. Aucun appel API.
+2. **Bandeau WhatsApp sticky mobile** — `components/layout/StickyWhatsApp.tsx`, monté dans le layout `[locale]`, visible `< lg` sur **toutes les pages publiques** (absent de `/admin`, `/mimi.html`). `<main>` a `pb-sticky-wa lg:pb-0` pour ne pas masquer le footer.
+3. **Formulaire court** — 4 champs visibles seulement : Service, Nom, Téléphone, Date. Heure / Nombre de personnes / Email / Message repliés sous « + Ajouter des précisions ». Email redevenu **optionnel** (l'accusé de réception client `4b6c44b` se déclenche toujours s'il est rempli).
+4. **Ligne de prix dynamique** sous le `<select>` : « {coiffure} — À partir de {prix} MAD · tarif indicatif, confirmé au salon », branchée sur les prix `/admin/settings`, se met à jour au changement de coiffure.
+5. **`handleSubmit` sécurisé** — helper `getVal()` : lit les champs via `form.elements.namedItem()` avec `?? ""`, ne peut plus lever `TypeError` quand le repli est fermé (les champs n'existent pas dans le DOM). Le reste (`fetch` → `window.location.href` → `setSubmitted`) inchangé.
+6. **Bouton de soumission** passé de ocre à vert WhatsApp, libellé « Réserver sur WhatsApp ».
+7. **Refactor** — `components/ui/WhatsAppIcon.tsx` (glyphe partagé, était inliné 3×), token Tailwind `spacing["sticky-wa"] = "52px"`, purge des clés i18n mortes `confirm` / `footer` dans `TEXTS`.
+8. **Tests** — `e2e/site.spec.ts` : 5 tests CRO (CTA href, prix dynamique, repli, sticky visible mobile / caché desktop). `playwright.config.ts` : `baseURL` surchargeable via `PLAYWRIGHT_BASE_URL` (les tests tournent contre la prod par défaut).
+
+### Vérifs faites (local)
+
+- `npx tsc --noEmit` ✓ · `npm run build` ✓ (Compiled successfully, 15/15 pages)
+- Playwright local (`PLAYWRIGHT_BASE_URL=http://localhost:3100`) : desktop 15 pass / 1 skip, mobile 15 pass / 1 skip, 0 régression
+- 3 langues `/fr` `/en` `/es` /reservation : HTTP 200, i18n complet, liens `wa.me` corrects
+- Golden path navigateur : CTA vert OK, repli OK, prix « Locks & dreads → 250 MAD » OK, panneau photo intact, 0 erreur console/logs
+
+### Reste à faire avant de considérer la tâche 100 % terminée
+
+- [ ] Merger `feat/tunnel-reservation-cro` sur `main` (déclenche le déploiement Railway)
+- [ ] Après déploiement : rejouer `npx playwright test` (desktop + mobile) contre `https://mimi-coiffure.com` — doit être 100 % vert
+- [ ] Revue visuelle mobile réelle sur `/fr/reservation` : la page a maintenant 3 CTA WhatsApp (CTA principal + bouton submit + sticka). La spec l'assume, mais vérifier que le sticky ne gêne pas trop la lecture du formulaire. Candidat éventuel : masquer le sticky sur `/reservation` (il fait doublon avec le CTA principal).
+- [ ] Test réel : une réservation avec email depuis `/reservation` prod → vérifier dashboard `/admin/dashboard` + notif push Mimi + accusé de réception client
+
+### Fast-follow non bloquants (notés en code review)
+
+- `Props.labels` de `ReservationLayout` est maintenant quasi mort (seuls `labels.error` / `labels.success` sont lus) — nettoyage possible, non urgent.
+- Refactor optionnel : faire passer `components/ui/WhatsAppButton.tsx` par le nouveau `WhatsAppIcon` (2 glyphes différents cohabitent dans le repo).
 
 ---
 
