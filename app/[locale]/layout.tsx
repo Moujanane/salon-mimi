@@ -6,6 +6,7 @@ import { Playfair_Display, Inter } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CookieBanner from "@/components/ui/CookieBanner";
+import StickyWhatsApp from "@/components/layout/StickyWhatsApp";
 import "../globals.css";
 
 const playfair = Playfair_Display({
@@ -209,9 +210,10 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <Header />
-          <main>{children}</main>
+          <main className="pb-[52px] lg:pb-0">{children}</main>
           <Footer />
           <CookieBanner locale={locale} />
+          <StickyWhatsApp />
         </NextIntlClientProvider>
       </body>
     </html>
