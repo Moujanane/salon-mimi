@@ -55,18 +55,11 @@ test.describe("Formulaire de réservation", () => {
   test("la page réservation s'affiche", async ({ page }) => {
     await page.goto("/fr/reservation");
     await expect(page).toHaveURL(/\/fr\/reservation/);
-    // Depuis la v2, le formulaire est masqué au chargement : on l'ouvre d'abord.
-    await page
-      .getByRole("button", { name: /réserver par formulaire/i })
-      .click();
     await expect(page.locator("form, input").first()).toBeVisible();
   });
 
   test("les champs obligatoires sont présents", async ({ page }) => {
     await page.goto("/fr/reservation");
-    await page
-      .getByRole("button", { name: /réserver par formulaire/i })
-      .click();
     await expect(
       page.locator("input[name='name'], input[placeholder*='nom' i]").first(),
     ).toBeVisible();
@@ -104,26 +97,8 @@ test.describe("Responsive mobile", () => {
 });
 
 test.describe("Tunnel de réservation (CRO)", () => {
-  test("le bouton Réserver par WhatsApp pointe vers wa.me avec un message", async ({
-    page,
-  }) => {
+  test("le formulaire est visible au chargement", async ({ page }) => {
     await page.goto("/fr/reservation");
-    const cta = page
-      .getByRole("link", { name: /réserver par whatsapp/i })
-      .first();
-    await expect(cta).toBeVisible();
-    const href = await cta.getAttribute("href");
-    expect(href).toMatch(/^https:\/\/wa\.me\/\d+\?text=.+/);
-  });
-
-  test("le formulaire est masqué au chargement et visible après clic", async ({
-    page,
-  }) => {
-    await page.goto("/fr/reservation");
-    await expect(page.locator("select[name='service']")).toHaveCount(0);
-    await page
-      .getByRole("button", { name: /réserver par formulaire/i })
-      .click();
     await expect(page.locator("select[name='service']")).toBeVisible();
   });
 
@@ -131,9 +106,6 @@ test.describe("Tunnel de réservation (CRO)", () => {
     page,
   }) => {
     await page.goto("/fr/reservation");
-    await page
-      .getByRole("button", { name: /réserver par formulaire/i })
-      .click();
     const select = page.locator("select[name='service']");
     await expect(select).toBeVisible();
     const priceLine = page.locator(
@@ -149,12 +121,29 @@ test.describe("Tunnel de réservation (CRO)", () => {
     page,
   }) => {
     await page.goto("/fr/reservation");
-    await page
-      .getByRole("button", { name: /réserver par formulaire/i })
-      .click();
     await expect(page.locator("input[name='email']")).toHaveCount(0);
     await page.getByRole("button", { name: /ajouter des précisions/i }).click();
     await expect(page.locator("input[name='email']")).toBeVisible();
+  });
+
+  test("le bouton Réserver par WhatsApp exige nom et téléphone", async ({
+    page,
+  }) => {
+    await page.goto("/fr/reservation");
+    const waBtn = page.getByRole("button", {
+      name: /réserver par whatsapp/i,
+    });
+    await expect(waBtn).toBeVisible();
+    await waBtn.click();
+    await expect(
+      page.getByText(/indiquer au moins votre nom et votre téléphone/i),
+    ).toBeVisible();
+    await page.locator("input[name='name']").fill("Test Playwright");
+    await page.locator("input[name='phone']").fill("+212600000000");
+    await waBtn.click();
+    await expect(
+      page.getByText(/indiquer au moins votre nom et votre téléphone/i),
+    ).toHaveCount(0);
   });
 
   test("le bandeau de réservation sticky est visible en mobile et pointe vers /reservation", async ({
@@ -184,7 +173,6 @@ test.describe("Tunnel de réservation (CRO)", () => {
     const sticky = page
       .locator("a.fixed.bottom-0")
       .filter({ hasText: /rendez-vous|reservation|réserver/i });
-    // `lg:hidden` = `display:none` — l'élément reste dans le DOM en desktop.
     await expect(sticky.first()).toBeHidden();
   });
 });
