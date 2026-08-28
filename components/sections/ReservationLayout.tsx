@@ -1,7 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { genericWhatsAppLink } from "@/lib/whatsapp";
+import { generateWhatsAppLink } from "@/lib/whatsapp";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
 
 const SERVICES = [
@@ -120,7 +120,7 @@ const TEXTS: Record<
     lostText: string;
     lostCallLabel: string;
     whatsappPrimaryBtn: string;
-    formBtn: string;
+    whatsappMissing: string;
     submitBtn: string;
     reassurance: string;
     priceIndicative: string;
@@ -161,7 +161,7 @@ const TEXTS: Record<
     priceIndicative: "tarif indicatif, confirmé au salon",
     addDetails: "+ Ajouter des précisions",
     noOnlinePayment: "Aucun paiement en ligne",
-    formBtn: "Réserver par formulaire",
+    whatsappMissing: "Merci d'indiquer au moins votre nom et votre téléphone.",
     submitBtn: "Confirmer ma réservation",
   },
   en: {
@@ -197,7 +197,7 @@ const TEXTS: Record<
     priceIndicative: "indicative price, confirmed at the salon",
     addDetails: "+ Add details",
     noOnlinePayment: "No online payment",
-    formBtn: "Book via form",
+    whatsappMissing: "Please enter at least your name and phone number.",
     submitBtn: "Confirm my booking",
   },
   es: {
@@ -233,7 +233,7 @@ const TEXTS: Record<
     priceIndicative: "precio orientativo, confirmado en el salón",
     addDetails: "+ Añadir detalles",
     noOnlinePayment: "Sin pago online",
-    formBtn: "Reservar con formulario",
+    whatsappMissing: "Indica al menos tu nombre y tu teléfono.",
     submitBtn: "Confirmar mi reserva",
   },
 };
@@ -273,7 +273,8 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
   const [whatsappLink, setWhatsappLink] = useState("");
   const [error, setError] = useState("");
   const [showDetails, setShowDetails] = useState(false);
-  const [showForm, setShowForm] = useState(false);
+  const [whatsappError, setWhatsappError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
 
   const activeSvc = SERVICES[activeIndex];
 
@@ -312,6 +313,40 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
     } catch {
       setError(labels.error);
     }
+  }
+
+  function handleWhatsApp() {
+    const form = formRef.current;
+    if (!form) return;
+    const getVal = (name: string) => {
+      const el = form.elements.namedItem(name) as
+        HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
+      return el?.value?.trim() ?? "";
+    };
+    const nom = getVal("name");
+    const telephone = getVal("phone");
+    if (!nom || !telephone) {
+      setWhatsappError(tx.whatsappMissing);
+      const missing = !nom ? "name" : "phone";
+      (form.elements.namedItem(missing) as HTMLElement | null)?.focus();
+      return;
+    }
+    setWhatsappError("");
+    const details = [
+      getVal("time") ? `Heure : ${getVal("time")}` : null,
+      getVal("persons") ? `Personnes : ${getVal("persons")}` : null,
+      getVal("message") || null,
+    ]
+      .filter(Boolean)
+      .join(" — ");
+    const url = generateWhatsAppLink({
+      nom,
+      telephone,
+      service: activeSvc.label,
+      dateSouhaitee: getVal("date") || undefined,
+      message: details || undefined,
+    });
+    window.location.href = url;
   }
 
   if (submitted) {
@@ -360,240 +395,227 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
         </h1>
       </div>
 
-      {/* Choix du mode de réservation */}
-      <div className="flex-shrink-0 px-5 md:px-12 pt-4 pb-2">
-        <div className="flex flex-col sm:flex-row gap-3">
-          <a
-            href={genericWhatsAppLink(locale)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2.5 bg-whatsapp hover:bg-whatsapp-hover text-white font-inter font-semibold text-[15px] py-4 rounded-full transition-colors"
+      <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-4 p-4 pt-3">
+        <div className="w-full md:w-[44%] bg-white rounded-2xl border border-ocre/20 shadow-sm p-5 md:p-6 md:flex-shrink-0 overflow-y-auto">
+          <form
+            ref={formRef}
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-4"
           >
-            <WhatsAppIcon className="w-5 h-5" />
-            {tx.whatsappPrimaryBtn}
-          </a>
-          <button
-            type="button"
-            onClick={() => setShowForm((v) => !v)}
-            aria-expanded={showForm}
-            className={`flex-1 flex items-center justify-center gap-2 border-2 border-ocre font-inter font-semibold text-[15px] py-4 rounded-full transition-colors ${
-              showForm
-                ? "bg-ocre text-white"
-                : "bg-transparent text-ocre hover:bg-ocre/10"
-            }`}
-          >
-            {tx.formBtn}
-          </button>
-        </div>
-        <p className="text-center text-nuit/40 text-[10px] font-inter mt-3">
-          {tx.reassurance}
-        </p>
-      </div>
-
-      {showForm && (
-        <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-4 p-4 pt-3">
-          <div className="w-full md:w-[44%] bg-white rounded-2xl border border-ocre/20 shadow-sm p-5 md:p-6 md:flex-shrink-0 overflow-y-auto">
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div>
-                <div className="font-georgia text-[15px] font-bold text-nuit mb-0.5">
-                  {tx.yourInfo}
-                </div>
-                <div className="text-[10px] text-nuit/50 font-inter tracking-wide">
-                  {tx.required}
-                </div>
+            <div>
+              <div className="font-georgia text-[15px] font-bold text-nuit mb-0.5">
+                {tx.yourInfo}
               </div>
+              <div className="text-[10px] text-nuit/50 font-inter tracking-wide">
+                {tx.required}
+              </div>
+            </div>
 
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+                Service <span className="text-ocre">*</span>
+              </label>
+              <select
+                name="service"
+                value={activeIndex}
+                onChange={(e) => setActiveIndex(Number(e.target.value))}
+                required
+                className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none cursor-pointer bg-fond"
+              >
+                {SERVICES.map((s, i) => (
+                  <option key={s.id} value={i}>
+                    {s.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <p className="text-[12px] text-nuit/70 font-inter -mt-1.5">
+              {activeSvc.label} — {tx.startingFrom}{" "}
+              <span className="text-ocre font-semibold">
+                {prices[activeSvc.id] ?? activeSvc.price} MAD
+              </span>{" "}
+              · {tx.priceIndicative}
+            </p>
+
+            <div className="h-px bg-ocre/15" />
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
                 <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                  Service <span className="text-ocre">*</span>
-                </label>
-                <select
-                  name="service"
-                  value={activeIndex}
-                  onChange={(e) => setActiveIndex(Number(e.target.value))}
-                  required
-                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none cursor-pointer bg-fond"
-                >
-                  {SERVICES.map((s, i) => (
-                    <option key={s.id} value={i}>
-                      {s.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <p className="text-[12px] text-nuit/70 font-inter -mt-1.5">
-                {activeSvc.label} — {tx.startingFrom}{" "}
-                <span className="text-ocre font-semibold">
-                  {prices[activeSvc.id] ?? activeSvc.price} MAD
-                </span>{" "}
-                · {tx.priceIndicative}
-              </p>
-
-              <div className="h-px bg-ocre/15" />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                    {tx.fullName} <span className="text-ocre">*</span>
-                  </label>
-                  <input
-                    name="name"
-                    type="text"
-                    placeholder={tx.namePlaceholder}
-                    required
-                    className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                    {tx.phone} <span className="text-ocre">*</span>
-                  </label>
-                  <input
-                    name="phone"
-                    type="tel"
-                    placeholder={tx.phonePlaceholder}
-                    required
-                    className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
-                  />
-                </div>
-              </div>
-
-              <div className="h-px bg-ocre/15" />
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                  {tx.date} <span className="text-ocre">*</span>
+                  {tx.fullName} <span className="text-ocre">*</span>
                 </label>
                 <input
-                  name="date"
-                  type="date"
+                  name="name"
+                  type="text"
+                  placeholder={tx.namePlaceholder}
                   required
-                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
+                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
                 />
               </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+                  {tx.phone} <span className="text-ocre">*</span>
+                </label>
+                <input
+                  name="phone"
+                  type="tel"
+                  placeholder={tx.phonePlaceholder}
+                  required
+                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
+                />
+              </div>
+            </div>
 
-              <button
-                type="button"
-                onClick={() => setShowDetails((v) => !v)}
-                className="text-ocre text-[12px] font-inter font-medium self-start hover:underline"
-              >
-                {tx.addDetails}
-              </button>
+            <div className="h-px bg-ocre/15" />
 
-              {showDetails && (
-                <div className="flex flex-col gap-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                        {tx.time}
-                      </label>
-                      <input
-                        name="time"
-                        type="time"
-                        className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
-                      />
-                    </div>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                        {tx.persons}
-                      </label>
-                      <select
-                        name="persons"
-                        className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none bg-fond"
-                      >
-                        <option>{tx.person1}</option>
-                        <option>{tx.person2}</option>
-                        <option>{tx.person3}</option>
-                        <option>{tx.person4}</option>
-                      </select>
-                    </div>
-                  </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+                {tx.date} <span className="text-ocre">*</span>
+              </label>
+              <input
+                name="date"
+                type="date"
+                required
+                className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
+              />
+            </div>
 
+            <button
+              type="button"
+              onClick={() => setShowDetails((v) => !v)}
+              className="text-ocre text-[12px] font-inter font-medium self-start hover:underline"
+            >
+              {tx.addDetails}
+            </button>
+
+            {showDetails && (
+              <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                      {tx.email}
+                      {tx.time}
                     </label>
                     <input
-                      name="email"
-                      type="email"
-                      placeholder={tx.emailPlaceholder}
-                      className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
+                      name="time"
+                      type="time"
+                      className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
                     />
                   </div>
-
                   <div className="flex flex-col gap-1.5">
                     <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                      {tx.message}
+                      {tx.persons}
                     </label>
-                    <textarea
-                      name="message"
-                      rows={3}
-                      placeholder={tx.messagePlaceholder}
-                      className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 resize-none bg-fond"
-                    />
+                    <select
+                      name="persons"
+                      className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none bg-fond"
+                    >
+                      <option>{tx.person1}</option>
+                      <option>{tx.person2}</option>
+                      <option>{tx.person3}</option>
+                      <option>{tx.person4}</option>
+                    </select>
                   </div>
                 </div>
-              )}
 
-              {error && (
-                <p className="text-red-500 text-[12px] font-inter">{error}</p>
-              )}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+                    {tx.email}
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder={tx.emailPlaceholder}
+                    className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
+                  />
+                </div>
 
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+                    {tx.message}
+                  </label>
+                  <textarea
+                    name="message"
+                    rows={3}
+                    placeholder={tx.messagePlaceholder}
+                    className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 resize-none bg-fond"
+                  />
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <p className="text-red-500 text-[12px] font-inter">{error}</p>
+            )}
+            {whatsappError && (
+              <p className="text-red-500 text-[12px] font-inter">
+                {whatsappError}
+              </p>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-3">
               <button
                 type="submit"
-                className="w-full bg-ocre hover:bg-or text-white text-[13px] font-inter font-semibold py-3.5 rounded-full transition-colors"
+                className="flex-1 bg-ocre hover:bg-or text-white text-[13px] font-inter font-semibold py-3.5 rounded-full transition-colors"
               >
                 {tx.submitBtn}
               </button>
-
-              <p className="text-center text-nuit/40 text-[10px] font-inter leading-relaxed">
-                {tx.reassurance} · {tx.noOnlinePayment}
-              </p>
-            </form>
-          </div>
-
-          <div className="hidden md:block flex-1 bg-nuit rounded-2xl border border-ocre/20 overflow-hidden relative">
-            {SERVICES.map((s, i) => (
-              <div
-                key={s.id}
-                className="absolute inset-0 transition-opacity duration-500"
-                style={{ opacity: i === activeIndex ? 1 : 0 }}
+              <button
+                type="button"
+                onClick={handleWhatsApp}
+                className="flex-1 flex items-center justify-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-white text-[13px] font-inter font-semibold py-3.5 rounded-full transition-colors"
               >
-                <Image
-                  src={s.image}
-                  alt={s.imageAlt}
-                  fill
-                  className="object-cover"
-                  sizes="50vw"
-                  priority={i === 0}
-                />
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "linear-gradient(to top, rgba(10,4,0,0.92) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.12) 100%)",
-                  }}
-                />
-                <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
-                  <span className="inline-block bg-ocre/25 border border-ocre/40 text-ocre text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
-                    {s.label}
-                  </span>
-                  <p className="font-georgia text-[15px] text-white leading-relaxed mb-2">
-                    {s.subServices}
-                  </p>
-                  <p className="text-[10px] tracking-[3px] uppercase text-white/50 font-inter">
-                    {tx.startingFrom}{" "}
-                    <span className="text-ocre font-bold">
-                      {prices[s.id] ?? s.price} MAD
-                    </span>
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+                <WhatsAppIcon className="w-4 h-4" />
+                {tx.whatsappPrimaryBtn}
+              </button>
+            </div>
+
+            <p className="text-center text-nuit/40 text-[10px] font-inter leading-relaxed">
+              {tx.reassurance} · {tx.noOnlinePayment}
+            </p>
+          </form>
         </div>
-      )}
+
+        <div className="hidden md:block flex-1 bg-nuit rounded-2xl border border-ocre/20 overflow-hidden relative">
+          {SERVICES.map((s, i) => (
+            <div
+              key={s.id}
+              className="absolute inset-0 transition-opacity duration-500"
+              style={{ opacity: i === activeIndex ? 1 : 0 }}
+            >
+              <Image
+                src={s.image}
+                alt={s.imageAlt}
+                fill
+                className="object-cover"
+                sizes="50vw"
+                priority={i === 0}
+              />
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(to top, rgba(10,4,0,0.92) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.12) 100%)",
+                }}
+              />
+              <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
+                <span className="inline-block bg-ocre/25 border border-ocre/40 text-ocre text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
+                  {s.label}
+                </span>
+                <p className="font-georgia text-[15px] text-white leading-relaxed mb-2">
+                  {s.subServices}
+                </p>
+                <p className="text-[10px] tracking-[3px] uppercase text-white/50 font-inter">
+                  {tx.startingFrom}{" "}
+                  <span className="text-ocre font-bold">
+                    {prices[s.id] ?? s.price} MAD
+                  </span>
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Section "Vous ne trouvez pas le salon ?" */}
       <div className="mx-5 md:mx-12 mb-8 mt-4 bg-nuit rounded-2xl overflow-hidden border border-ocre/20">
