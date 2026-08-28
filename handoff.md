@@ -6,6 +6,71 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 23. Session 28 août 2026 (soir) — Audit indexation Google Search Console + GEO (EN PROD)
+
+Google Search Console remontait 5 motifs de pages non indexées : 24 « Page avec
+redirection », 16 « Autre page avec balise canonique correcte », 9 « Bloquée 403 »,
+4 « Introuvable 404 », 3 « Explorée, non indexée ». Diagnostic complet + corrections.
+
+Commit `main` : `263dd8d` (déployé Railway).
+Détail et règles : mémoire `salon-mimi-seo-indexation.md`.
+
+### Cause racine des 24 + 16 : trailing slash
+
+Le serveur Next.js (`trailingSlash: false`) redirige `/.../` → `/...` en 308.
+Or `app/sitemap.ts`, tous les `canonical` et tous les `hreflang` pointaient vers
+des URLs AVEC slash final → Google classait le sitemap en « redirection » et les
+pages en « canonique vers une autre URL ».
+
+**Fix `263dd8d`** : slash final retiré de `app/sitemap.ts` (+ suppression de
+l'entrée apex nue) et des `canonical` / `hreflang` / `openGraph.url` / JSON-LD
+`url` des 8 pages + `app/[locale]/layout.tsx`. Nouveau test
+`e2e/seo-canonical.spec.ts` (29 cas) verrouille la non-régression.
+Vérifié : `next lint` OK, `tsc --noEmit` OK, `next build` OK (15/15),
+Playwright **88 passed / 2 skipped** contre build local, puis prod : sitemap
+24 URLs toutes 200, canonicals auto-référents sans slash.
+
+**RÈGLE** : canonical / hreflang / sitemap ne finissent JAMAIS par `/` sur ce
+projet. Ne pas réintroduire de slash final sans passer `trailingSlash: true`
+dans `next.config.mjs` ET tout aligner d'un coup.
+
+### GEO : robots.txt managé Cloudflare bloquait les IA
+
+Cloudflare → **AI Crawl Control → Overview → « Managed robots.txt »** était activé
+et injectait un bloc `# BEGIN Cloudflare Managed content` avec `Disallow: /` sur
+ClaudeBot, GPTBot, Google-Extended, etc., AVANT le bloc de `app/robots.ts`.
+ChatGPT / Claude / Gemini ne pouvaient pas indexer le site.
+
+**Fix** : Mouj a désactivé le toggle « Managed robots.txt » dans Cloudflare.
+Vérifié : `robots.txt` prod ne contient plus que le bloc `app/robots.ts`
+(tout `Allow: /`). **RÈGLE** : ne jamais réactiver cette option.
+
+### 9 « Bloquée 403 » + 4 « Introuvable 404 » : fausses alertes
+
+Les 13 URLs (exports GSC du 28/08) ont été explorées les 20-22 août 2026, PENDANT
+l'incident apex Railway 403/404 (§16, résolu le 22 août 00h08). Elles répondent
+toutes 200 aujourd'hui (vérifié en tant que Googlebot). Rien à coder.
+
+### 3 « Explorée, non indexée »
+
+Variantes `/xx/reservation?service=...`. Normal (canonical pointe vers
+`/xx/reservation` sans le paramètre). Rien à faire.
+
+### Suites côté Mouj (GSC) — fait le 28 août 2026
+
+Renvoi du sitemap + « Valider la correction » sur les 4 motifs + demande
+d'indexation sur `/fr` `/en` `/es`. Recrawl Google attendu sur 1 à 4 semaines —
+à re-vérifier dans GSC en septembre 2026.
+
+### Note branches
+
+Le travail V2 de la home (branche `feat/home-v2`) était en cours au début de la
+session : mis de côté dans `stash@{0}` sur `feat/home-v2`. Récupérer avec
+`git checkout feat/home-v2 && git stash pop`. Le fix SEO a été fait sur `main`,
+sans toucher à la V2.
+
+---
+
 ## 2. État actuel du code — mis à jour le 7 juin 2026 (fin de session, soir)
 
 ### Ce qui marche
