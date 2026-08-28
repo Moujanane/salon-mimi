@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 
-function esc(str: string | undefined): string {
+export function esc(str: string | undefined): string {
   if (!str) return "";
   return String(str)
     .replace(/&/g, "&amp;")

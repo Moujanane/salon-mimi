@@ -263,6 +263,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
       ).value,
       message: (form.elements.namedItem("message") as HTMLTextAreaElement)
         .value,
+      locale,
     };
     try {
       const res = await fetch("/api/reservations", {

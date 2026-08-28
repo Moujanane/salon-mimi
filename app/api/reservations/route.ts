@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { getSettings } from "@/lib/settings";
 import { generateWhatsAppLink } from "@/lib/whatsapp";
 import { sendNotificationEmail } from "@/lib/sendNotificationEmail";
+import { sendClientConfirmationEmail } from "@/lib/sendClientConfirmationEmail";
 import { sendPushToMimi } from "@/lib/sendPushToMimi";
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -54,7 +55,10 @@ export async function POST(request: NextRequest) {
     heure_souhaitee,
     nombre_personnes,
     message,
+    locale,
   } = body;
+
+  const clientLocale = locale === "en" || locale === "es" ? locale : "fr";
 
   if (
     !nom ||
@@ -117,6 +121,16 @@ export async function POST(request: NextRequest) {
       nombre_personnes,
       message,
     }).catch((err) => console.error("[email notification]", err));
+  }
+
+  // Accusé de réception au client (uniquement s'il a laissé un email),
+  // dans sa langue, avec copies internes en Bcc. Non bloquant.
+  if (email) {
+    sendClientConfirmationEmail(
+      email,
+      { nom, service, date_souhaitee, heure_souhaitee },
+      clientLocale,
+    ).catch((err) => console.error("[email confirmation client]", err));
   }
 
   sendPushToMimi({
