@@ -469,16 +469,28 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
 
             <div className="h-px bg-ocre/15" />
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                {tx.date} <span className="text-ocre">*</span>
-              </label>
-              <input
-                name="date"
-                type="date"
-                required
-                className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+                  {tx.date} <span className="text-ocre">*</span>
+                </label>
+                <input
+                  name="date"
+                  type="date"
+                  required
+                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+                  {tx.time}
+                </label>
+                <input
+                  name="time"
+                  type="time"
+                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
+                />
+              </div>
             </div>
 
             <button
@@ -491,31 +503,19 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
 
             {showDetails && (
               <div className="flex flex-col gap-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                      {tx.time}
-                    </label>
-                    <input
-                      name="time"
-                      type="time"
-                      className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                      {tx.persons}
-                    </label>
-                    <select
-                      name="persons"
-                      className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none bg-fond"
-                    >
-                      <option>{tx.person1}</option>
-                      <option>{tx.person2}</option>
-                      <option>{tx.person3}</option>
-                      <option>{tx.person4}</option>
-                    </select>
-                  </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+                    {tx.persons}
+                  </label>
+                  <select
+                    name="persons"
+                    className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none bg-fond"
+                  >
+                    <option>{tx.person1}</option>
+                    <option>{tx.person2}</option>
+                    <option>{tx.person3}</option>
+                    <option>{tx.person4}</option>
+                  </select>
                 </div>
 
                 <div className="flex flex-col gap-1.5">
