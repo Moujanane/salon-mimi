@@ -149,7 +149,7 @@ const TEXTS: Record<string, TxShape> = {
     required: "Tous les champs * sont obligatoires",
     fullName: "Nom complet",
     namePlaceholder: "Fatima Zahra...",
-    phone: "Téléphone / WhatsApp",
+    phone: "Téléphone",
     phonePlaceholder: "+212 6...",
     email: "Email",
     emailPlaceholder: "votre@email.com",
@@ -198,7 +198,7 @@ const TEXTS: Record<string, TxShape> = {
     required: "All fields marked * are required",
     fullName: "Full name",
     namePlaceholder: "Your name...",
-    phone: "Phone / WhatsApp",
+    phone: "Phone",
     phonePlaceholder: "+212 6...",
     email: "Email",
     emailPlaceholder: "your@email.com",
@@ -247,7 +247,7 @@ const TEXTS: Record<string, TxShape> = {
     required: "Todos los campos * son obligatorios",
     fullName: "Nombre completo",
     namePlaceholder: "Tu nombre...",
-    phone: "Teléfono / WhatsApp",
+    phone: "Teléfono",
     phonePlaceholder: "+212 6...",
     email: "Email",
     emailPlaceholder: "tu@email.com",
@@ -305,9 +305,9 @@ interface Props {
 }
 
 const FIELD_CLASS =
-  "border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond";
+  "border border-nuit/15 focus:border-ocre rounded-lg text-nuit text-[13px] px-3 py-2 focus-visible:outline-none transition-colors font-inter bg-fond";
 const LABEL_CLASS =
-  "text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter";
+  "text-[10px] tracking-[1px] uppercase text-nuit/60 font-inter";
 
 export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
   const tx = TEXTS[locale] ?? TEXTS.fr;
@@ -406,8 +406,15 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-fond px-6">
-        <div className="text-center max-w-sm">
+      <div className="min-h-screen flex items-center justify-center bg-nuit px-6">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 20%, rgba(193,123,63,0.18), transparent 60%)",
+          }}
+        />
+        <div className="relative text-center max-w-sm">
           <Image
             src="/images/logo-mimi.webp"
             alt="Salon Mimi"
@@ -415,11 +422,11 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
             height={96}
             className="mx-auto mb-4"
           />
-          <div className="text-ocre text-3xl mb-3">✦</div>
-          <h2 className="font-georgia text-2xl text-nuit mb-3">
+          <div className="text-or text-3xl mb-3">✦</div>
+          <h2 className="font-georgia text-2xl text-fond mb-3">
             {labels.success}
           </h2>
-          <p className="text-nuit/60 text-sm font-inter mb-6">
+          <p className="text-fond/60 text-sm font-inter mb-6">
             {tx.confirmSubtitle}
           </p>
           {whatsappLink && (
@@ -438,63 +445,58 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-fond">
-      {/* espace navbar fixe */}
-      <div className="h-[57px]" />
+    <div className="relative min-h-screen bg-nuit overflow-hidden">
+      {/* halo doré global, derrière tout le contenu */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[560px]"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 0%, rgba(193,123,63,0.22), transparent 60%)",
+        }}
+      />
 
-      {/* HERO */}
-      <header className="relative overflow-hidden bg-nuit text-center px-6 pt-12 pb-16">
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse at 50% 0%, rgba(193,123,63,0.20), transparent 62%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-[640px]">
+      <div className="relative mx-auto w-full max-w-[560px] px-4 sm:px-6">
+        {/* espace navbar fixe */}
+        <div className="h-[57px]" />
+
+        {/* HERO — compact */}
+        <header className="text-center pt-4 pb-4">
           <Image
             src="/images/logo-mimi.webp"
             alt="Salon Mimi — Rasta Africain Coiffure"
-            width={160}
-            height={160}
+            width={120}
+            height={120}
             priority
-            className="mx-auto mb-4 w-[128px] h-auto sm:w-[160px]"
+            className="mx-auto mb-2 w-[76px] h-auto sm:w-[88px] drop-shadow-[0_4px_20px_rgba(212,168,67,0.25)]"
           />
-          <span className="block text-ocre text-[10px] tracking-[3px] uppercase font-inter mb-2">
+          <span className="block text-ocre text-[9px] tracking-[3px] uppercase font-inter mb-1">
             {tx.heroKicker}
           </span>
-          <h1 className="font-georgia text-[clamp(24px,5vw,32px)] font-bold text-fond leading-tight">
+          <h1 className="font-georgia text-[clamp(20px,4.5vw,26px)] font-bold text-fond leading-tight">
             {tx.heading} <em className="text-or italic">{tx.finalWord}</em>
           </h1>
-          <p className="text-fond/60 text-[12px] font-inter mt-3 max-w-[380px] mx-auto leading-relaxed">
-            {tx.heroSubtitle}
-          </p>
-        </div>
-      </header>
+        </header>
 
-      {/* CARTE FORMULAIRE */}
-      <div className="mx-auto max-w-[640px] px-4 sm:px-6 -mt-8">
-        <div className="bg-white rounded-[20px] border border-ocre/25 shadow-[0_8px_30px_rgba(26,13,5,0.08)] p-5 sm:p-7">
+        {/* CARTE FORMULAIRE — flotte sur le fond sombre */}
+        <div className="rounded-2xl border border-or/30 bg-fond shadow-[0_20px_60px_-12px_rgba(0,0,0,0.6)] p-4 sm:p-5">
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-2.5"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-ocre/12 flex items-center justify-center text-ocre text-lg flex-shrink-0">
-                ✦
-              </div>
-              <div>
-                <div className="font-georgia text-[16px] font-bold text-nuit leading-tight">
+            <div className="flex items-center gap-2.5">
+              <span className="text-ocre text-base flex-shrink-0">✦</span>
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="font-georgia text-[15px] font-bold text-nuit leading-tight">
                   {tx.formTitle}
-                </div>
-                <div className="text-[10px] text-nuit/50 font-inter tracking-wide">
+                </span>
+                <span className="text-[9px] text-nuit/45 font-inter tracking-wide">
                   {tx.required}
-                </div>
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1">
               <label className={LABEL_CLASS}>
                 Service <span className="text-ocre">*</span>
               </label>
@@ -511,20 +513,17 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
                   </option>
                 ))}
               </select>
+              <p className="text-[11px] text-nuit/65 font-inter">
+                {tx.startingFrom}{" "}
+                <span className="text-ocre font-semibold">
+                  {prices[activeSvc.id] ?? activeSvc.price} MAD
+                </span>{" "}
+                · {tx.priceIndicative}
+              </p>
             </div>
 
-            <p className="text-[12px] text-nuit/70 font-inter -mt-1.5">
-              {activeSvc.label} — {tx.startingFrom}{" "}
-              <span className="text-ocre font-semibold">
-                {prices[activeSvc.id] ?? activeSvc.price} MAD
-              </span>{" "}
-              · {tx.priceIndicative}
-            </p>
-
-            <div className="h-px bg-ocre/15" />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5">
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="flex flex-col gap-1">
                 <label className={LABEL_CLASS}>
                   {tx.fullName} <span className="text-ocre">*</span>
                 </label>
@@ -536,7 +535,7 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
                   className={`${FIELD_CLASS} placeholder:text-nuit/30`}
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1">
                 <label className={LABEL_CLASS}>
                   {tx.phone} <span className="text-ocre">*</span>
                 </label>
@@ -550,8 +549,8 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5">
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="flex flex-col gap-1">
                 <label className={LABEL_CLASS}>
                   {tx.date} <span className="text-ocre">*</span>
                 </label>
@@ -562,7 +561,7 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
                   className={FIELD_CLASS}
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-1">
                 <label className={LABEL_CLASS}>{tx.time}</label>
                 <input name="time" type="time" className={FIELD_CLASS} />
               </div>
@@ -571,14 +570,14 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
             <button
               type="button"
               onClick={() => setShowDetails((v) => !v)}
-              className="text-ocre text-[12px] font-inter font-medium self-start hover:underline"
+              className="text-ocre text-[11px] font-inter font-medium self-start hover:underline"
             >
               {tx.addDetails}
             </button>
 
             {showDetails && (
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-1">
                   <label className={LABEL_CLASS}>{tx.persons}</label>
                   <select
                     name="persons"
@@ -590,7 +589,7 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
                     <option>{tx.person4}</option>
                   </select>
                 </div>
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className={LABEL_CLASS}>{tx.email}</label>
                   <input
                     name="email"
@@ -599,11 +598,11 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
                     className={`${FIELD_CLASS} placeholder:text-nuit/30`}
                   />
                 </div>
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-1">
                   <label className={LABEL_CLASS}>{tx.message}</label>
                   <textarea
                     name="message"
-                    rows={3}
+                    rows={2}
                     placeholder={tx.messagePlaceholder}
                     className={`${FIELD_CLASS} placeholder:text-nuit/30 resize-none`}
                   />
@@ -620,31 +619,28 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
               </p>
             )}
 
-            <div className="flex items-center gap-3 my-1">
+            <div className="flex items-center gap-2.5 mt-0.5">
               <div className="h-px bg-ocre/20 flex-1" />
-              <span className="text-[10px] tracking-[2px] uppercase text-nuit/40 font-inter">
+              <span className="text-[9px] tracking-[2px] uppercase text-nuit/40 font-inter">
                 {tx.chooseSend}
               </span>
               <div className="h-px bg-ocre/20 flex-1" />
             </div>
 
-            <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={handleWhatsApp}
                 aria-label={tx.whatsappPrimaryBtn}
-                className="group rounded-2xl border-[1.5px] border-whatsapp bg-whatsapp/[0.06] hover:bg-whatsapp/10 px-4 py-4 text-center transition-colors"
+                className="group flex flex-col items-center gap-1 rounded-xl border-[1.5px] border-whatsapp bg-whatsapp/[0.06] hover:bg-whatsapp/10 px-2 py-2.5 text-center transition-colors"
               >
-                <span className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-whatsapp text-white">
-                  <WhatsAppIcon className="w-4 h-4" />
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-whatsapp text-white">
+                  <WhatsAppIcon className="w-3.5 h-3.5" />
                 </span>
-                <span className="block text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
-                  {tx.sendVia}
-                </span>
-                <span className="block text-[14px] font-bold text-vert font-inter">
+                <span className="text-[12px] font-bold text-vert font-inter leading-tight">
                   {tx.whatsappPrimaryBtn}
                 </span>
-                <span className="block text-[9px] text-nuit/50 font-inter mt-0.5">
+                <span className="text-[9px] text-nuit/50 font-inter leading-tight">
                   {tx.whatsappCardHint}
                 </span>
               </button>
@@ -652,11 +648,11 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
               <button
                 type="submit"
                 aria-label={tx.submitBtn}
-                className="group rounded-2xl border-[1.5px] border-ocre bg-ocre/[0.06] hover:bg-ocre/10 px-4 py-4 text-center transition-colors"
+                className="group flex flex-col items-center gap-1 rounded-xl border-[1.5px] border-ocre bg-ocre/[0.06] hover:bg-ocre/10 px-2 py-2.5 text-center transition-colors"
               >
-                <span className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-ocre text-white">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ocre text-white">
                   <svg
-                    className="w-4 h-4"
+                    className="w-3.5 h-3.5"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -669,28 +665,23 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
                     <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                   </svg>
                 </span>
-                <span className="block text-[9px] tracking-[2px] uppercase text-nuit/50 font-inter">
-                  {tx.sendVia}
-                </span>
-                <span className="block text-[14px] font-bold text-ocre font-inter">
+                <span className="text-[12px] font-bold text-ocre font-inter leading-tight">
                   {tx.submitBtn}
                 </span>
-                <span className="block text-[9px] text-nuit/50 font-inter mt-0.5">
+                <span className="text-[9px] text-nuit/50 font-inter leading-tight">
                   {tx.emailCardHint}
                 </span>
               </button>
             </div>
 
-            <p className="text-center text-nuit/40 text-[10px] font-inter leading-relaxed">
+            <p className="text-center text-nuit/40 text-[9px] font-inter leading-relaxed">
               {tx.reassurance} · {tx.noOnlinePayment}
             </p>
           </form>
         </div>
-      </div>
 
-      {/* BADGES DE RÉASSURANCE */}
-      <div className="mx-auto max-w-[640px] px-4 sm:px-6 mt-6">
-        <div className="grid grid-cols-3 gap-3">
+        {/* BADGES DE RÉASSURANCE — sur le fond sombre */}
+        <div className="mt-5 grid grid-cols-3 gap-3">
           {[
             { t: tx.badge1Title, d: tx.badge1Text, icon: "M12 6v6l4 2" },
             {
@@ -706,7 +697,7 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
           ].map((b) => (
             <div key={b.t} className="text-center">
               <svg
-                className="w-5 h-5 mx-auto mb-1.5 text-ocre"
+                className="w-5 h-5 mx-auto mb-1.5 text-or"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -718,20 +709,25 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
                 {b.icon === "M12 6v6l4 2" && <circle cx="12" cy="12" r="9" />}
                 <path d={b.icon} />
               </svg>
-              <div className="text-[10px] font-bold text-nuit font-inter">
+              <div className="text-[10px] font-bold text-fond font-inter">
                 {b.t}
               </div>
-              <div className="text-[9px] text-nuit/50 font-inter leading-snug">
+              <div className="text-[9px] text-fond/45 font-inter leading-snug">
                 {b.d}
               </div>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* SECTION "VOUS NE TROUVEZ PAS LE SALON ?" */}
-      <div className="mx-auto max-w-[640px] px-4 sm:px-6 my-8">
-        <div className="bg-nuit rounded-2xl overflow-hidden border border-ocre/20">
+        {/* SÉPARATEUR ORNEMENTAL */}
+        <div className="my-8 flex items-center justify-center gap-3 text-or/50">
+          <span className="h-px w-14 bg-or/25" />
+          <span className="text-[10px]">◈</span>
+          <span className="h-px w-14 bg-or/25" />
+        </div>
+
+        {/* SECTION "VOUS NE TROUVEZ PAS LE SALON ?" */}
+        <div className="mb-10 rounded-2xl overflow-hidden border border-or/20 bg-brun/60">
           <div className="grid grid-cols-1 sm:grid-cols-2 items-center">
             <div className="relative h-44 sm:h-full sm:min-h-[190px] bg-black">
               <Image
@@ -739,12 +735,12 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
                 alt="Restaurant Argana — Place Jamaa El Fna, Marrakech"
                 fill
                 className="object-contain"
-                sizes="(max-width: 640px) 100vw, 320px"
+                sizes="(max-width: 560px) 100vw, 280px"
               />
             </div>
             <div className="p-6 flex flex-col gap-3">
               <h2 className="font-georgia text-xl text-or">{tx.lostTitle}</h2>
-              <p className="text-white/80 text-sm leading-relaxed">
+              <p className="text-fond/75 text-sm leading-relaxed">
                 {tx.lostText}
               </p>
               <a
