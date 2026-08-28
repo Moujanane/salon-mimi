@@ -45,7 +45,24 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
-- ~~**PRIORITÉ 1 — Refonte du tunnel de réservation (CRO).**~~ **FAIT ET DÉPLOYÉ** — v1 (§18) → v2 « choix explicite » (§19) → hotfix hydratation (§19bis) → **v3 « formulaire commun » (§20, état final actuel en prod)**.
+- **PROCHAINE SESSION — Refonte du design de la page `/reservation` + ajout d'un logo.**
+  Le fonctionnel du tunnel est stable (voir §20). La prochaine étape est
+  purement visuelle :
+  - Retravailler le design de `/reservation` (mise en page, hiérarchie,
+    espacements, couleurs, typographie du formulaire et des 2 boutons).
+  - **Ajouter un logo** sur la page (à préciser avec Mouj : logo « SALON MIMI /
+    MARRAKECH » texte actuel du header, ou un vrai logo graphique fourni). Voir
+    §2 état actuel : le header utilise un logo TEXTE (le SVG a été supprimé lors
+    d'une session précédente). Si Mouj fournit un fichier logo, l'ajouter dans
+    `public/images/` en SVG ou PNG optimisé et le placer dans l'en-tête de
+    `ReservationLayout.tsx` (bloc `<h1>` « Réserve ton rendez-vous »).
+  - Fichier concerné : `components/sections/ReservationLayout.tsx` (+ éventuel
+    asset dans `public/images/`). Ne PAS casser les tests CRO existants
+    (`e2e/site.spec.ts`) — ils ciblent `select[name="service"]`,
+    `button` « Confirmer ma réservation » / « Réserver par WhatsApp »,
+    « + Ajouter des précisions », le sticky. Garder ces libellés et sélecteurs.
+  - Rappel piège : ne PAS réintroduire `useSearchParams()` dans
+    `ReservationLayout` (cf. §19bis).
 - **Avis Google** : 13 avis / 4,2 étoiles au 28 août 2026 (était 6 le 1er juin). Objectif 30+ : QR code plastifié à la caisse + SMS/WhatsApp automatique 2 h après le RDV avec `https://g.page/r/CXqJtbaOg9FUEBM/review`. Répondre à TOUS les avis existants.
 - **Bios réseaux** : ajouter le lien `https://mimi-coiffure.com/reservation` dans les bios Instagram (`salonmimi.marrakech`) et TikTok (`@mimicoiffure700`).
 - **Cloudflare Cache Rule** : éliminerait les redirections multiples (610ms), PageSpeed 92 → 95+. Instructions en section 7
@@ -53,7 +70,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 20. Session 30 août 2026 — Tunnel de réservation v3 : formulaire commun + 2 boutons d'envoi (ÉTAT ACTUEL EN PROD)
+## 20. Session 30 août 2026 — Tunnel de réservation v3 : formulaire commun + 2 boutons d'envoi + layout Date/Heure (ÉTAT ACTUEL EN PROD)
 
 Fait suite à la v2 (§19). **Retour terrain sur la v2 :** les 2 boutons en haut
 (« Réserver par WhatsApp » / « Réserver par formulaire ») étaient confus.
@@ -101,6 +118,17 @@ Plan : `docs/superpowers/plans/2026-08-30-tunnel-reservation-v3-formulaire-commu
 - `?service=locks-dreads` → `<select>` présélectionné + prix correct ✓
 - Console : seule erreur = 400 sur le script Umami (pré-existant, hors sujet)
 
+### Ajustement layout (commit `6fbf723`, déployé)
+
+- **Date et Heure sur une même ligne** (grille `grid-cols-1 sm:grid-cols-2`,
+  comme Nom + Téléphone) : sur desktop côte à côte, sur mobile empilés.
+- **Heure sortie du repli** « + Ajouter des précisions » — visible d'emblée,
+  **optionnelle** (pas de `required`).
+- Le repli ne contient plus que : Nombre de personnes, Email, Message.
+- L'heure remonte dans le message WhatsApp du bouton vert (ligne
+  « Message : Heure : HH:MM » — améliorable : lui donner sa propre ligne dans
+  `generateWhatsAppLink`, non bloquant).
+
 ### État du fichier `components/sections/ReservationLayout.tsx`
 
 - States : `activeIndex` (+ `useEffect` `?service=`), `submitted`,
@@ -110,6 +138,21 @@ Plan : `docs/superpowers/plans/2026-08-30-tunnel-reservation-v3-formulaire-commu
   fonctions distinctes. `handleWhatsApp` lit les champs via `formRef.current`.
 - `import { generateWhatsAppLink } from "@/lib/whatsapp";` (plus de
   `genericWhatsAppLink` — supprimé avec le bloc de choix v2).
+- Champs visibles du formulaire : Service (+ ligne de prix dynamique),
+  Nom, Téléphone, Date, Heure. Repli : Personnes, Email, Message.
+  2 boutons en bas : « Confirmer ma réservation » (ocre, submit) +
+  « Réserver par WhatsApp » (vert, `type="button"`).
+
+### Note outillage — serveurs de dev fantômes sur le port 3100
+
+Plusieurs fois cette session, un `next-server` / `next dev` d'une session
+précédente est resté vivant sur le port 3100 et a bloqué le démarrage d'un
+nouveau serveur (`EADDRINUSE`), en servant du code périmé — ce qui donne
+l'illusion qu'un changement « ne marche pas ». Claude n'a **pas** la permission
+de `kill` ces process. Réflexe pour la prochaine session : avant de tester en
+local, `lsof -ti:3100` puis demander à Mouj de faire `kill -9 <pid>` si un
+`next-server` traîne. `preview_start` (Browser pane) échoue aussi par
+intermittence (`EPERM uv_cwd`) sur ce Mac.
 
 ### Fast-follow non bloquants (toujours valables)
 
