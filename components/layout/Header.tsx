@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -131,22 +132,32 @@ export default function Header() {
         {/* Mobile : col vide */}
         <div className="lg:hidden" />
 
-        {/* Col 2 — Logo centré, taille fixe */}
+        {/* Col 2 — Logo graphique + texte marque (compact, aligné à gauche) */}
         <Link
           href={`/${locale}`}
-          className="flex flex-col items-center leading-none group"
+          className="flex items-center gap-2.5 leading-none group"
         >
-          <span
-            className="font-playfair text-[16px] tracking-[5px] uppercase text-ocre transition-colors duration-300 group-hover:text-or"
-            style={{ fontStyle: "normal", fontWeight: 700 }}
-          >
-            Salon Mimi
-          </span>
-          <span
-            className="font-inter text-[8px] tracking-[4px] uppercase mt-0.5"
-            style={{ color: "rgba(193,123,63,0.5)" }}
-          >
-            Marrakech
+          <Image
+            src="/images/logo-mimi.webp"
+            alt="Salon Mimi — Rasta Africain Coiffure"
+            width={68}
+            height={68}
+            priority
+            className="w-[34px] h-[34px] flex-shrink-0"
+          />
+          <span className="flex flex-col items-start leading-none">
+            <span
+              className="font-playfair text-[14px] tracking-[3px] uppercase text-ocre transition-colors duration-300 group-hover:text-or"
+              style={{ fontStyle: "normal", fontWeight: 700 }}
+            >
+              Salon Mimi
+            </span>
+            <span
+              className="font-inter text-[8px] tracking-[3px] uppercase mt-0.5"
+              style={{ color: "rgba(193,123,63,0.5)" }}
+            >
+              Marrakech
+            </span>
           </span>
         </Link>
 
