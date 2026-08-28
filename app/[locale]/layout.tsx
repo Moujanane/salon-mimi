@@ -65,6 +65,7 @@ export async function generateMetadata({
     openGraph: {
       title: titles[locale] ?? titles.fr,
       description: descriptions[locale] ?? descriptions.fr,
+      siteName: "Salon Mimi",
       locale,
       type: "website",
       url: `${BASE_URL}/${locale}/`,
@@ -76,6 +77,12 @@ export async function generateMetadata({
           alt: "Salon Mimi — Tresses africaines Marrakech",
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: titles[locale] ?? titles.fr,
+      description: descriptions[locale] ?? descriptions.fr,
+      images: [`${BASE_URL}/${locale}/opengraph-image`],
     },
   };
 }
@@ -105,7 +112,9 @@ const jsonLd = {
   sameAs: [
     "https://maps.app.goo.gl/2VHUxKWpLpYFE8836",
     "https://share.google/t4j91V4ZgAESOoNwp",
+    "https://g.page/r/CXqJtbaOg9FUEBM",
     "https://www.instagram.com/salonmimi.marrakech",
+    "https://www.tiktok.com/@mimicoiffure700",
   ],
   openingHoursSpecification: [
     {
