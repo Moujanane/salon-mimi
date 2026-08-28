@@ -632,6 +632,7 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
               <button
                 type="button"
                 onClick={handleWhatsApp}
+                aria-label={tx.whatsappPrimaryBtn}
                 className="group rounded-2xl border-[1.5px] border-whatsapp bg-whatsapp/[0.06] hover:bg-whatsapp/10 px-4 py-4 text-center transition-colors"
               >
                 <span className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-whatsapp text-white">
@@ -650,6 +651,7 @@ export default function ReservationLayoutV2({ labels, prices, locale }: Props) {
 
               <button
                 type="submit"
+                aria-label={tx.submitBtn}
                 className="group rounded-2xl border-[1.5px] border-ocre bg-ocre/[0.06] hover:bg-ocre/10 px-4 py-4 text-center transition-colors"
               >
                 <span className="mx-auto mb-2 flex h-9 w-9 items-center justify-center rounded-full bg-ocre text-white">
