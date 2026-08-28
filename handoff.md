@@ -60,14 +60,98 @@ Variantes `/xx/reservation?service=...`. Normal (canonical pointe vers
 
 Renvoi du sitemap + « Valider la correction » sur les 4 motifs + demande
 d'indexation sur `/fr` `/en` `/es`. Recrawl Google attendu sur 1 à 4 semaines —
-à re-vérifier dans GSC en septembre 2026.
+**à re-vérifier dans GSC courant septembre 2026** (motifs doivent passer à
+« Réussite »).
+
+### Fix lien avis Google + centralisation (commit `7b3ca10`, déployé)
+
+Le dashboard Google Business fournit désormais
+`g.page/r/CXqJtbaOg9FUEAE/review` (`source=merchant-review-solicitation`).
+Le code utilisait `…FUEBM` (ancien, toujours valide, même établissement
+`placeid ChIJedvCcgDvrw0Reom1to6D0VQ` — les deux liens ouvrent la même page).
+
+- `lib/social.ts` : `GBP_URL` + `GOOGLE_REVIEW_URL` → `…FUEAE`
+- `app/[locale]/contact/page.tsx` : bouton « avis Google » importe
+  `GOOGLE_REVIEW_URL` (plus de lien en dur)
+- `lib/sendNotificationEmail.ts` : bouton avis de l'email de notif idem
+- `app/[locale]/layout.tsx` : JSON-LD `sameAs` + `hasMap` importent les
+  constantes de `lib/social` (`INSTAGRAM_URL`, `TIKTOK_URL`, `MAPS_URL`,
+  `GBP_URL`)
+
+Plus aucune occurrence de `CXqJtbaOg9FUEBM` dans le code. Vérifié en prod :
+`/fr/contact` → bouton vers `…FUEAE/review`, JSON-LD `sameAs` → `…FUEAE`.
+
+**Fast-follow non bloquant** : les liens Maps (`maps.app.goo.gl/2VHUxKWpLpYFE8836`,
+`share.google/t4j91V4ZgAESOoNwp`) restent en dur dans `GoogleReviews.tsx`,
+`LocationSection.tsx` et `contact/page.tsx` — pourraient aussi passer par
+`lib/social`.
+
+### Carte avis QR à imprimer (livrée, hors git — dans `docs/`)
+
+`docs/carte-avis-qr-salon-mimi.html` — carte format **A6**, fond brun + doré de
+la marque, logo Mimi, QR code (généré en JS, lib `qrcode-generator` MIT inline)
+pointant vers `g.page/r/CXqJtbaOg9FUEAE/review`, titres **FR/EN/ES**, « Scannez
+avec votre téléphone ».
+
+**Obtenir le PDF** : ouvrir le fichier dans Chrome → `Cmd+P` → « Enregistrer au
+format PDF » → format **A6**, marges **Aucune**. (Pas de générateur PDF installé
+sur ce Mac ; le HTML est éditable si besoin d'ajuster le texte.)
+
+Usage : autocollant plastifié à la caisse / chevalet table de coiffage / carte
+remise en fin de prestation. À tester en scannant avec un vrai téléphone avant
+impression.
+
+### Test global de non-régression (fin de session 28 août 2026)
+
+Après les 2 déploiements du jour (`263dd8d` + `7b3ca10`) :
+
+- `npx tsc --noEmit` ✓
+- Playwright contre la prod `https://mimi-coiffure.com` : **desktop 44 passed /
+  1 skip**, **mobile 44 passed / 1 skip**, 0 échec, 0 flaky
+- Vérif navigateur prod : home `/fr`, `/fr/reservation?service=box-braids`
+  (présélection + prix OK, pas de bug `useSearchParams`), `/fr/contact`
+  (bouton avis → `…FUEAE/review`) — tout OK
+- Seule erreur console : `400` sur le script Umami — **préexistant** (§20),
+  sans impact fonctionnel
+
+**Conclusion : zéro régression.**
+
+### 2 anomalies repérées (NON liées aux changements de la session, non bloquantes)
+
+1. **Hero home affiche « 5/5 sur Google »** alors que la fiche est à **4,2 / 13
+   avis**. Le composant `GoogleReviews.tsx` lit l'API Google Places en direct —
+   soit l'API renvoie une note partielle, soit un fallback. À investiguer une
+   prochaine session.
+2. **Erreur console `400` sur le script Umami** sur toutes les pages. Présente
+   depuis longtemps, aucun impact fonctionnel, mais casse probablement le
+   tracking analytics. À corriger un jour (vérifier Website ID / URL du script
+   dans `app/[locale]/layout.tsx`).
+
+### Audit sécurité — pas fait, pas nécessaire pour cette session
+
+Les changements de la session (chaînes d'URL statiques dans `<link>` / JSON-LD /
+templates email) n'ont **aucune surface de sécurité** : zéro input utilisateur,
+zéro requête serveur, zéro dépendance ajoutée. Un audit sécu complet n'était pas
+justifié ici.
+
+**En revanche, un audit sécurité en chantier dédié serait légitime** (jamais
+fait formellement) : politiques RLS Supabase réelles (rappel §leçon 1 :
+`supabase-schema.sql` est de la doc morte), `npm audit` sur les dépendances,
+fuzzing des API routes (`/api/reservations`, `/api/contact`, `/api/push`).
+Skill à utiliser : `security-review`. À planifier avec Mouj.
 
 ### Note branches
 
 Le travail V2 de la home (branche `feat/home-v2`) était en cours au début de la
 session : mis de côté dans `stash@{0}` sur `feat/home-v2`. Récupérer avec
-`git checkout feat/home-v2 && git stash pop`. Le fix SEO a été fait sur `main`,
-sans toucher à la V2.
+`git checkout feat/home-v2 && git stash pop`. Les fix de la session ont été faits
+sur `main`, sans toucher à la V2.
+
+### Commits de la session (sur `main`, tous déployés)
+
+- `263dd8d` fix(seo): retire le slash final des canonical, hreflang et sitemap
+- `a34b6fa` docs: handoff — audit indexation GSC + GEO (section 23)
+- `7b3ca10` fix(avis): aligne le lien avis Google sur celui du dashboard + centralise
 
 ---
 
