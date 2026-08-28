@@ -7,6 +7,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CookieBanner from "@/components/ui/CookieBanner";
 import StickyBooking from "@/components/layout/StickyBooking";
+import { INSTAGRAM_URL, TIKTOK_URL, MAPS_URL, GBP_URL } from "@/lib/social";
 import "../globals.css";
 
 const playfair = Playfair_Display({
@@ -109,13 +110,13 @@ const jsonLd = {
     latitude: 31.6258,
     longitude: -7.9892,
   },
-  hasMap: "https://maps.app.goo.gl/2VHUxKWpLpYFE8836",
+  hasMap: MAPS_URL,
   sameAs: [
-    "https://maps.app.goo.gl/2VHUxKWpLpYFE8836",
+    MAPS_URL,
     "https://share.google/t4j91V4ZgAESOoNwp",
-    "https://g.page/r/CXqJtbaOg9FUEBM",
-    "https://www.instagram.com/salonmimi.marrakech",
-    "https://www.tiktok.com/@mimicoiffure700",
+    GBP_URL,
+    INSTAGRAM_URL,
+    TIKTOK_URL,
   ],
   openingHoursSpecification: [
     {

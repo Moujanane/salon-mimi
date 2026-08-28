@@ -3,6 +3,7 @@ export const revalidate = 3600;
 import type { Metadata } from "next";
 import Image from "next/image";
 import { getSettings } from "@/lib/settings";
+import { GOOGLE_REVIEW_URL } from "@/lib/social";
 import ContactForm from "@/components/sections/ContactForm";
 
 export async function generateMetadata({
@@ -178,7 +179,7 @@ export default async function ContactPage({
               {data.igLabel}
             </a>
             <a
-              href="https://g.page/r/CXqJtbaOg9FUEBM/review"
+              href={GOOGLE_REVIEW_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white border border-ocre/30 text-brun text-center py-4 rounded-full font-medium hover:border-ocre transition-colors"

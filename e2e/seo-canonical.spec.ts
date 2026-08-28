@@ -85,7 +85,10 @@ test.describe("SEO — canonical auto-référent", () => {
       test(`${url} : canonical == son URL, sans slash final`, async ({
         page,
       }) => {
-        const resp = await page.goto(url);
+        // Le <link canonical> est dans le HTML initial (SSR) : "commit" suffit,
+        // pas besoin d'attendre "load" (évite les timeouts sur /services,
+        // la page la plus lourde, quand le CPU mobile émulé est saturé).
+        const resp = await page.goto(url, { waitUntil: "commit" });
         expect(resp?.status()).toBe(200);
 
         const canonical = await page

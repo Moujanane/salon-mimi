@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { GOOGLE_REVIEW_URL } from "@/lib/social";
 
 export function esc(str: string | undefined): string {
   if (!str) return "";
@@ -61,7 +62,7 @@ export async function sendNotificationEmail(
         </table>
         <hr style="border:none;border-top:1px solid #f0e8de;margin:16px 0;">
         <div style="text-align:center;margin-bottom:16px;">
-          <a href="https://g.page/r/CXqJtbaOg9FUEBM/review" target="_blank" style="display:inline-block;background:#c9a96e;color:#fff;text-decoration:none;padding:10px 24px;border-radius:999px;font-size:13px;font-weight:600;">⭐ Laisser un avis Google</a>
+          <a href="${GOOGLE_REVIEW_URL}" target="_blank" style="display:inline-block;background:#c9a96e;color:#fff;text-decoration:none;padding:10px 24px;border-radius:999px;font-size:13px;font-weight:600;">⭐ Laisser un avis Google</a>
         </div>
         <p style="font-size:12px;color:#aaa;text-align:center;">Mimi Coiffure · Marrakech</p>
       </div>
