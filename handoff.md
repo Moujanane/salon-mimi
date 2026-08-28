@@ -45,28 +45,83 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
-- **PROCHAINE SESSION — Refonte du design de la page `/reservation` + ajout d'un logo.**
-  Le fonctionnel du tunnel est stable (voir §20). La prochaine étape est
-  purement visuelle :
-  - Retravailler le design de `/reservation` (mise en page, hiérarchie,
-    espacements, couleurs, typographie du formulaire et des 2 boutons).
-  - **Ajouter un logo** sur la page (à préciser avec Mouj : logo « SALON MIMI /
-    MARRAKECH » texte actuel du header, ou un vrai logo graphique fourni). Voir
-    §2 état actuel : le header utilise un logo TEXTE (le SVG a été supprimé lors
-    d'une session précédente). Si Mouj fournit un fichier logo, l'ajouter dans
-    `public/images/` en SVG ou PNG optimisé et le placer dans l'en-tête de
-    `ReservationLayout.tsx` (bloc `<h1>` « Réserve ton rendez-vous »).
-  - Fichier concerné : `components/sections/ReservationLayout.tsx` (+ éventuel
-    asset dans `public/images/`). Ne PAS casser les tests CRO existants
-    (`e2e/site.spec.ts`) — ils ciblent `select[name="service"]`,
-    `button` « Confirmer ma réservation » / « Réserver par WhatsApp »,
-    « + Ajouter des précisions », le sticky. Garder ces libellés et sélecteurs.
-  - Rappel piège : ne PAS réintroduire `useSearchParams()` dans
-    `ReservationLayout` (cf. §19bis).
+- **PROCHAINE SESSION — Valider `/reservation-v2` sur mimi-coiffure.com puis basculer en prod.**
+  La refonte visuelle est faite en preview (voir §21). Il reste :
+  - Revue visuelle de Mouj sur `https://mimi-coiffure.com/fr/reservation-v2`
+    (après merge de `feat/reservation-v2` sur `main`).
+  - **Bascule** : remplacer le contenu de `ReservationLayout.tsx` par celui de
+    `ReservationLayoutV2.tsx`, supprimer `app/[locale]/reservation-v2/` et
+    `ReservationLayoutV2.tsx`, adapter les tests CRO si un sélecteur de structure
+    a bougé (les `name=` et libellés sont déjà conservés → a priori rien).
+  - Rappel piège : ne PAS réintroduire `useSearchParams()` (cf. §19bis) — la v2
+    lit `?service=` via `useEffect` + `window.location.search`.
 - **Avis Google** : 13 avis / 4,2 étoiles au 28 août 2026 (était 6 le 1er juin). Objectif 30+ : QR code plastifié à la caisse + SMS/WhatsApp automatique 2 h après le RDV avec `https://g.page/r/CXqJtbaOg9FUEBM/review`. Répondre à TOUS les avis existants.
 - **Bios réseaux** : ajouter le lien `https://mimi-coiffure.com/reservation` dans les bios Instagram (`salonmimi.marrakech`) et TikTok (`@mimicoiffure700`).
 - **Cloudflare Cache Rule** : éliminerait les redirections multiples (610ms), PageSpeed 92 → 95+. Instructions en section 7
 - **Fiche TripAdvisor** : en attente de validation depuis mai 2026
+
+---
+
+## 21. Session 28 août 2026 — Refonte design page réservation : /reservation-v2 (preview)
+
+Nouvelle page **/reservation-v2** (`noindex`) au design premium inspiré d'un
+template fourni : hero sombre + logo doré Mimi centré, carte formulaire crème,
+2 cartes d'envoi (verte « Réserver par WhatsApp » / ocre « Confirmer ma
+réservation » avec icône enveloppe), 3 badges de réassurance, section « Vous ne
+trouvez pas le salon ? » conservée.
+
+**La v1 /reservation reste intacte et en production.** Bascule v2 → prod NON
+faite (en attente de la validation visuelle de Mouj).
+
+Branche : `feat/reservation-v2` (4 commits, non mergée).
+Spec : `docs/superpowers/specs/2026-08-28-reservation-v2-design-template-design.md`
+Plan : `docs/superpowers/plans/2026-08-28-reservation-v2-design-template.md`
+
+### Fichiers créés
+
+- `public/images/logo-mimi.webp` (89 KB) + `logo-mimi.png` (322 KB) — logo 512px,
+  fond transparent. Source : `~/Downloads/Logo Mimi-coiffure.png`.
+- `components/sections/ReservationLayoutV2.tsx` — composant client v2. Logique JS
+  (states, `handleSubmit`, `handleWhatsApp`, lecture `?service=` via `useEffect` +
+  `window.location.search`) reprise **à l'identique** de `ReservationLayout.tsx`.
+  **Ne PAS y introduire `useSearchParams()`** (piège §19bis).
+- `app/[locale]/reservation-v2/page.tsx` — route preview. `metadata` :
+  `robots: { index: false, follow: false }`, PAS d'`alternates`, PAS d'entrée
+  sitemap.
+
+### Vérifié (local, dev server port 3100)
+
+- `npx tsc --noEmit` ✓ · `npm run build` ✓ (route `/reservation-v2` 7.16 kB)
+- `npx playwright test` (desktop + mobile) : **32 passed / 2 skipped** — 0
+  régression (les 8 tests CRO ciblent toujours `/reservation` v1)
+- Checks headless v2 (spec temporaire, supprimée) : toggle « + Ajouter des
+  précisions » révèle email/persons/message ✓ · pas de scroll horizontal 375 /
+  1280 ✓ · submit sans exception JS ✓ · `?service=locks-dreads` présélectionne
+  (select value "5") + libellés « Réserver par WhatsApp » / « Confirmer ma
+  réservation » + texte « tarif indicatif, confirmé au salon » présents ✓
+- Navigateur : 3 langues (fr/en/es) HTTP 200 + `noindex` dans le HTML, hero +
+  logo doré, ligne de prix dynamique (150 → 250 MAD au changement de coiffure),
+  bouton WhatsApp exige nom+tél (message d'erreur, pas de navigation), avec
+  nom+tél → navigation `api.whatsapp.com`
+- Seule erreur console : 400 sur le script Umami (pré-existant, hors sujet)
+
+### Prochaine étape — bascule (à décider avec Mouj)
+
+1. Merger `feat/reservation-v2` sur `main` (déploiement Railway auto) →
+   `/reservation-v2` accessible sur mimi-coiffure.com pour la revue de Mouj.
+2. Quand validé : remplacer le contenu de `ReservationLayout.tsx` par celui de
+   `ReservationLayoutV2.tsx` (interface `Props` identique — RAS côté
+   `app/[locale]/reservation/page.tsx`).
+3. Supprimer `app/[locale]/reservation-v2/` et `ReservationLayoutV2.tsx`.
+4. Adapter les 8 tests e2e CRO si un sélecteur de structure a bougé (les `name=`
+   et libellés sont déjà conservés → a priori rien à changer).
+5. `npx tsc --noEmit` + `npm run build` + `npx playwright test` contre la prod.
+
+### Fast-follow non bloquant
+
+- `logo-mimi.webp` fait 89 KB (q82, l'alpha lossless gonfle le poids). Acceptable
+  pour une page unique. Si besoin d'alléger : régénérer en `-q 70` ou détourer le
+  halo rouge/vert du contour de la source (artefact de génération).
 
 ---
 
