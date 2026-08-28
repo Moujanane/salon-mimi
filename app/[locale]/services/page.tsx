@@ -28,12 +28,12 @@ export async function generateMetadata({
     title: titles[locale] ?? titles.fr,
     description: descriptions[locale] ?? descriptions.fr,
     alternates: {
-      canonical: `https://mimi-coiffure.com/${locale}/services/`,
+      canonical: `https://mimi-coiffure.com/${locale}/services`,
       languages: {
-        fr: "https://mimi-coiffure.com/fr/services/",
-        en: "https://mimi-coiffure.com/en/services/",
-        es: "https://mimi-coiffure.com/es/services/",
-        "x-default": "https://mimi-coiffure.com/fr/services/",
+        fr: "https://mimi-coiffure.com/fr/services",
+        en: "https://mimi-coiffure.com/en/services",
+        es: "https://mimi-coiffure.com/es/services",
+        "x-default": "https://mimi-coiffure.com/fr/services",
       },
     },
   };
@@ -138,7 +138,7 @@ export default async function ServicesPage({
         : locale === "es"
           ? "Servicios de peluquería africana en Marrakech — trenzas, locks, knotless"
           : "Services de coiffure africaine à Marrakech — tresses, locks, knotless",
-    url: `https://mimi-coiffure.com/${locale}/services/`,
+    url: `https://mimi-coiffure.com/${locale}/services`,
     itemListElement: servicesList.map((s, i) => ({
       "@type": "ListItem",
       position: i + 1,
@@ -161,7 +161,7 @@ export default async function ServicesPage({
           price: s.price,
           priceCurrency: "MAD",
           availability: "https://schema.org/InStock",
-          url: `https://mimi-coiffure.com/${locale}/reservation/`,
+          url: `https://mimi-coiffure.com/${locale}/reservation`,
         },
       },
     })),
