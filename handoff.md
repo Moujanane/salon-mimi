@@ -45,7 +45,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
-- ~~**PRIORITÉ 1 — Refonte du tunnel de réservation (CRO).**~~ **FAIT ET DÉPLOYÉ** — v1 (section 18) déployée, puis v2 « choix explicite » (section 19). Voir section 19 pour l'état final.
+- ~~**PRIORITÉ 1 — Refonte du tunnel de réservation (CRO).**~~ **FAIT ET DÉPLOYÉ** — v1 (§18) → v2 « choix explicite » (§19) → hotfix hydratation (§19bis) → **v3 « formulaire commun » (§20, état final actuel en prod)**.
 - **Avis Google** : 13 avis / 4,2 étoiles au 28 août 2026 (était 6 le 1er juin). Objectif 30+ : QR code plastifié à la caisse + SMS/WhatsApp automatique 2 h après le RDV avec `https://g.page/r/CXqJtbaOg9FUEBM/review`. Répondre à TOUS les avis existants.
 - **Bios réseaux** : ajouter le lien `https://mimi-coiffure.com/reservation` dans les bios Instagram (`salonmimi.marrakech`) et TikTok (`@mimicoiffure700`).
 - **Cloudflare Cache Rule** : éliminerait les redirections multiples (610ms), PageSpeed 92 → 95+. Instructions en section 7
@@ -53,7 +53,74 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 19. Session 28-30 août 2026 — Tunnel de réservation v2 : choix explicite WhatsApp / formulaire
+## 20. Session 30 août 2026 — Tunnel de réservation v3 : formulaire commun + 2 boutons d'envoi (ÉTAT ACTUEL EN PROD)
+
+Fait suite à la v2 (§19). **Retour terrain sur la v2 :** les 2 boutons en haut
+(« Réserver par WhatsApp » / « Réserver par formulaire ») étaient confus.
+« Réserver par formulaire » dépliait le formulaire, « Réserver par WhatsApp »
+n'ouvrait que WhatsApp — la logique des 2 modes n'était pas comprise.
+
+Commits `888cb1a` (feat) + `7747da7` (tests) sur `main`. Déployé.
+Spec : `docs/superpowers/specs/2026-08-30-tunnel-reservation-v3-formulaire-commun-design.md`
+Plan : `docs/superpowers/plans/2026-08-30-tunnel-reservation-v3-formulaire-commun.md`
+
+### Ce qui a changé vs v2
+
+1. **Formulaire toujours affiché** au chargement (comme la v1). Suppression du
+   state `showForm` et du bloc « 2 boutons de choix » du haut.
+2. **Deux boutons d'envoi EN BAS du formulaire** (`flex flex-col sm:flex-row`) :
+   - **« Confirmer ma réservation »** (ocre, `<button type="submit">`) —
+     comportement de soumission inchangé : POST `/api/reservations` → base +
+     notif push Mimi + accusé de réception client si email → redirection
+     WhatsApp (message détaillé serveur). Champs `required` HTML natifs.
+   - **« Réserver par WhatsApp »** (vert, `<button type="button">`,
+     `onClick={handleWhatsApp}`) — **aucun appel API**. Exige **Nom + Téléphone**
+     (sinon message d'erreur `whatsappError` + `focus()` sur le champ manquant).
+     Sinon construit un message WhatsApp pré-rempli (coiffure + date + nom + tél
+     - heure/personnes/message si renseignés) via `generateWhatsAppLink()` et
+       `window.location.href`.
+3. **Panneau photo droite** : toujours affiché (comme v1).
+4. **i18n** : `formBtn` supprimé ; `whatsappMissing` ajouté (fr/en/es) :
+   fr « Merci d'indiquer au moins votre nom et votre téléphone. ».
+5. `useSearchParams` **toujours absent** (hotfix §19bis conservé — `?service=`
+   lu via `useEffect` + `window.location.search`).
+6. **`StickyBooking` inchangé** — pointe toujours vers `/{locale}/reservation`.
+
+### Vérifié en prod (mimi-coiffure.com) après déploiement
+
+- `npx tsc --noEmit` ✓ · `npm run build` ✓ (Compiled successfully)
+- Playwright contre la prod : **32 passed / 2 skipped** (desktop + mobile)
+- Fiber tree en prod : `ReservationLayout` **pas sous un `OffscreenComponent`**
+  (le bug §19bis ne se reproduit pas)
+- **Vrai clic** « Réserver par WhatsApp » sans champs → message d'erreur +
+  focus Nom, pas de navigation ✓
+- **Vrai clic** avec Nom + Téléphone → navigation vers `api.whatsapp.com` avec
+  message pré-rempli ✓
+- 3 langues : formulaire rendu au SSR, 2 boutons traduits, « Réserver par
+  formulaire » absent ✓
+- `?service=locks-dreads` → `<select>` présélectionné + prix correct ✓
+- Console : seule erreur = 400 sur le script Umami (pré-existant, hors sujet)
+
+### État du fichier `components/sections/ReservationLayout.tsx`
+
+- States : `activeIndex` (+ `useEffect` `?service=`), `submitted`,
+  `whatsappLink`, `error`, `showDetails`, **`whatsappError`**, **`formRef`**
+  (`useRef<HTMLFormElement>`).
+- `handleSubmit` (bouton ocre) et `handleWhatsApp` (bouton vert) — deux
+  fonctions distinctes. `handleWhatsApp` lit les champs via `formRef.current`.
+- `import { generateWhatsAppLink } from "@/lib/whatsapp";` (plus de
+  `genericWhatsAppLink` — supprimé avec le bloc de choix v2).
+
+### Fast-follow non bloquants (toujours valables)
+
+- `Props.labels` de `ReservationLayout` quasi mort (seuls `labels.error` /
+  `labels.success` lus)
+- `components/ui/WhatsAppButton.tsx` a son propre glyphe WhatsApp (2 glyphes
+  dans le repo) — pourrait passer par `WhatsAppIcon`
+
+---
+
+## 19. Session 28-30 août 2026 — Tunnel de réservation v2 : choix explicite WhatsApp / formulaire (remplacée par la v3, §20)
 
 Fait suite à la v1 (section 18, déployée). **Problème constaté sur la v1 en prod :**
 sur mobile, le gros bouton WhatsApp vert remplissait l'écran, le lien vers le
