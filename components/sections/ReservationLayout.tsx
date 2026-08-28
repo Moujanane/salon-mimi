@@ -3,6 +3,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import { genericWhatsAppLink } from "@/lib/whatsapp";
+import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
 
 const SERVICES = [
   {
@@ -113,8 +114,6 @@ const TEXTS: Record<
     person4: string;
     message: string;
     messagePlaceholder: string;
-    confirm: string;
-    footer: string;
     confirmSubtitle: string;
     whatsappBtn: string;
     startingFrom: string;
@@ -150,9 +149,6 @@ const TEXTS: Record<
     person4: "4 personnes et +",
     message: "Message (optionnel)",
     messagePlaceholder: "Précisions sur le style, longueur souhaitée...",
-    confirm: "→ Confirmer la réservation",
-    footer:
-      "Confirmation par WhatsApp sous 24h · Aucun paiement requis maintenant",
     confirmSubtitle: "Mimi vous contacte dès que possible pour confirmer.",
     whatsappBtn: "WhatsApp non ouvert ? Cliquer ici",
     startingFrom: "À partir de",
@@ -189,8 +185,6 @@ const TEXTS: Record<
     person4: "4 people or more",
     message: "Message (optional)",
     messagePlaceholder: "Details about the style, desired length...",
-    confirm: "→ Confirm booking",
-    footer: "WhatsApp confirmation within 24h · No payment required now",
     confirmSubtitle: "Mimi will contact you as soon as possible to confirm.",
     whatsappBtn: "WhatsApp didn't open? Click here",
     startingFrom: "From",
@@ -227,8 +221,6 @@ const TEXTS: Record<
     person4: "4 personas o más",
     message: "Mensaje (opcional)",
     messagePlaceholder: "Detalles sobre el estilo, longitud deseada...",
-    confirm: "→ Confirmar reserva",
-    footer: "Confirmación por WhatsApp en 24h · Sin pago ahora",
     confirmSubtitle: "Mimi se pondrá en contacto contigo lo antes posible.",
     whatsappBtn: "¿WhatsApp no se abrió? Haz clic aquí",
     startingFrom: "Desde",
@@ -370,14 +362,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
           rel="noopener noreferrer"
           className="w-full flex items-center justify-center gap-2.5 bg-whatsapp hover:bg-whatsapp-hover text-white font-inter font-semibold text-[15px] py-4 rounded-full transition-colors"
         >
-          <svg
-            className="w-5 h-5"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.49 0 1.47 1.07 2.89 1.22 3.09.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35zM12.05 21.5h-.01a9.4 9.4 0 0 1-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.42 9.42 0 1 1 8.31 4.4l-.35-.02zM12.05 2a11.32 11.32 0 0 0-9.8 17.04L1 23l4.06-1.07A11.32 11.32 0 1 0 12.05 2z" />
-          </svg>
+          <WhatsAppIcon className="w-5 h-5" />
           {tx.whatsappPrimaryBtn}
         </a>
         <p className="text-center text-nuit/50 text-[11px] font-inter mt-2">
@@ -548,14 +533,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
               type="submit"
               className="w-full flex items-center justify-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-white text-[13px] font-inter font-semibold py-3.5 rounded-full transition-colors"
             >
-              <svg
-                className="w-4 h-4"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.49 0 1.47 1.07 2.89 1.22 3.09.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35zM12.05 21.5h-.01a9.4 9.4 0 0 1-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.42 9.42 0 1 1 8.31 4.4l-.35-.02zM12.05 2a11.32 11.32 0 0 0-9.8 17.04L1 23l4.06-1.07A11.32 11.32 0 1 0 12.05 2z" />
-              </svg>
+              <WhatsAppIcon className="w-4 h-4" />
               {tx.whatsappPrimaryBtn}
             </button>
 

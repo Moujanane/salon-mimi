@@ -25,6 +25,9 @@ const config: Config = {
         inter: ["var(--font-inter)", "sans-serif"],
         georgia: ["Georgia", "serif"],
       },
+      spacing: {
+        "sticky-wa": "52px",
+      },
     },
   },
   plugins: [],

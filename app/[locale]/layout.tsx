@@ -210,7 +210,7 @@ export default async function LocaleLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <Header />
-          <main className="pb-[52px] lg:pb-0">{children}</main>
+          <main className="pb-sticky-wa lg:pb-0">{children}</main>
           <Footer />
           <CookieBanner locale={locale} />
           <StickyWhatsApp />
