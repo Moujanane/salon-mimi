@@ -45,7 +45,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
-- ~~**PRIORITÉ 1 — Refonte du tunnel de réservation (CRO).**~~ **FAIT** — branche `feat/tunnel-reservation-cro` (voir section 18). En attente de merge + déploiement.
+- ~~**PRIORITÉ 1 — Refonte du tunnel de réservation (CRO).**~~ **FAIT ET DÉPLOYÉ** — v1 (section 18) déployée, puis v2 « choix explicite » (section 19). Voir section 19 pour l'état final.
 - **Avis Google** : 13 avis / 4,2 étoiles au 28 août 2026 (était 6 le 1er juin). Objectif 30+ : QR code plastifié à la caisse + SMS/WhatsApp automatique 2 h après le RDV avec `https://g.page/r/CXqJtbaOg9FUEBM/review`. Répondre à TOUS les avis existants.
 - **Bios réseaux** : ajouter le lien `https://mimi-coiffure.com/reservation` dans les bios Instagram (`salonmimi.marrakech`) et TikTok (`@mimicoiffure700`).
 - **Cloudflare Cache Rule** : éliminerait les redirections multiples (610ms), PageSpeed 92 → 95+. Instructions en section 7
@@ -53,9 +53,66 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 18. Session 28-29 août 2026 — Refonte du tunnel de réservation (CRO)
+## 19. Session 28-30 août 2026 — Tunnel de réservation v2 : choix explicite WhatsApp / formulaire
 
-Branche : `feat/tunnel-reservation-cro` (7 commits `c4fbe8e` → `543a090`). **Pas encore mergée sur `main` ni déployée.**
+Fait suite à la v1 (section 18, déployée). **Problème constaté sur la v1 en prod :**
+sur mobile, le gros bouton WhatsApp vert remplissait l'écran, le lien vers le
+formulaire était en petit gris → les visiteurs croyaient que la page ne
+proposait QUE WhatsApp.
+
+Branche : `feat/tunnel-reservation-v2` (5 commits `c2ea6b6` → `bf71e06`).
+Spec : `docs/superpowers/specs/2026-08-30-tunnel-reservation-v2-choix-explicite-design.md`
+Plan : `docs/superpowers/plans/2026-08-30-tunnel-reservation-v2-choix-explicite.md`
+
+### Ce qui a changé vs v1
+
+1. **Deux boutons de choix de même taille** au chargement de `/reservation` :
+   « Réserver par WhatsApp » (vert plein, ouvre `wa.me` direct, aucune API) et
+   « Réserver par formulaire » (contour ocre). Fini l'effet « une seule option ».
+2. **Le formulaire est masqué au chargement** (`showForm = false`). Clic sur
+   « Réserver par formulaire » → il se déplie en dessous, les 2 boutons restent
+   visibles, le bouton formulaire passe en fond ocre plein (état actif).
+3. **Le panneau photo (desktop)** n'apparaît que quand le formulaire est déplié.
+4. **Bouton de soumission du formulaire** repassé en **ocre** (`bg-ocre`),
+   libellé « Confirmer ma réservation » (plus de vert, plus d'icône WhatsApp —
+   pour ne pas le confondre avec le bouton WhatsApp du haut).
+5. **`StickyWhatsApp` renommé `StickyBooking`** (`git mv`). Il pointe désormais
+   vers `/{locale}/reservation` (au lieu d'ouvrir `wa.me` direct) — pour que les
+   visiteurs **sans WhatsApp** aient accès au formulaire. Libellé
+   « Réserver un rendez-vous » / « Book an appointment » / « Reservar una cita ».
+   Utilise `next/link`. Fond vert conservé. `pb-sticky-wa` sur `<main>` inchangé.
+6. **i18n** : clés `whatsappPrimaryHint` et `orFillForm` supprimées ; `formBtn` et
+   `submitBtn` ajoutées ; `whatsappPrimaryBtn` re-libellé « Réserver **par**
+   WhatsApp » (EN « Book via WhatsApp »).
+7. **Tests** : les 5 tests CRO adaptés + 1 nouveau (« formulaire masqué au
+   chargement, visible après clic ») = 6. Les 2 tests du bloc « Formulaire de
+   réservation » corrigés (ils cliquent « Réserver par formulaire » d'abord).
+
+### Vérifs faites (local)
+
+- `npx tsc --noEmit` ✓ · `npm run build` ✓ (Compiled successfully, 15/15 pages)
+- Playwright local : desktop **16 pass / 1 skip**, mobile **16 pass / 1 skip**, 0 régression
+- 3 langues `/fr` `/en` `/es` /reservation : HTTP 200, 2 boutons présents, `select` absent du SSR (formulaire masqué), anciens textes v1 absents
+- Sticky sur `/fr`, `/fr/galerie`, `/fr/contact`, `/en`, `/es` : `<a href="/{locale}/reservation">` avec `aria-label` traduit, plus de `wa.me`
+- Golden path navigateur (desktop) : 2 boutons au chargement → clic « formulaire » → dépli du formulaire + panneau photo, bouton formulaire en ocre plein, bouton submit ocre « Confirmer ma réservation », section « Vous ne trouvez pas le salon ? » intacte. 0 erreur console/logs.
+
+### Reste à faire avant de considérer la tâche 100 % terminée
+
+- [ ] Merger `feat/tunnel-reservation-v2` sur `main` (déploiement Railway auto)
+- [ ] Après déploiement : `npx playwright test` (desktop + mobile) contre `https://mimi-coiffure.com` — 100 % vert
+- [ ] Sur un vrai mobile : ouvrir `/fr/reservation`, vérifier que les 2 boutons sont bien visibles côte à côte / empilés sans ambiguïté, que le dépli du formulaire est fluide, que le sticky ne gêne pas
+- [ ] Test réel : une réservation avec email via le formulaire depuis la prod → dashboard `/admin/dashboard` + notif push Mimi + accusé de réception client
+
+### Fast-follow non bloquants (hérités de la v1, toujours valables)
+
+- `Props.labels` de `ReservationLayout` quasi mort (seuls `labels.error` / `labels.success` lus)
+- `components/ui/WhatsAppButton.tsx` a encore son propre glyphe (2 glyphes WhatsApp dans le repo) — pourrait passer par `WhatsAppIcon`
+
+---
+
+## 18. Session 28-29 août 2026 — Refonte du tunnel de réservation (CRO) — v1 (remplacée par la v2, section 19)
+
+Branche : `feat/tunnel-reservation-cro` (8 commits `c4fbe8e` → `e0d8d8a`). **Déployée sur `main`.**
 
 Spec : `docs/superpowers/specs/2026-08-29-refonte-tunnel-reservation-cro-design.md`
 Plan : `docs/superpowers/plans/2026-08-29-refonte-tunnel-reservation-cro.md`
