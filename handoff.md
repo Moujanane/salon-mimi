@@ -60,7 +60,8 @@ sur mobile, le gros bouton WhatsApp vert remplissait l'écran, le lien vers le
 formulaire était en petit gris → les visiteurs croyaient que la page ne
 proposait QUE WhatsApp.
 
-Branche : `feat/tunnel-reservation-v2` (5 commits `c2ea6b6` → `bf71e06`).
+Branche : `feat/tunnel-reservation-v2` (5 commits `c2ea6b6` → `bf71e06`), mergée
+sur `main` et déployée. **Puis hotfix `a843b57` sur `main`** (voir §19bis).
 Spec : `docs/superpowers/specs/2026-08-30-tunnel-reservation-v2-choix-explicite-design.md`
 Plan : `docs/superpowers/plans/2026-08-30-tunnel-reservation-v2-choix-explicite.md`
 
@@ -107,6 +108,78 @@ Plan : `docs/superpowers/plans/2026-08-30-tunnel-reservation-v2-choix-explicite.
 
 - `Props.labels` de `ReservationLayout` quasi mort (seuls `labels.error` / `labels.success` lus)
 - `components/ui/WhatsAppButton.tsx` a encore son propre glyphe (2 glyphes WhatsApp dans le repo) — pourrait passer par `WhatsAppIcon`
+
+---
+
+## 19bis. Session 30 août 2026 — HOTFIX : le bouton « Réserver par formulaire » ne faisait rien en prod
+
+### Symptôme
+
+Après déploiement de la v2, cliquer « Réserver par formulaire » sur
+`mimi-coiffure.com/fr/reservation` **n'affichait pas le formulaire**. Le bouton
+restait en contour ocre (état fermé), rien ne se dépliait.
+
+**Reproductible uniquement en prod.** En local (`npm run dev` ET
+`npm run build && npm start`), le clic fonctionnait normalement. Les 32 tests
+Playwright passaient (ils testent contre la prod mais via `page.click()` de
+Playwright, qui contourne le bug — voir plus bas).
+
+### Diagnostic (systematic-debugging)
+
+Via inspection du fiber tree React dans la console de la prod :
+`ReservationLayout` était monté dans un **sous-arbre `OffscreenComponent` sous
+un `<Suspense>`** (React 18 : "CSR bailout"). Le DOM SSR était visible, les hooks
+hydratés, `props.onClick` existait et fonctionnait si appelé **directement en
+JS** — mais **les événements de clic du navigateur n'étaient pas délégués vers ce
+sous-arbre Offscreen**.
+
+**Cause racine** : `ReservationLayout` appelait `useSearchParams()` (pour lire
+`?service=` et présélectionner la coiffure). Sur `/reservation`
+(`export const revalidate = 3600` → page pré-rendue statiquement),
+`useSearchParams()` force tout le composant en CSR bailout / Offscreen sous le
+`<Suspense>` de `page.tsx`.
+
+En **v1**, le `<form>` était toujours rendu et le `<select value={activeIndex}>`
+(où `activeIndex` dérive de `searchParams`) forçait la consommation de la valeur
+→ React réveillait le sous-arbre → hydratation complète, clics OK.
+
+En **v2**, `showForm = false` → le rendu initial est minimal (2 boutons) et ne
+consomme jamais `searchParams` dans le DOM. Rien ne réveille le sous-arbre
+Offscreen côté client **dans les conditions de timing de la prod** (chunks JS
+servis avec latence Railway + Cloudflare). En local, tout est en cache disque →
+hydratation immédiate → le bug ne se manifeste pas.
+
+Pourquoi Playwright ne le voyait pas : `page.getByRole("button").click()` de
+Playwright déclenche le handler via l'API DOM d'une façon que React capte même
+en Offscreen (comme `element.click()` ou `props.onClick()` en console). Seul un
+**vrai clic OS** (souris utilisateur) est filtré par l'Offscreen.
+
+### Fix (commit `a843b57` sur `main`)
+
+- `components/sections/ReservationLayout.tsx` : suppression de
+  `useSearchParams()`. Le paramètre `?service=` est maintenant lu dans un
+  `useEffect` via `new URLSearchParams(window.location.search).get("service")` —
+  **ne suspend pas**. `activeIndex` démarre à `0` (SSR-safe), ajusté après le
+  montage si `?service=` présent. Pré-remplissage imperceptible.
+- `app/[locale]/reservation/page.tsx` : `<Suspense>` retiré (devenu inutile,
+  plus rien ne suspend).
+
+### Vérifié en prod après déploiement du hotfix
+
+- Clic « Réserver par formulaire » → formulaire s'affiche ✓ (vrai clic navigateur)
+- Fiber tree : plus d'`OffscreenComponent`/`Suspense` au-dessus de `ReservationLayout`
+- Toggle dans les deux sens ✓
+- `?service=box-braids` → `<select>` présélectionné sur « Box braids » + prix correct ✓
+- `npx playwright test` contre la prod : 32 passed / 2 skipped
+
+### Règle à retenir
+
+**Ne jamais utiliser `useSearchParams()` dans un composant client dont le rendu
+initial est conditionnel/minimal, sur une page pré-rendue** (`revalidate` ou
+statique). Ça met le composant en Offscreen et les vrais clics utilisateur sont
+perdus. Lire les query params via `useEffect` + `window.location.search` à la
+place, ou isoler la lecture dans un enfant minuscule avec son propre `<Suspense>`
+qui, lui, rend quelque chose au SSR.
 
 ---
 
