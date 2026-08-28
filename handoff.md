@@ -15,8 +15,8 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 - **Galerie** : onglets Photos (34 photos) / Vidéos (5 vidéos : 3 Pomelli + 2 marketing), texte indexable trilingue
 - **Page Services** : section vidéos Pomelli en bas + JSON-LD `ItemList` avec prix des 10 services
 - **Menu nav** : Georgia 16px, fond brun `#2C1508`, grille 3 colonnes (logo centré sans chevauchement), soulignement ocre au hover, hamburger jusqu'à `lg`
-- **Header** : logo texte "Salon Mimi / Marrakech" (SVG supprimé), fond brun chaud distinct du body
-- **Page Réservation** : fond beige clair, formulaire blanc, textes traduits EN/ES, champ email obligatoire, bouton WhatsApp post-soumission, scroll auto vers confirmation après envoi
+- **Header** : logo graphique Mimi (`/images/logo-mimi.webp`, 34px) + texte "Salon Mimi / Marrakech" resserré à gauche, fond brun chaud distinct du body (voir §21)
+- **Page Réservation** : nouveau design (session 28 août 2026, §21) — fond sombre `bg-nuit` continu, carte formulaire crème flottante bordure dorée, hero avec logo, 2 cartes d'envoi WhatsApp/email, badges de réassurance. Textes traduits fr/en/es. Colonne unique centrée (plus de panneau photo latéral)
 - **Page Contact** : bouton "Ouvrir dans Maps" → fiche salon `maps.app.goo.gl/2VHUxKWpLpYFE8836`, formulaire avec scroll vers confirmation
 - **Traductions** : phrase "on s'occupe du reste." traduite EN/ES dans ServicesPageClient
 - SEO : JSON-LD HairSalon complet, FAQ schema, hreflang, sitemap 24 URLs, `metadataBase` corrigé (og:image ne pointe plus vers localhost), crawlers IA débloqués (GPTBot, ClaudeBot, Google-Extended, PerplexityBot)
@@ -45,16 +45,8 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ### Ce qui reste à faire (par priorité)
 
-- **PROCHAINE SESSION — Valider `/reservation-v2` sur mimi-coiffure.com puis basculer en prod.**
-  La refonte visuelle est faite en preview (voir §21). Il reste :
-  - Revue visuelle de Mouj sur `https://mimi-coiffure.com/fr/reservation-v2`
-    (après merge de `feat/reservation-v2` sur `main`).
-  - **Bascule** : remplacer le contenu de `ReservationLayout.tsx` par celui de
-    `ReservationLayoutV2.tsx`, supprimer `app/[locale]/reservation-v2/` et
-    `ReservationLayoutV2.tsx`, adapter les tests CRO si un sélecteur de structure
-    a bougé (les `name=` et libellés sont déjà conservés → a priori rien).
-  - Rappel piège : ne PAS réintroduire `useSearchParams()` (cf. §19bis) — la v2
-    lit `?service=` via `useEffect` + `window.location.search`.
+- ~~Refonte du design de `/reservation` + logo header~~ **FAIT** — nouveau design
+  en prod sur `/reservation`, logo Mimi dans le header sur tout le site (voir §21).
 - **Avis Google** : 13 avis / 4,2 étoiles au 28 août 2026 (était 6 le 1er juin). Objectif 30+ : QR code plastifié à la caisse + SMS/WhatsApp automatique 2 h après le RDV avec `https://g.page/r/CXqJtbaOg9FUEBM/review`. Répondre à TOUS les avis existants.
 - **Bios réseaux** : ajouter le lien `https://mimi-coiffure.com/reservation` dans les bios Instagram (`salonmimi.marrakech`) et TikTok (`@mimicoiffure700`).
 - **Cloudflare Cache Rule** : éliminerait les redirections multiples (610ms), PageSpeed 92 → 95+. Instructions en section 7
@@ -62,66 +54,103 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 21. Session 28 août 2026 — Refonte design page réservation : /reservation-v2 (preview)
+## 21. Session 28 août 2026 — Nouveau design de `/reservation` + logo dans le header (EN PROD)
 
-Nouvelle page **/reservation-v2** (`noindex`) au design premium inspiré d'un
-template fourni : hero sombre + logo doré Mimi centré, carte formulaire crème,
-2 cartes d'envoi (verte « Réserver par WhatsApp » / ocre « Confirmer ma
-réservation » avec icône enveloppe), 3 badges de réassurance, section « Vous ne
-trouvez pas le salon ? » conservée.
+Refonte visuelle complète de la page de réservation, inspirée d'un template
+premium fourni. Développée d'abord sur `/reservation-v2` (preview noindex),
+validée par Mouj sur mobile, puis **basculée en prod sur `/reservation`**. Le
+logo graphique Mimi a aussi été ajouté au header, sur tout le site.
 
-**La v1 /reservation reste intacte et en production.** Bascule v2 → prod NON
-faite (en attente de la validation visuelle de Mouj).
+**En prod sur `mimi-coiffure.com`** (déployé Railway) :
 
-Branche : `feat/reservation-v2` (4 commits, non mergée).
+- `/reservation` (fr/en/es) : nouveau design — voir ci-dessous
+- Header : logo Mimi (~34px) à gauche de « SALON MIMI / MARRAKECH », toutes pages
+- `/reservation-v2` : **supprimée** (404) — c'était la preview, son contenu est
+  devenu `/reservation`
+
+Commits `main` : `06948b1..cf6bcf1` (design v2 + logo header) puis
+`cf6bcf1..42baf60` (bascule v2 → `/reservation`).
 Spec : `docs/superpowers/specs/2026-08-28-reservation-v2-design-template-design.md`
 Plan : `docs/superpowers/plans/2026-08-28-reservation-v2-design-template.md`
 
-### Fichiers créés
+### Le nouveau design de `/reservation`
 
-- `public/images/logo-mimi.webp` (89 KB) + `logo-mimi.png` (322 KB) — logo 512px,
-  fond transparent. Source : `~/Downloads/Logo Mimi-coiffure.png`.
-- `components/sections/ReservationLayoutV2.tsx` — composant client v2. Logique JS
-  (states, `handleSubmit`, `handleWhatsApp`, lecture `?service=` via `useEffect` +
-  `window.location.search`) reprise **à l'identique** de `ReservationLayout.tsx`.
-  **Ne PAS y introduire `useSearchParams()`** (piège §19bis).
-- `app/[locale]/reservation-v2/page.tsx` — route preview. `metadata` :
-  `robots: { index: false, follow: false }`, PAS d'`alternates`, PAS d'entrée
-  sitemap.
+- **Fond sombre continu** (`bg-nuit`) sur toute la page — plus de rupture
+  hero/formulaire. La carte formulaire crème (`bg-fond`) **flotte** dessus :
+  bordure dorée `border-or/30`, `rounded-2xl`, ombre portée.
+- Hero compact : logo Mimi (~88px) + kicker + `<h1>` Georgia « Réservez votre
+  _rendez-vous_ » (mot final doré, traduit `appointment` / `cita`).
+- Colonne unique centrée `max-w-[560px]`. **Le panneau photo latéral de l'ancien
+  design a été supprimé.**
+- Formulaire compacté pour tenir (form + 2 boutons d'envoi) dans un écran mobile
+  sans scroller : `select[name=service]` + ligne de prix dynamique (texte
+  « tarif indicatif, confirmé au salon » conservé), Nom + Téléphone, Date +
+  Heure, repli « + Ajouter des précisions » (Personnes, Email, Message).
+- **2 cartes d'envoi** côte à côte, style template (icône dans un rond, kicker
+  « ENVOYER PAR », libellé, sous-titre) :
+  - verte — `<button type="button" onClick={handleWhatsApp}>` — libellé
+    **« Réserver par WhatsApp »**, `aria-label` idem
+  - ocre, icône enveloppe — `<button type="submit">` — libellé **« Confirmer ma
+    réservation »**, sous-titre « Mimi vous répond par email », `aria-label` idem
+- 3 badges de réassurance (Réponse rapide / Données sécurisées / Service
+  personnalisé) sur le fond sombre, séparateur ornemental ◈.
+- Section « Vous ne trouvez pas le salon ? » conservée, restylée fond sombre.
+- Écran de confirmation : logo + ✦ + message + bouton WhatsApp de secours.
 
-### Vérifié (local, dev server port 3100)
+### Fichiers
 
-- `npx tsc --noEmit` ✓ · `npm run build` ✓ (route `/reservation-v2` 7.16 kB)
-- `npx playwright test` (desktop + mobile) : **32 passed / 2 skipped** — 0
-  régression (les 8 tests CRO ciblent toujours `/reservation` v1)
-- Checks headless v2 (spec temporaire, supprimée) : toggle « + Ajouter des
-  précisions » révèle email/persons/message ✓ · pas de scroll horizontal 375 /
-  1280 ✓ · submit sans exception JS ✓ · `?service=locks-dreads` présélectionne
-  (select value "5") + libellés « Réserver par WhatsApp » / « Confirmer ma
-  réservation » + texte « tarif indicatif, confirmé au salon » présents ✓
-- Navigateur : 3 langues (fr/en/es) HTTP 200 + `noindex` dans le HTML, hero +
-  logo doré, ligne de prix dynamique (150 → 250 MAD au changement de coiffure),
-  bouton WhatsApp exige nom+tél (message d'erreur, pas de navigation), avec
-  nom+tél → navigation `api.whatsapp.com`
-- Seule erreur console : 400 sur le script Umami (pré-existant, hors sujet)
+- **Modifié** `components/sections/ReservationLayout.tsx` — contenu entièrement
+  remplacé par le nouveau design (l'ancien `ReservationLayoutV2.tsx` renommé).
+  Logique JS (states, `handleSubmit`, `handleWhatsApp`, lecture `?service=` via
+  `useEffect` + `window.location.search`) **inchangée** vs l'ancienne v1.
+  **NE JAMAIS y introduire `useSearchParams()`** (piège §19bis).
+- **Modifié** `components/layout/Header.tsx` — `import Image from "next/image"`,
+  bloc marque (col 2) : logo `/images/logo-mimi.webp` 34px + texte resserré
+  aligné à gauche.
+- **Créé** `public/images/logo-mimi.webp` (89 KB) + `logo-mimi.png` (322 KB) —
+  logo 512px, fond transparent. Source : `~/Downloads/Logo Mimi-coiffure.png`.
+- **Supprimé** `components/sections/ReservationLayoutV2.tsx` et
+  `app/[locale]/reservation-v2/`.
+- `app/[locale]/reservation/page.tsx` — **inchangée** (mêmes props, `metadata`
+  complet conservé : title/description + canonical + hreflang fr/en/es).
 
-### Prochaine étape — bascule (à décider avec Mouj)
+### Vérifié
 
-1. Merger `feat/reservation-v2` sur `main` (déploiement Railway auto) →
-   `/reservation-v2` accessible sur mimi-coiffure.com pour la revue de Mouj.
-2. Quand validé : remplacer le contenu de `ReservationLayout.tsx` par celui de
-   `ReservationLayoutV2.tsx` (interface `Props` identique — RAS côté
-   `app/[locale]/reservation/page.tsx`).
-3. Supprimer `app/[locale]/reservation-v2/` et `ReservationLayoutV2.tsx`.
-4. Adapter les 8 tests e2e CRO si un sélecteur de structure a bougé (les `name=`
-   et libellés sont déjà conservés → a priori rien à changer).
-5. `npx tsc --noEmit` + `npm run build` + `npx playwright test` contre la prod.
+- `npx tsc --noEmit` ✓ · `npm run build` ✓ (`/[locale]/reservation` 7.18 kB,
+  plus de route `/reservation-v2`)
+- `npx playwright test` (desktop + mobile) contre le build local :
+  **32 passed / 2 skipped** — 0 régression. Les 8 tests CRO ciblent
+  `/reservation` et passent sur le nouveau design (sélecteurs `select[name=
+service]`, `input[name=name/phone/email]`, libellés boutons, « + Ajouter des
+  précisions », texte de la ligne de prix : tous conservés).
+- Checks headless : form + 2 boutons d'envoi tiennent dans un viewport 390×844 ✓ ·
+  toggle révèle email/persons/message ✓ · pas de scroll horizontal 375/1280 ✓ ·
+  `?service=locks-dreads` présélectionne ✓ · bouton WhatsApp exige nom+tél ✓
+- Prod `mimi-coiffure.com/fr/reservation` : nouveau HTML servi (`Réservez votre`,
+  `bg-nuit`, `logo-mimi`), `/reservation-v2` → 404, header avec logo sur `/fr`.
+
+### Incident résolu pendant la session — `.next` corrompu
+
+Lancer `npm run build` pendant qu'un `next dev` tourne sur le même dossier
+corrompt `.next/` et le dev server sert du HTML **sans CSS** (une image `<Image
+fill object-contain>` s'étale alors sur toute la page — c'est ce qui a produit
+une « photo Argana géante » sur `/reservation`). **Ce n'était pas un bug de
+code.** Fix : `trash .next` + relancer. **Règle** : sur ce Mac, ne jamais faire
+tourner `build` et `dev` en parallèle ; tester sur `npx next start` (build de
+prod stable) plutôt que sur le dev server instable. Le `preview_start` du Browser
+pane fonctionne en mode `{url}` (pas en mode `{name}` — cf. handoff Salon Mimi
+plus bas).
 
 ### Fast-follow non bloquant
 
-- `logo-mimi.webp` fait 89 KB (q82, l'alpha lossless gonfle le poids). Acceptable
-  pour une page unique. Si besoin d'alléger : régénérer en `-q 70` ou détourer le
-  halo rouge/vert du contour de la source (artefact de génération).
+- `logo-mimi.webp` fait 89 KB (q82, l'alpha lossless gonfle le poids). Acceptable.
+  Si besoin d'alléger : régénérer en `-q 70` ou détourer le halo rouge/vert du
+  contour de la source.
+- Le `persons` `<select>` n'a pas d'option vide → `getVal("persons")` renvoie
+  toujours « 1 personne » même si le repli n'a pas été ouvert (bug hérité de
+  l'ancienne v1, non régressif). À corriger un jour : ajouter une option vide.
+- Les libellés des 2 boutons d'envoi passent sur 2 lignes centrées à 375px
+  (« Réserver par / WhatsApp ») — lisible mais perfectible.
 
 ---
 
