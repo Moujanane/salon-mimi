@@ -91,51 +91,65 @@ const SERVICES = [
   },
 ];
 
-const TEXTS: Record<
-  string,
-  {
-    heading: string;
-    subheading: string;
-    yourInfo: string;
-    required: string;
-    fullName: string;
-    namePlaceholder: string;
-    phone: string;
-    phonePlaceholder: string;
-    email: string;
-    emailPlaceholder: string;
-    date: string;
-    time: string;
-    persons: string;
-    person1: string;
-    person2: string;
-    person3: string;
-    person4: string;
-    message: string;
-    messagePlaceholder: string;
-    confirmSubtitle: string;
-    whatsappBtn: string;
-    startingFrom: string;
-    lostTitle: string;
-    lostText: string;
-    lostCallLabel: string;
-    whatsappPrimaryBtn: string;
-    whatsappMissing: string;
-    submitBtn: string;
-    reassurance: string;
-    priceIndicative: string;
-    addDetails: string;
-    noOnlinePayment: string;
-  }
-> = {
+type TxShape = {
+  heading: string;
+  finalWord: string;
+  heroKicker: string;
+  heroSubtitle: string;
+  formTitle: string;
+  required: string;
+  fullName: string;
+  namePlaceholder: string;
+  phone: string;
+  phonePlaceholder: string;
+  email: string;
+  emailPlaceholder: string;
+  date: string;
+  time: string;
+  persons: string;
+  person1: string;
+  person2: string;
+  person3: string;
+  person4: string;
+  message: string;
+  messagePlaceholder: string;
+  confirmSubtitle: string;
+  whatsappBtn: string;
+  startingFrom: string;
+  priceIndicative: string;
+  addDetails: string;
+  chooseSend: string;
+  sendVia: string;
+  whatsappPrimaryBtn: string;
+  whatsappCardHint: string;
+  submitBtn: string;
+  emailCardHint: string;
+  whatsappMissing: string;
+  reassurance: string;
+  noOnlinePayment: string;
+  badge1Title: string;
+  badge1Text: string;
+  badge2Title: string;
+  badge2Text: string;
+  badge3Title: string;
+  badge3Text: string;
+  lostTitle: string;
+  lostText: string;
+  lostCallLabel: string;
+};
+
+const TEXTS: Record<string, TxShape> = {
   fr: {
-    heading: "Réserve ton",
-    subheading: "Réservation en ligne · Marrakech",
-    yourInfo: "Tes informations",
+    heading: "Réservez votre",
+    finalWord: "rendez-vous",
+    heroKicker: "Réservation en ligne · Marrakech",
+    heroSubtitle:
+      "Choisissez votre coiffure et votre date. Mimi vous confirme la disponibilité par WhatsApp ou par email.",
+    formTitle: "Votre réservation",
     required: "Tous les champs * sont obligatoires",
     fullName: "Nom complet",
     namePlaceholder: "Fatima Zahra...",
-    phone: "Téléphone / WhatsApp",
+    phone: "Téléphone",
     phonePlaceholder: "+212 6...",
     email: "Email",
     emailPlaceholder: "votre@email.com",
@@ -151,27 +165,40 @@ const TEXTS: Record<
     confirmSubtitle: "Mimi vous contacte dès que possible pour confirmer.",
     whatsappBtn: "WhatsApp non ouvert ? Cliquer ici",
     startingFrom: "À partir de",
+    priceIndicative: "tarif indicatif, confirmé au salon",
+    addDetails: "+ Ajouter des précisions",
+    chooseSend: "Choisissez votre moyen d'envoi",
+    sendVia: "Envoyer par",
+    whatsappPrimaryBtn: "Réserver par WhatsApp",
+    whatsappCardHint: "Réponse rapide assurée",
+    submitBtn: "Confirmer ma réservation",
+    emailCardHint: "Mimi vous répond par email",
+    whatsappMissing: "Merci d'indiquer au moins votre nom et votre téléphone.",
+    reassurance:
+      "Réponse rapide par WhatsApp · Annulation gratuite · Paiement sur place",
+    noOnlinePayment: "Aucun paiement en ligne",
+    badge1Title: "Réponse rapide",
+    badge1Text: "Nous confirmons dans les plus brefs délais",
+    badge2Title: "Données sécurisées",
+    badge2Text: "Vos informations restent confidentielles",
+    badge3Title: "Service personnalisé",
+    badge3Text: "Nous prenons soin de vos envies",
     lostTitle: "Vous ne trouvez pas le salon ?",
     lostText:
       "Rendez-vous devant le restaurant Argana, Place Jamaa El Fna. Appelez Mimi — elle viendra vous chercher.",
     lostCallLabel: "Appeler Mimi",
-    whatsappPrimaryBtn: "Réserver par WhatsApp",
-    reassurance:
-      "Réponse rapide par WhatsApp · Annulation gratuite · Paiement sur place",
-    priceIndicative: "tarif indicatif, confirmé au salon",
-    addDetails: "+ Ajouter des précisions",
-    noOnlinePayment: "Aucun paiement en ligne",
-    whatsappMissing: "Merci d'indiquer au moins votre nom et votre téléphone.",
-    submitBtn: "Confirmer ma réservation",
   },
   en: {
     heading: "Book your",
-    subheading: "Online booking · Marrakech",
-    yourInfo: "Your details",
+    finalWord: "appointment",
+    heroKicker: "Online booking · Marrakech",
+    heroSubtitle:
+      "Choose your hairstyle and your date. Mimi confirms availability by WhatsApp or email.",
+    formTitle: "Your booking",
     required: "All fields marked * are required",
     fullName: "Full name",
     namePlaceholder: "Your name...",
-    phone: "Phone / WhatsApp",
+    phone: "Phone",
     phonePlaceholder: "+212 6...",
     email: "Email",
     emailPlaceholder: "your@email.com",
@@ -187,27 +214,40 @@ const TEXTS: Record<
     confirmSubtitle: "Mimi will contact you as soon as possible to confirm.",
     whatsappBtn: "WhatsApp didn't open? Click here",
     startingFrom: "From",
+    priceIndicative: "indicative price, confirmed at the salon",
+    addDetails: "+ Add details",
+    chooseSend: "Choose how to send",
+    sendVia: "Send via",
+    whatsappPrimaryBtn: "Book via WhatsApp",
+    whatsappCardHint: "Quick reply guaranteed",
+    submitBtn: "Confirm my booking",
+    emailCardHint: "Mimi replies by email",
+    whatsappMissing: "Please enter at least your name and phone number.",
+    reassurance:
+      "Quick reply on WhatsApp · Free cancellation · Pay at the salon",
+    noOnlinePayment: "No online payment",
+    badge1Title: "Quick reply",
+    badge1Text: "We confirm as soon as possible",
+    badge2Title: "Secure data",
+    badge2Text: "Your details stay confidential",
+    badge3Title: "Personal service",
+    badge3Text: "We take care of what you want",
     lostTitle: "Can't find the salon?",
     lostText:
       "Head to the Argana restaurant, Jamaa El Fna Square. Call Mimi — she will come and meet you.",
     lostCallLabel: "Call Mimi",
-    whatsappPrimaryBtn: "Book via WhatsApp",
-    reassurance:
-      "Quick reply on WhatsApp · Free cancellation · Pay at the salon",
-    priceIndicative: "indicative price, confirmed at the salon",
-    addDetails: "+ Add details",
-    noOnlinePayment: "No online payment",
-    whatsappMissing: "Please enter at least your name and phone number.",
-    submitBtn: "Confirm my booking",
   },
   es: {
     heading: "Reserva tu",
-    subheading: "Reserva online · Marrakech",
-    yourInfo: "Tus datos",
+    finalWord: "cita",
+    heroKicker: "Reserva online · Marrakech",
+    heroSubtitle:
+      "Elige tu peinado y tu fecha. Mimi te confirma la disponibilidad por WhatsApp o por email.",
+    formTitle: "Tu reserva",
     required: "Todos los campos * son obligatorios",
     fullName: "Nombre completo",
     namePlaceholder: "Tu nombre...",
-    phone: "Teléfono / WhatsApp",
+    phone: "Teléfono",
     phonePlaceholder: "+212 6...",
     email: "Email",
     emailPlaceholder: "tu@email.com",
@@ -223,18 +263,28 @@ const TEXTS: Record<
     confirmSubtitle: "Mimi se pondrá en contacto contigo lo antes posible.",
     whatsappBtn: "¿WhatsApp no se abrió? Haz clic aquí",
     startingFrom: "Desde",
+    priceIndicative: "precio orientativo, confirmado en el salón",
+    addDetails: "+ Añadir detalles",
+    chooseSend: "Elige cómo enviar",
+    sendVia: "Enviar por",
+    whatsappPrimaryBtn: "Reservar por WhatsApp",
+    whatsappCardHint: "Respuesta rápida asegurada",
+    submitBtn: "Confirmar mi reserva",
+    emailCardHint: "Mimi responde por email",
+    whatsappMissing: "Indica al menos tu nombre y tu teléfono.",
+    reassurance:
+      "Respuesta rápida por WhatsApp · Cancelación gratuita · Pago en el salón",
+    noOnlinePayment: "Sin pago online",
+    badge1Title: "Respuesta rápida",
+    badge1Text: "Confirmamos lo antes posible",
+    badge2Title: "Datos seguros",
+    badge2Text: "Tus datos son confidenciales",
+    badge3Title: "Servicio personalizado",
+    badge3Text: "Cuidamos lo que deseas",
     lostTitle: "¿No encuentras el salón?",
     lostText:
       "Ve al restaurante Argana, Plaza Jamaa El Fna. Llama a Mimi — ella vendrá a buscarte.",
     lostCallLabel: "Llamar a Mimi",
-    whatsappPrimaryBtn: "Reservar por WhatsApp",
-    reassurance:
-      "Respuesta rápida por WhatsApp · Cancelación gratuita · Pago en el salón",
-    priceIndicative: "precio orientativo, confirmado en el salón",
-    addDetails: "+ Añadir detalles",
-    noOnlinePayment: "Sin pago online",
-    whatsappMissing: "Indica al menos tu nombre y tu teléfono.",
-    submitBtn: "Confirmar mi reserva",
   },
 };
 
@@ -254,13 +304,18 @@ interface Props {
   locale: string;
 }
 
+const FIELD_CLASS =
+  "border border-nuit/15 focus:border-ocre rounded-lg text-nuit text-[13px] px-3 py-2 focus-visible:outline-none transition-colors font-inter bg-fond";
+const LABEL_CLASS =
+  "text-[10px] tracking-[1px] uppercase text-nuit/60 font-inter";
+
 export default function ReservationLayout({ labels, prices, locale }: Props) {
   const tx = TEXTS[locale] ?? TEXTS.fr;
 
-  // Coiffure présélectionnée via ?service=… — lue après le montage pour ne pas
-  // suspendre l'hydratation (useSearchParams met tout le composant en CSR
-  // bailout / Offscreen sur cette page pré-rendue, ce qui empêchait les clics
-  // de déplier le formulaire en prod).
+  // Coiffure présélectionnée via ?service=… — lue APRÈS le montage.
+  // NE JAMAIS utiliser useSearchParams() ici : sur cette page pré-rendue
+  // (revalidate) ça met le composant en CSR bailout / Offscreen et les vrais
+  // clics utilisateur sont perdus en prod (cf. handoff Salon Mimi §19bis).
   const [activeIndex, setActiveIndex] = useState(0);
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("service");
@@ -351,13 +406,27 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
 
   if (submitted) {
     return (
-      <div className="h-screen flex items-center justify-center bg-fond">
-        <div className="text-center px-6">
-          <div className="text-ocre text-4xl mb-4">✦</div>
-          <h2 className="font-georgia text-2xl text-nuit mb-3">
+      <div className="min-h-screen flex items-center justify-center bg-nuit px-6">
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at 50% 20%, rgba(193,123,63,0.18), transparent 60%)",
+          }}
+        />
+        <div className="relative text-center max-w-sm">
+          <Image
+            src="/images/logo-mimi.webp"
+            alt="Salon Mimi"
+            width={96}
+            height={96}
+            className="mx-auto mb-4"
+          />
+          <div className="text-or text-3xl mb-3">✦</div>
+          <h2 className="font-georgia text-2xl text-fond mb-3">
             {labels.success}
           </h2>
-          <p className="text-nuit/60 text-sm font-inter mb-6">
+          <p className="text-fond/60 text-sm font-inter mb-6">
             {tx.confirmSubtitle}
           </p>
           {whatsappLink && (
@@ -376,43 +445,59 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-fond">
-      <div className="h-[57px] flex-shrink-0" />
+    <div className="relative min-h-screen bg-nuit overflow-hidden">
+      {/* halo doré global, derrière tout le contenu */}
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[560px]"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 0%, rgba(193,123,63,0.22), transparent 60%)",
+        }}
+      />
 
-      <div className="flex-shrink-0 px-5 md:px-12 py-3 border-b border-ocre/20">
-        <span className="text-ocre text-[11px] tracking-[3px] uppercase font-inter block mb-0.5">
-          {tx.subheading}
-        </span>
-        <h1 className="font-georgia text-[clamp(18px,2vw,26px)] font-bold text-nuit">
-          {tx.heading}{" "}
-          <em className="text-ocre italic">
-            {locale === "fr"
-              ? "rendez-vous"
-              : locale === "es"
-                ? "cita"
-                : "appointment"}
-          </em>
-        </h1>
-      </div>
+      <div className="relative mx-auto w-full max-w-[560px] px-4 sm:px-6">
+        {/* espace navbar fixe */}
+        <div className="h-[57px]" />
 
-      <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-4 p-4 pt-3">
-        <div className="w-full md:w-[44%] bg-white rounded-2xl border border-ocre/20 shadow-sm p-5 md:p-6 md:flex-shrink-0 overflow-y-auto">
+        {/* HERO — compact */}
+        <header className="text-center pt-4 pb-4">
+          <Image
+            src="/images/logo-mimi.webp"
+            alt="Salon Mimi — Rasta Africain Coiffure"
+            width={120}
+            height={120}
+            priority
+            className="mx-auto mb-2 w-[76px] h-auto sm:w-[88px] drop-shadow-[0_4px_20px_rgba(212,168,67,0.25)]"
+          />
+          <span className="block text-ocre text-[9px] tracking-[3px] uppercase font-inter mb-1">
+            {tx.heroKicker}
+          </span>
+          <h1 className="font-georgia text-[clamp(20px,4.5vw,26px)] font-bold text-fond leading-tight">
+            {tx.heading} <em className="text-or italic">{tx.finalWord}</em>
+          </h1>
+        </header>
+
+        {/* CARTE FORMULAIRE — flotte sur le fond sombre */}
+        <div className="rounded-2xl border border-or/30 bg-fond shadow-[0_20px_60px_-12px_rgba(0,0,0,0.6)] p-4 sm:p-5">
           <form
             ref={formRef}
             onSubmit={handleSubmit}
-            className="flex flex-col gap-4"
+            className="flex flex-col gap-2.5"
           >
-            <div>
-              <div className="font-georgia text-[15px] font-bold text-nuit mb-0.5">
-                {tx.yourInfo}
-              </div>
-              <div className="text-[10px] text-nuit/50 font-inter tracking-wide">
-                {tx.required}
+            <div className="flex items-center gap-2.5">
+              <span className="text-ocre text-base flex-shrink-0">✦</span>
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <span className="font-georgia text-[15px] font-bold text-nuit leading-tight">
+                  {tx.formTitle}
+                </span>
+                <span className="text-[9px] text-nuit/45 font-inter tracking-wide">
+                  {tx.required}
+                </span>
               </div>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+            <div className="flex flex-col gap-1">
+              <label className={LABEL_CLASS}>
                 Service <span className="text-ocre">*</span>
               </label>
               <select
@@ -420,7 +505,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
                 value={activeIndex}
                 onChange={(e) => setActiveIndex(Number(e.target.value))}
                 required
-                className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none cursor-pointer bg-fond"
+                className={`${FIELD_CLASS} appearance-none cursor-pointer`}
               >
                 {SERVICES.map((s, i) => (
                   <option key={s.id} value={i}>
@@ -428,21 +513,18 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
                   </option>
                 ))}
               </select>
+              <p className="text-[11px] text-nuit/65 font-inter">
+                {tx.startingFrom}{" "}
+                <span className="text-ocre font-semibold">
+                  {prices[activeSvc.id] ?? activeSvc.price} MAD
+                </span>{" "}
+                · {tx.priceIndicative}
+              </p>
             </div>
 
-            <p className="text-[12px] text-nuit/70 font-inter -mt-1.5">
-              {activeSvc.label} — {tx.startingFrom}{" "}
-              <span className="text-ocre font-semibold">
-                {prices[activeSvc.id] ?? activeSvc.price} MAD
-              </span>{" "}
-              · {tx.priceIndicative}
-            </p>
-
-            <div className="h-px bg-ocre/15" />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="flex flex-col gap-1">
+                <label className={LABEL_CLASS}>
                   {tx.fullName} <span className="text-ocre">*</span>
                 </label>
                 <input
@@ -450,11 +532,11 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
                   type="text"
                   placeholder={tx.namePlaceholder}
                   required
-                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
+                  className={`${FIELD_CLASS} placeholder:text-nuit/30`}
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+              <div className="flex flex-col gap-1">
+                <label className={LABEL_CLASS}>
                   {tx.phone} <span className="text-ocre">*</span>
                 </label>
                 <input
@@ -462,54 +544,44 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
                   type="tel"
                   placeholder={tx.phonePlaceholder}
                   required
-                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
+                  className={`${FIELD_CLASS} placeholder:text-nuit/30`}
                 />
               </div>
             </div>
 
-            <div className="h-px bg-ocre/15" />
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="flex flex-col gap-1">
+                <label className={LABEL_CLASS}>
                   {tx.date} <span className="text-ocre">*</span>
                 </label>
                 <input
                   name="date"
                   type="date"
                   required
-                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
+                  className={FIELD_CLASS}
                 />
               </div>
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                  {tx.time}
-                </label>
-                <input
-                  name="time"
-                  type="time"
-                  className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter bg-fond"
-                />
+              <div className="flex flex-col gap-1">
+                <label className={LABEL_CLASS}>{tx.time}</label>
+                <input name="time" type="time" className={FIELD_CLASS} />
               </div>
             </div>
 
             <button
               type="button"
               onClick={() => setShowDetails((v) => !v)}
-              className="text-ocre text-[12px] font-inter font-medium self-start hover:underline"
+              className="text-ocre text-[11px] font-inter font-medium self-start hover:underline"
             >
               {tx.addDetails}
             </button>
 
             {showDetails && (
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                    {tx.persons}
-                  </label>
+              <div className="flex flex-col gap-2.5">
+                <div className="flex flex-col gap-1">
+                  <label className={LABEL_CLASS}>{tx.persons}</label>
                   <select
                     name="persons"
-                    className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter appearance-none bg-fond"
+                    className={`${FIELD_CLASS} appearance-none`}
                   >
                     <option>{tx.person1}</option>
                     <option>{tx.person2}</option>
@@ -517,28 +589,22 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
                     <option>{tx.person4}</option>
                   </select>
                 </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                    {tx.email}
-                  </label>
+                <div className="flex flex-col gap-1">
+                  <label className={LABEL_CLASS}>{tx.email}</label>
                   <input
                     name="email"
                     type="email"
                     placeholder={tx.emailPlaceholder}
-                    className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 bg-fond"
+                    className={`${FIELD_CLASS} placeholder:text-nuit/30`}
                   />
                 </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-[11px] tracking-[1px] uppercase text-nuit/70 font-inter">
-                    {tx.message}
-                  </label>
+                <div className="flex flex-col gap-1">
+                  <label className={LABEL_CLASS}>{tx.message}</label>
                   <textarea
                     name="message"
-                    rows={3}
+                    rows={2}
                     placeholder={tx.messagePlaceholder}
-                    className="border border-nuit/15 focus:border-ocre rounded-xl text-nuit text-[13px] px-4 py-2.5 focus-visible:outline-none transition-colors font-inter placeholder:text-nuit/30 resize-none bg-fond"
+                    className={`${FIELD_CLASS} placeholder:text-nuit/30 resize-none`}
                   />
                 </div>
               </div>
@@ -553,93 +619,137 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
               </p>
             )}
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                type="submit"
-                className="flex-1 bg-ocre hover:bg-or text-white text-[13px] font-inter font-semibold py-3.5 rounded-full transition-colors"
-              >
-                {tx.submitBtn}
-              </button>
+            <div className="flex items-center gap-2.5 mt-0.5">
+              <div className="h-px bg-ocre/20 flex-1" />
+              <span className="text-[9px] tracking-[2px] uppercase text-nuit/40 font-inter">
+                {tx.chooseSend}
+              </span>
+              <div className="h-px bg-ocre/20 flex-1" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={handleWhatsApp}
-                className="flex-1 flex items-center justify-center gap-2 bg-whatsapp hover:bg-whatsapp-hover text-white text-[13px] font-inter font-semibold py-3.5 rounded-full transition-colors"
+                aria-label={tx.whatsappPrimaryBtn}
+                className="group flex flex-col items-center gap-1 rounded-xl border-[1.5px] border-whatsapp bg-whatsapp/[0.06] hover:bg-whatsapp/10 px-2 py-2.5 text-center transition-colors"
               >
-                <WhatsAppIcon className="w-4 h-4" />
-                {tx.whatsappPrimaryBtn}
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-whatsapp text-white">
+                  <WhatsAppIcon className="w-3.5 h-3.5" />
+                </span>
+                <span className="text-[12px] font-bold text-vert font-inter leading-tight">
+                  {tx.whatsappPrimaryBtn}
+                </span>
+                <span className="text-[9px] text-nuit/50 font-inter leading-tight">
+                  {tx.whatsappCardHint}
+                </span>
+              </button>
+
+              <button
+                type="submit"
+                aria-label={tx.submitBtn}
+                className="group flex flex-col items-center gap-1 rounded-xl border-[1.5px] border-ocre bg-ocre/[0.06] hover:bg-ocre/10 px-2 py-2.5 text-center transition-colors"
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ocre text-white">
+                  <svg
+                    className="w-3.5 h-3.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <rect x="2" y="4" width="20" height="16" rx="2" />
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+                  </svg>
+                </span>
+                <span className="text-[12px] font-bold text-ocre font-inter leading-tight">
+                  {tx.submitBtn}
+                </span>
+                <span className="text-[9px] text-nuit/50 font-inter leading-tight">
+                  {tx.emailCardHint}
+                </span>
               </button>
             </div>
 
-            <p className="text-center text-nuit/40 text-[10px] font-inter leading-relaxed">
+            <p className="text-center text-nuit/40 text-[9px] font-inter leading-relaxed">
               {tx.reassurance} · {tx.noOnlinePayment}
             </p>
           </form>
         </div>
 
-        <div className="hidden md:block flex-1 bg-nuit rounded-2xl border border-ocre/20 overflow-hidden relative">
-          {SERVICES.map((s, i) => (
-            <div
-              key={s.id}
-              className="absolute inset-0 transition-opacity duration-500"
-              style={{ opacity: i === activeIndex ? 1 : 0 }}
-            >
-              <Image
-                src={s.image}
-                alt={s.imageAlt}
-                fill
-                className="object-cover"
-                sizes="50vw"
-                priority={i === 0}
-              />
-              <div
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(to top, rgba(10,4,0,0.92) 0%, rgba(10,4,0,0.5) 45%, rgba(10,4,0,0.12) 100%)",
-                }}
-              />
-              <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
-                <span className="inline-block bg-ocre/25 border border-ocre/40 text-ocre text-[9px] tracking-[3px] uppercase px-3 py-1.5 rounded-full mb-3">
-                  {s.label}
-                </span>
-                <p className="font-georgia text-[15px] text-white leading-relaxed mb-2">
-                  {s.subServices}
-                </p>
-                <p className="text-[10px] tracking-[3px] uppercase text-white/50 font-inter">
-                  {tx.startingFrom}{" "}
-                  <span className="text-ocre font-bold">
-                    {prices[s.id] ?? s.price} MAD
-                  </span>
-                </p>
+        {/* BADGES DE RÉASSURANCE — sur le fond sombre */}
+        <div className="mt-5 grid grid-cols-3 gap-3">
+          {[
+            { t: tx.badge1Title, d: tx.badge1Text, icon: "M12 6v6l4 2" },
+            {
+              t: tx.badge2Title,
+              d: tx.badge2Text,
+              icon: "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+            },
+            {
+              t: tx.badge3Title,
+              d: tx.badge3Text,
+              icon: "M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 1 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z",
+            },
+          ].map((b) => (
+            <div key={b.t} className="text-center">
+              <svg
+                className="w-5 h-5 mx-auto mb-1.5 text-or"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                {b.icon === "M12 6v6l4 2" && <circle cx="12" cy="12" r="9" />}
+                <path d={b.icon} />
+              </svg>
+              <div className="text-[10px] font-bold text-fond font-inter">
+                {b.t}
+              </div>
+              <div className="text-[9px] text-fond/45 font-inter leading-snug">
+                {b.d}
               </div>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Section "Vous ne trouvez pas le salon ?" */}
-      <div className="mx-5 md:mx-12 mb-8 mt-4 bg-nuit rounded-2xl overflow-hidden border border-ocre/20">
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center">
-          <div className="relative h-52 md:h-full min-h-[200px] bg-black">
-            <Image
-              src="/images/restaurant-argana.jpg"
-              alt="Restaurant Argana — Place Jamaa El Fna, Marrakech"
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-          </div>
-          <div className="p-6 flex flex-col gap-3">
-            <h2 className="font-georgia text-xl text-or">{tx.lostTitle}</h2>
-            <p className="text-white/80 text-sm leading-relaxed">
-              {tx.lostText}
-            </p>
-            <a
-              href="tel:+212710388204"
-              className="inline-block bg-ocre text-white text-center py-2.5 px-5 rounded-full text-sm font-medium hover:bg-ocre/80 transition-colors self-start"
-            >
-              📞 {tx.lostCallLabel}
-            </a>
+        {/* SÉPARATEUR ORNEMENTAL */}
+        <div className="my-8 flex items-center justify-center gap-3 text-or/50">
+          <span className="h-px w-14 bg-or/25" />
+          <span className="text-[10px]">◈</span>
+          <span className="h-px w-14 bg-or/25" />
+        </div>
+
+        {/* SECTION "VOUS NE TROUVEZ PAS LE SALON ?" */}
+        <div className="mb-10 rounded-2xl overflow-hidden border border-or/20 bg-brun/60">
+          <div className="grid grid-cols-1 sm:grid-cols-2 items-center">
+            <div className="relative h-44 sm:h-full sm:min-h-[190px] bg-black">
+              <Image
+                src="/images/restaurant-argana.jpg"
+                alt="Restaurant Argana — Place Jamaa El Fna, Marrakech"
+                fill
+                className="object-contain"
+                sizes="(max-width: 560px) 100vw, 280px"
+              />
+            </div>
+            <div className="p-6 flex flex-col gap-3">
+              <h2 className="font-georgia text-xl text-or">{tx.lostTitle}</h2>
+              <p className="text-fond/75 text-sm leading-relaxed">
+                {tx.lostText}
+              </p>
+              <a
+                href="tel:+212710388204"
+                className="inline-block bg-ocre text-white text-center py-2.5 px-5 rounded-full text-sm font-medium hover:bg-ocre/80 transition-colors self-start"
+              >
+                📞 {tx.lostCallLabel}
+              </a>
+            </div>
           </div>
         </div>
       </div>
