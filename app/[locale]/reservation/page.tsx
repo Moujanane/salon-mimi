@@ -2,7 +2,6 @@
 export const revalidate = 3600;
 
 import { getTranslations } from "next-intl/server";
-import { Suspense } from "react";
 import ReservationLayout from "@/components/sections/ReservationLayout";
 import { getSettings } from "@/lib/settings";
 import type { Metadata } from "next";
@@ -75,9 +74,5 @@ export default async function ReservationPage({
     "ongles-soins-epilation": settings.price_ongles_soins_epilation,
   };
 
-  return (
-    <Suspense fallback={<div className="h-screen bg-nuit" />}>
-      <ReservationLayout labels={labels} prices={prices} locale={locale} />
-    </Suspense>
-  );
+  return <ReservationLayout labels={labels} prices={prices} locale={locale} />;
 }

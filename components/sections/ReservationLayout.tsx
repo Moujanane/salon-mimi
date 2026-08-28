@@ -1,6 +1,5 @@
 "use client";
-import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { genericWhatsAppLink } from "@/lib/whatsapp";
 import WhatsAppIcon from "@/components/ui/WhatsAppIcon";
@@ -257,13 +256,19 @@ interface Props {
 
 export default function ReservationLayout({ labels, prices, locale }: Props) {
   const tx = TEXTS[locale] ?? TEXTS.fr;
-  const searchParams = useSearchParams();
-  const serviceParam = searchParams.get("service") ?? "tresses-africaines";
 
-  const initialIndex = SERVICES.findIndex((s) => s.id === serviceParam);
-  const [activeIndex, setActiveIndex] = useState(
-    initialIndex >= 0 ? initialIndex : 0,
-  );
+  // Coiffure présélectionnée via ?service=… — lue après le montage pour ne pas
+  // suspendre l'hydratation (useSearchParams met tout le composant en CSR
+  // bailout / Offscreen sur cette page pré-rendue, ce qui empêchait les clics
+  // de déplier le formulaire en prod).
+  const [activeIndex, setActiveIndex] = useState(0);
+  useEffect(() => {
+    const param = new URLSearchParams(window.location.search).get("service");
+    if (!param) return;
+    const i = SERVICES.findIndex((s) => s.id === param);
+    if (i >= 0) setActiveIndex(i);
+  }, []);
+
   const [submitted, setSubmitted] = useState(false);
   const [whatsappLink, setWhatsappLink] = useState("");
   const [error, setError] = useState("");
