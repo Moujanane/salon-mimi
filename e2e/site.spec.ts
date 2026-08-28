@@ -95,3 +95,72 @@ test.describe("Responsive mobile", () => {
     expect(bodyWidth).toBeLessThanOrEqual(viewportWidth + 5);
   });
 });
+
+test.describe("Tunnel de réservation (CRO)", () => {
+  test("le CTA WhatsApp principal pointe vers wa.me avec un message", async ({
+    page,
+  }) => {
+    await page.goto("/fr/reservation");
+    const cta = page
+      .getByRole("link", { name: /réserver sur whatsapp/i })
+      .first();
+    await expect(cta).toBeVisible();
+    const href = await cta.getAttribute("href");
+    expect(href).toMatch(/^https:\/\/wa\.me\/\d+\?text=.+/);
+  });
+
+  test("la ligne de prix change quand on change de coiffure", async ({
+    page,
+  }) => {
+    await page.goto("/fr/reservation");
+    const select = page.locator("select[name='service']");
+    await expect(select).toBeVisible();
+    const priceLine = page.locator(
+      "text=/tarif indicatif, confirmé au salon/i",
+    );
+    const before = await priceLine.first().textContent();
+    await select.selectOption({ index: 5 });
+    const after = await priceLine.first().textContent();
+    expect(after).not.toEqual(before);
+  });
+
+  test("les champs optionnels sont masqués puis dépliables", async ({
+    page,
+  }) => {
+    await page.goto("/fr/reservation");
+    await expect(page.locator("input[name='email']")).toHaveCount(0);
+    await page.getByRole("button", { name: /ajouter des précisions/i }).click();
+    await expect(page.locator("input[name='email']")).toBeVisible();
+  });
+
+  test("le bandeau WhatsApp sticky est visible en mobile", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "mobile",
+      "Bandeau sticky mobile uniquement",
+    );
+    await page.goto("/fr");
+    const sticky = page
+      .locator("a.fixed.bottom-0")
+      .filter({ hasText: /whatsapp/i });
+    await expect(sticky.first()).toBeVisible();
+  });
+
+  test("le bandeau WhatsApp sticky est absent en desktop", async ({
+    page,
+  }, testInfo) => {
+    test.skip(
+      testInfo.project.name !== "desktop",
+      "Vérifie l'absence en desktop",
+    );
+    await page.goto("/fr");
+    const sticky = page
+      .locator("a.fixed.bottom-0")
+      .filter({ hasText: /whatsapp/i });
+    // Déviation vs plan : le plan attend toHaveCount(0), mais la classe Tailwind
+    // `lg:hidden` = `display:none` — l'élément reste dans le DOM en desktop.
+    // toBeHidden() valide bien qu'il n'est pas rendu visuellement.
+    await expect(sticky.first()).toBeHidden();
+  });
+});

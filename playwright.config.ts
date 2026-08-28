@@ -7,7 +7,7 @@ export default defineConfig({
   timeout: 30000,
   reporter: "html",
   use: {
-    baseURL: "https://mimi-coiffure.com",
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "https://mimi-coiffure.com",
     trace: "on-first-retry",
   },
   projects: [
