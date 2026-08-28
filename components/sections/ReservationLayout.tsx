@@ -2,6 +2,7 @@
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
+import { genericWhatsAppLink } from "@/lib/whatsapp";
 
 const SERVICES = [
   {
@@ -120,6 +121,13 @@ const TEXTS: Record<
     lostTitle: string;
     lostText: string;
     lostCallLabel: string;
+    whatsappPrimaryBtn: string;
+    whatsappPrimaryHint: string;
+    orFillForm: string;
+    reassurance: string;
+    priceIndicative: string;
+    addDetails: string;
+    noOnlinePayment: string;
   }
 > = {
   fr: {
@@ -152,6 +160,14 @@ const TEXTS: Record<
     lostText:
       "Rendez-vous devant le restaurant Argana, Place Jamaa El Fna. Appelez Mimi — elle viendra vous chercher.",
     lostCallLabel: "Appeler Mimi",
+    whatsappPrimaryBtn: "Réserver sur WhatsApp",
+    whatsappPrimaryHint: "Le plus rapide — écris directement à Mimi",
+    orFillForm: "ou remplis ce formulaire rapide",
+    reassurance:
+      "Réponse rapide par WhatsApp · Annulation gratuite · Paiement sur place",
+    priceIndicative: "tarif indicatif, confirmé au salon",
+    addDetails: "+ Ajouter des précisions",
+    noOnlinePayment: "Aucun paiement en ligne",
   },
   en: {
     heading: "Book your",
@@ -182,6 +198,14 @@ const TEXTS: Record<
     lostText:
       "Head to the Argana restaurant, Jamaa El Fna Square. Call Mimi — she will come and meet you.",
     lostCallLabel: "Call Mimi",
+    whatsappPrimaryBtn: "Book on WhatsApp",
+    whatsappPrimaryHint: "Fastest way — message Mimi directly",
+    orFillForm: "or fill in this quick form",
+    reassurance:
+      "Quick reply on WhatsApp · Free cancellation · Pay at the salon",
+    priceIndicative: "indicative price, confirmed at the salon",
+    addDetails: "+ Add details",
+    noOnlinePayment: "No online payment",
   },
   es: {
     heading: "Reserva tu",
@@ -212,6 +236,14 @@ const TEXTS: Record<
     lostText:
       "Ve al restaurante Argana, Plaza Jamaa El Fna. Llama a Mimi — ella vendrá a buscarte.",
     lostCallLabel: "Llamar a Mimi",
+    whatsappPrimaryBtn: "Reservar por WhatsApp",
+    whatsappPrimaryHint: "Lo más rápido — escribe directamente a Mimi",
+    orFillForm: "o rellena este formulario rápido",
+    reassurance:
+      "Respuesta rápida por WhatsApp · Cancelación gratuita · Pago en el salón",
+    priceIndicative: "precio orientativo, confirmado en el salón",
+    addDetails: "+ Añadir detalles",
+    noOnlinePayment: "Sin pago online",
   },
 };
 
@@ -327,6 +359,39 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
                 : "appointment"}
           </em>
         </h1>
+      </div>
+
+      {/* CTA WhatsApp principal */}
+      <div className="flex-shrink-0 px-5 md:px-12 pt-4 pb-2">
+        <a
+          href={genericWhatsAppLink(locale)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full flex items-center justify-center gap-2.5 bg-whatsapp hover:bg-whatsapp-hover text-white font-inter font-semibold text-[15px] py-4 rounded-full transition-colors"
+        >
+          <svg
+            className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.4-1.48-.89-.79-1.49-1.77-1.66-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.67-1.62-.92-2.22-.24-.58-.49-.5-.67-.51l-.57-.01c-.2 0-.52.07-.8.37-.27.3-1.04 1.02-1.04 2.49 0 1.47 1.07 2.89 1.22 3.09.15.2 2.1 3.2 5.08 4.49.71.31 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.17-1.41-.07-.12-.27-.2-.57-.35zM12.05 21.5h-.01a9.4 9.4 0 0 1-4.79-1.31l-.34-.2-3.56.93.95-3.47-.22-.36a9.42 9.42 0 1 1 8.31 4.4l-.35-.02zM12.05 2a11.32 11.32 0 0 0-9.8 17.04L1 23l4.06-1.07A11.32 11.32 0 1 0 12.05 2z" />
+          </svg>
+          {tx.whatsappPrimaryBtn}
+        </a>
+        <p className="text-center text-nuit/50 text-[11px] font-inter mt-2">
+          {tx.whatsappPrimaryHint}
+        </p>
+        <p className="text-center text-nuit/40 text-[10px] font-inter mt-1">
+          {tx.reassurance}
+        </p>
+        <div className="flex items-center gap-3 mt-4 mb-1">
+          <div className="h-px bg-ocre/20 flex-1" />
+          <span className="text-nuit/40 text-[10px] tracking-[2px] uppercase font-inter">
+            {tx.orFillForm}
+          </span>
+          <div className="h-px bg-ocre/20 flex-1" />
+        </div>
       </div>
 
       <div className="flex flex-col md:flex-row flex-1 min-h-0 gap-4 p-4 pt-3">
