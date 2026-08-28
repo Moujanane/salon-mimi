@@ -55,11 +55,18 @@ test.describe("Formulaire de réservation", () => {
   test("la page réservation s'affiche", async ({ page }) => {
     await page.goto("/fr/reservation");
     await expect(page).toHaveURL(/\/fr\/reservation/);
+    // Depuis la v2, le formulaire est masqué au chargement : on l'ouvre d'abord.
+    await page
+      .getByRole("button", { name: /réserver par formulaire/i })
+      .click();
     await expect(page.locator("form, input").first()).toBeVisible();
   });
 
   test("les champs obligatoires sont présents", async ({ page }) => {
     await page.goto("/fr/reservation");
+    await page
+      .getByRole("button", { name: /réserver par formulaire/i })
+      .click();
     await expect(
       page.locator("input[name='name'], input[placeholder*='nom' i]").first(),
     ).toBeVisible();
