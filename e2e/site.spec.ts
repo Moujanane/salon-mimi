@@ -97,22 +97,36 @@ test.describe("Responsive mobile", () => {
 });
 
 test.describe("Tunnel de réservation (CRO)", () => {
-  test("le CTA WhatsApp principal pointe vers wa.me avec un message", async ({
+  test("le bouton Réserver par WhatsApp pointe vers wa.me avec un message", async ({
     page,
   }) => {
     await page.goto("/fr/reservation");
     const cta = page
-      .getByRole("link", { name: /réserver sur whatsapp/i })
+      .getByRole("link", { name: /réserver par whatsapp/i })
       .first();
     await expect(cta).toBeVisible();
     const href = await cta.getAttribute("href");
     expect(href).toMatch(/^https:\/\/wa\.me\/\d+\?text=.+/);
   });
 
+  test("le formulaire est masqué au chargement et visible après clic", async ({
+    page,
+  }) => {
+    await page.goto("/fr/reservation");
+    await expect(page.locator("select[name='service']")).toHaveCount(0);
+    await page
+      .getByRole("button", { name: /réserver par formulaire/i })
+      .click();
+    await expect(page.locator("select[name='service']")).toBeVisible();
+  });
+
   test("la ligne de prix change quand on change de coiffure", async ({
     page,
   }) => {
     await page.goto("/fr/reservation");
+    await page
+      .getByRole("button", { name: /réserver par formulaire/i })
+      .click();
     const select = page.locator("select[name='service']");
     await expect(select).toBeVisible();
     const priceLine = page.locator(
@@ -128,12 +142,15 @@ test.describe("Tunnel de réservation (CRO)", () => {
     page,
   }) => {
     await page.goto("/fr/reservation");
+    await page
+      .getByRole("button", { name: /réserver par formulaire/i })
+      .click();
     await expect(page.locator("input[name='email']")).toHaveCount(0);
     await page.getByRole("button", { name: /ajouter des précisions/i }).click();
     await expect(page.locator("input[name='email']")).toBeVisible();
   });
 
-  test("le bandeau WhatsApp sticky est visible en mobile", async ({
+  test("le bandeau de réservation sticky est visible en mobile et pointe vers /reservation", async ({
     page,
   }, testInfo) => {
     test.skip(
@@ -143,11 +160,13 @@ test.describe("Tunnel de réservation (CRO)", () => {
     await page.goto("/fr");
     const sticky = page
       .locator("a.fixed.bottom-0")
-      .filter({ hasText: /whatsapp/i });
+      .filter({ hasText: /rendez-vous|reservation|réserver/i });
     await expect(sticky.first()).toBeVisible();
+    const href = await sticky.first().getAttribute("href");
+    expect(href).toMatch(/\/fr\/reservation$/);
   });
 
-  test("le bandeau WhatsApp sticky est absent en desktop", async ({
+  test("le bandeau de réservation sticky est absent en desktop", async ({
     page,
   }, testInfo) => {
     test.skip(
@@ -157,10 +176,8 @@ test.describe("Tunnel de réservation (CRO)", () => {
     await page.goto("/fr");
     const sticky = page
       .locator("a.fixed.bottom-0")
-      .filter({ hasText: /whatsapp/i });
-    // Déviation vs plan : le plan attend toHaveCount(0), mais la classe Tailwind
+      .filter({ hasText: /rendez-vous|reservation|réserver/i });
     // `lg:hidden` = `display:none` — l'élément reste dans le DOM en desktop.
-    // toBeHidden() valide bien qu'il n'est pas rendu visuellement.
     await expect(sticky.first()).toBeHidden();
   });
 });
