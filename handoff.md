@@ -6,6 +6,71 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 25. Session 30 août 2026 — Pivot stratégique « rasta » + suite optimisation GBP / réseaux
+
+Fait suite à la §24. **Nouvelles stats Google Maps (juillet→août 2026)** :
+75 recherches ont affiché la fiche (**+275 %** vs juillet 2025). Top requêtes :
+
+1. `rasta` — **35** (47 %) → **passé n°1**, quasi aucune concurrence à Marrakech
+2. `beauty salons` — 24
+3. `tresse africaine marrakech` — 16
+4. `africa beauty marrakech` — < 15
+5. `african salon marrakech` — < 15
+
+**Analyse** : les requêtes deviennent précises et locales (« marrakech » + métier).
+Intention d'achat forte. **Décision : arrêter de courir après « beauty salons »
+(générique/concurrentiel), tout miser sur « rasta » + « tresse africaine
+Marrakech ».** « rasta » devient le fil conducteur de tout : description, posts,
+photos, hashtags, future page site.
+
+### Fait cette session (par Mouj, dans les dashboards)
+
+| #   | Action                           | Détail                                                                                                                                                                                                                                                                                                                                |
+| --- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Description GBP ré-optimisée** | « tresses rasta » remonté en 1er mot, « Vanilles, locks » en tête de liste des prestations, phrase EN « African salon in Marrakech — rasta & African braids, locks, weaves ». **Google tronque plus court que 750 car.** : version finale ~640 car. (retiré « twists », raccourci « Français, anglais, arabe »)                       |
+| 2   | **Post GBP n°1 publié**          | Type « Actualité », thème **Tresses rasta / vanilles**, photo `public/images/tresses-mimi-2.jpeg`, bouton Réserver → `/fr/reservation`                                                                                                                                                                                                |
+| 3   | **Bios Instagram + TikTok**      | IG : nom « Salon Mimi · Tresses rasta & africaines », bio « rasta » en 1er + Vanilles/Locks. **Lien IG modifiable UNIQUEMENT dans l'app mobile** → mis sur `https://mimi-coiffure.com/reservation`. TikTok : nom « Salon Mimi · Tresses Marrakech », bio idem, lien `/reservation`. Doublon vidéo TikTok supprimé (gardé la plus vue) |
+| 4   | **Attributs GBP**                | Paiements = « Argent liquide seulement » (déjà ok). Parking + équipements complétés                                                                                                                                                                                                                                                   |
+| —   | **Réponses aux avis**            | Les 10 réponses (§24) **postées**                                                                                                                                                                                                                                                                                                     |
+
+### Pourquoi `/reservation` sans `/fr/` dans les bios réseaux
+
+Testé : `https://mimi-coiffure.com/reservation` fait un 308 vers `/fr/`, `/en/`
+ou `/es/reservation` **selon la langue du navigateur du visiteur**. Comme 72 %
+des chercheurs sont anglophones, le lien sans locale les envoie sur la page EN
+automatiquement. **Bios réseaux = `/reservation` sans locale.** Le bouton
+« Prendre RDV » de la fiche GBP garde `/fr/reservation` (vu surtout depuis
+Marrakech, libellés Google en FR).
+
+### Reste à faire — priorités (par impact)
+
+1. **Shooting photos** (`docs/checklist-shooting-photos-salon-mimi.html`) —
+   blocage n°1. Débloque galerie GBP + posts Locks/Tissage + page site « rasta »
+2. **1 post GBP/semaine** : Box braids (`tresses-mimi-6.jpeg`) → Cornrows/Fulani
+   (`tresses-mimi-3.jpeg`) → Locks (après shooting) → Enfants (`s-tresse-fille1.png`)
+   → Knotless (`tresses-mimi-1.jpeg`) → Homme (`s-tresse-garcon.png`) → 2e post rasta
+3. **Page site `/fr/tresses-rasta-marrakech` + `/en/rasta-braids-marrakech`** —
+   chantier dev. Cible : `tresses rasta marrakech`, `rasta braids marrakech`,
+   `tresse africaine marrakech`, `african salon marrakech`, `africa beauty marrakech`.
+   Structure : H1 rasta+lieu, section « qu'est-ce que les tresses rasta/vanilles/
+   locks », prestations+prix, durée/entretien, galerie 6-8 photos rasta (shooting
+   requis), FAQ 5-6 Q, « comment venir », CTA, JSON-LD Service+FAQPage+BreadcrumbList,
+   lien menu+footer, sitemap, hreflang. **À faire après le shooting + validation
+   du plan avec Mouj** (règle projet)
+4. **Hashtags rasta** sur chaque post réseau : `#tressesrasta #rastabraids
+#rastamarrakech #vanilles #locksmarrakech` + bloc africain/local + bloc Marrakech
+5. **Réponses aux avis** : glisser « tresses rasta » / « tresses africaines »
+   quand c'est naturel (les réponses sont indexées)
+6. TripAdvisor (en attente depuis mai 2026), annuaires Maroc
+
+### Note — pas de changement de code cette session
+
+Tout dans les dashboards GBP / Instagram / TikTok. `git` inchangé côté prod
+(dernier commit `901cf5e`). Livrables `docs/` déjà en place (carte QR §23,
+checklist shooting §24).
+
+---
+
 ## 23. Session 28 août 2026 (soir) — Audit indexation Google Search Console + GEO (EN PROD)
 
 Google Search Console remontait 5 motifs de pages non indexées : 24 « Page avec
