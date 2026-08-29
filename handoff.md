@@ -155,6 +155,129 @@ sur `main`, sans toucher à la V2.
 
 ---
 
+## 24. Session 29 août 2026 — Optimisation Google Business Profile + stats + shooting photos
+
+Objectif : améliorer la visibilité du salon sur Google. Analyse des stats GBP,
+optimisation complète de la fiche, ménage des photos, livraison d'une checklist
+de shooting. **Aucun changement de code** — tout se passe dans le dashboard
+Google Business (fait par Mouj) + 2 livrables `docs/` (hors git).
+
+### Ce que disent les stats GBP (30 jours)
+
+- **3 492 vues de fiche.** Répartition : **56 % Google Maps mobile**, 36 %
+  Recherche Google mobile, 4 % Maps desktop, 4 % Recherche desktop.
+  → **92 % de l'audience est sur mobile, 60 % via Maps.** Ce sont des gens
+  physiquement à Marrakech qui cherchent un salon maintenant : très forte
+  intention.
+- **Seulement 496 vues (14 %) viennent d'une recherche par mots-clés.** Les 86 %
+  restants trouvent la fiche en naviguant sur Maps ou via lien direct.
+  → **La position sur Maps compte plus que le référencement par mots-clés.**
+  Ce qui fait remonter sur Maps : avis, photos, activité (posts), complétude.
+- Top requêtes : `beauty salons` 256 (52 %), `hair salon` 98 (20 %),
+  `rasta` 35 (7 %), `pedicure` 25 (5 %), `coiffure` 17 (3 %).
+  → 72 % des recherches sont en anglais. « rasta » = angle différenciant, peu
+  concurrentiel, le salon ressort déjà dessus.
+
+### Fiche GBP — modifications faites (dans le dashboard, par Mouj)
+
+| Champ                                                                                                      | Avant                               | Après                                                                                                                                                                                                                                                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Nom**                                                                                                    | `SALON MIMI - COIFFURES AFRICAINES` | `Salon Mimi` — violation Google (keyword stuffing) corrigée, risque de suspension éliminé, cohérence NAP avec le site                                                                                                                                                                                                                                  |
+| **Catégorie principale**                                                                                   | Salon de coiffure                   | Salon de coiffure (inchangé)                                                                                                                                                                                                                                                                                                                           |
+| **Catégories secondaires**                                                                                 | doublon « Salon de coiffure »       | **Institut de beauté** + **Salon de manucure** (doublon retiré). La liste GBP Maroc est réduite : « Salon de beauté », « Coiffeur afro », « Salon de tresses » n'existent pas. « Institut de beauté » capte `beauty salons` (52 % des recherches), « Salon de manucure » capte `pedicure`                                                              |
+| **Description**                                                                                            | ok mais générique                   | Réécrite : « tresses rasta » dans la 1re phrase + « Place Jamaa El Fna, au cœur de la Médina » + « Nous parlons français, anglais et arabe » + 1 phrase EN en fin. **Google refuse toute URL dans la description** (même sans `https://`) — remplacé « mimi-coiffure.com » par « Réservation en ligne ou par WhatsApp ». Limite réelle ~750 caractères |
+| **Site Web**                                                                                               | `https://www.mimi-coiffure.com/`    | `https://mimi-coiffure.com/` — `www` retiré. Google **rajoute** le `/` final automatiquement (normalisation domaine racine) : c'est normal, `/` fait 1 redirection 308 vers `/fr` (comportement voulu, pas le bug §23)                                                                                                                                 |
+| **Lien menu/services**                                                                                     | vide                                | `https://mimi-coiffure.com/fr/services`                                                                                                                                                                                                                                                                                                                |
+| **Réseaux sociaux**                                                                                        | Instagram seul                      | + TikTok `https://www.tiktok.com/@mimicoiffure700`                                                                                                                                                                                                                                                                                                     |
+| **Lien de réservation** (section « Liens vers vos outils de réservation en ligne », séparée des attributs) | vide                                | `https://mimi-coiffure.com/fr/reservation` — crée le **bouton « Prendre rendez-vous »** en haut de la fiche. `https://` obligatoire ici (contrairement à la description)                                                                                                                                                                               |
+| **Attribut Planning**                                                                                      | vide                                | « Sur rendez-vous ». L'attribut « réservation en ligne » n'existe pas au Maroc (géré par le lien de réservation ci-dessus)                                                                                                                                                                                                                             |
+
+### Ménage des photos de la fiche
+
+Point de départ : ~40 éléments, dont beaucoup de **visuels marketing générés par
+IA / Canva** (« The Power of Pure Argan », « Authentic Heritage In Every Braid »,
+« EXPERT IVORIAN CRAFTSMANSHIP », « BEAUTY ROOTED IN COMMUNITY », montage
+« INSPIRATIONS TRESSES »), des **photos stock** (blonde fond végétal, pull rose),
+des **vidéos avec texte incrusté** (« Réservez sur… »), et des photos de
+**présentoirs de mèches en désordre** + devanture sombre.
+
+Tout ça a été **supprimé** (via « Gérer vos photos »). Restent **~11 vrais
+éléments** : photo de couverture (portrait box braids + perles), logo MIMI, et
+~9 vraies réalisations (cornrows vue de dessus, tresse latérale profil, fille
+tresses roses/violettes, box braids longues de dos, mains en train de tresser,
+etc.).
+
+**RÈGLE** : ne plus jamais mettre sur la fiche GBP des visuels avec texte
+superposé, des montages, ou des images stock. Google Business ≠ Instagram.
+
+### Livrable 1 — Réponses aux 10 avis Google (rédigées, à poster par Mouj)
+
+Réponses personnalisées rédigées dans la conversation pour les 10 avis existants
+(dont 1 négatif « ongles permanent mauvais travail » → réponse type SAV :
+s'excuser sans reconnaître de faute, basculer en privé WhatsApp/email). **Aucun
+avis n'a de réponse aujourd'hui** — c'est le quick win le plus rentable
+(facteur n°1 du classement Maps). Objectif 30+ avis (13 au 28/08).
+
+### Livrable 2 — `docs/carte-avis-qr-salon-mimi.html` (déjà livré §23)
+
+Carte QR A6 vers `…FUEAE/review`. Pour la caisse / table de coiffage.
+
+### Livrable 3 — `docs/checklist-shooting-photos-salon-mimi.html` (NOUVEAU, hors git)
+
+Checklist A4 imprimable (2 pages) : 15 plans à photographier avec cadrage précis
+(façade/302, intérieur rangé, poste de coiffage, 5 techniques box braids /
+knotless / cornrows-fulani / locks / tissage en face+dos, rasta, enfants, homme,
+Mimi au travail, avant/après), réglages téléphone, règles par photo, nommage SEO
+des fichiers, rythme de publication (3-4/semaine sur 6 semaines).
+**PDF à générer via Chrome → Cmd+P → A4.**
+
+**Le shooting est la priorité n°1** : 56 % du trafic est sur Maps où les photos
+décident du clic ; le salon a ~11 photos vs 40-60 chez les concurrents de la
+Médina. Le repo `public/images/` n'a **aucune** photo utilisable d'intérieur
+propre, de façade, de Mimi (visage), ni de locks / tissage / mariage.
+
+### Posts GBP — 8 posts rédigés (dans la conversation)
+
+1 post/semaine minimum. **6 des 8 posts** sont faisables tout de suite avec les
+images `public/images/` existantes :
+
+| Post              | Image `public/images/`                                     |
+| ----------------- | ---------------------------------------------------------- |
+| Box braids        | `tresses-mimi-6.jpeg` (la seule vraie photo propre du lot) |
+| Knotless          | `tresses-mimi-1.jpeg`                                      |
+| Cornrows / Fulani | `tresses-mimi-3.jpeg`                                      |
+| Enfants           | `s-tresse-fille1.png` ou `s-tresse-fille2.png`             |
+| Rasta / vanilles  | `tresses-mimi-2.jpeg`                                      |
+| Homme             | `s-tresse-garcon.png`                                      |
+| **Locks**         | ❌ aucune photo — bloqué, attendre le shooting             |
+| **Tissage**       | ❌ aucune photo — bloqué, attendre le shooting             |
+
+Images `public/images/` **à NE PAS utiliser** (photos stock ou présentoirs de
+mèches malgré le nom de fichier) : `s-box-braids-longues.jpg`,
+`s-tressage-mains.jpg`, `s-tressage-action.jpg`, `s-cornrows.jpg`,
+`s-depart-locks.jpg`, `s-knotless.jpg`, `s-fulani.jpg`, `s-boho.jpg`,
+`salon-mimi-1/2/3.jpeg`, `s-box-braids-xl.jpg` (devanture « 302 »),
+`pomelli-image-*` (IA).
+
+### Reste à faire — priorités visibilité Google (par impact réel)
+
+1. **Shooting photos** (checklist livrée) → débloquer galerie GBP + posts Locks/Tissage
+2. **Répondre aux 10 avis** (rédigés) + récolter des avis (carte QR + SMS 2h après RDV)
+3. **1 post GBP/semaine** (6 prêts, 2 en attente de photos)
+4. Onglet GBP « Plus » : Paiements (au moins « Espèces »), Wi-Fi / Clim / Toilettes si applicable
+5. **Pages site en anglais** ciblant `hair salon Marrakech`, `beauty salon Marrakech Medina`, `rasta braids Marrakech` (PAS « box braids Marrakech » — personne ne le cherche assez). Cible générique + anglais, pas les termes techniques
+6. Bios Instagram + TikTok : ajouter `https://mimi-coiffure.com/reservation` (toujours pas fait)
+7. Citations locales : TripAdvisor (en attente depuis mai 2026), annuaires Maroc
+
+### Anomalie à corriger (repérée en vérifiant la home en prod)
+
+**Le hero de la home affiche « 5/5 sur Google »** alors que la fiche est à
+**4,2 / 13 avis**. `components/sections/GoogleReviews.tsx` lit l'API Google
+Places en direct — l'API renvoie une note partielle ou un fallback. Déjà noté
+§23, confirmé cette session. À corriger.
+
+---
+
 ## 2. État actuel du code — mis à jour le 7 juin 2026 (fin de session, soir)
 
 ### Ce qui marche
@@ -196,7 +319,7 @@ sur `main`, sans toucher à la V2.
 
 - ~~Refonte du design de `/reservation` + logo header~~ **FAIT** — nouveau design
   en prod sur `/reservation`, logo Mimi dans le header sur tout le site (voir §21).
-- **Avis Google** : 13 avis / 4,2 étoiles au 28 août 2026 (était 6 le 1er juin). Objectif 30+ : QR code plastifié à la caisse + SMS/WhatsApp automatique 2 h après le RDV avec `https://g.page/r/CXqJtbaOg9FUEBM/review`. Répondre à TOUS les avis existants.
+- **Avis Google** : 13 avis / 4,2 étoiles au 28 août 2026 (était 6 le 1er juin). Objectif 30+ : QR code plastifié à la caisse (`docs/carte-avis-qr-salon-mimi.html`, §23) + SMS/WhatsApp automatique 2 h après le RDV avec `https://g.page/r/CXqJtbaOg9FUEAE/review` (nouveau lien, cf. §23/§24). Répondre à TOUS les avis existants (10 réponses rédigées §24, pas encore postées).
 - **Bios réseaux** : ajouter le lien `https://mimi-coiffure.com/reservation` dans les bios Instagram (`salonmimi.marrakech`) et TikTok (`@mimicoiffure700`).
 - **Cloudflare Cache Rule** : éliminerait les redirections multiples (610ms), PageSpeed 92 → 95+. Instructions en section 7
 - **Fiche TripAdvisor** : en attente de validation depuis mai 2026
