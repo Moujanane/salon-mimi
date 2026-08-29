@@ -63,6 +63,84 @@ Marrakech, libellés Google en FR).
    quand c'est naturel (les réponses sont indexées)
 6. TripAdvisor (en attente depuis mai 2026), annuaires Maroc
 
+### Pourquoi Mimi n'apparaît PAS sur « coiffure africaine marrakech » (diagnostic 30/08)
+
+Sur cette requête, Google affiche Salon Mouna (**813 avis**), Mpat coiffure
+(**160 avis**), Hair Mermaid (24 avis). Mimi = **13 avis**. Le classement local
+Google = pertinence + distance + **notoriété** (avis nombre/note/fraîcheur,
+ancienneté affichée, photos, activité, citations/backlinks). Mimi perd sur la
+notoriété, surtout **le nombre d'avis**. Une meilleure description ne compense
+pas 13 avis face à 160-813.
+
+**Plan pour remonter (réaliste : 2-3 mois, top 3 atteignable, dépasser Mouna
+non) :**
+
+1. **AVIS — priorité n°1, ~70 % du problème.** Objectif 13 → 40+ en 8 semaines
+   (3-4/semaine). Leviers : carte QR à la caisse (`docs/carte-avis-qr-salon-mimi.html`),
+   SMS/WhatsApp post-RDV (texte ci-dessous), demande à l'oral en fin de
+   prestation, cibler les clientes contentes + touristes, répondre à tous les
+   avis en glissant « tresses rasta » / « coiffure africaine ».
+2. **Date d'ouverture GBP** : Modifier le profil → À propos → renseigner la vraie
+   date (fiche créée février 2016) → Google affiche « Plus de 8 ans en activité »
+   comme les concurrents.
+3. **Photos** : shooting → 30-40 photos, priorité africaines/rasta/cornrows/locks,
+   fichiers nommés `coiffure-africaine-marrakech-*.jpg`.
+4. **1 post GBP/semaine** sans interruption.
+5. **Services GBP** : Modifier le profil → Services → ajouter des libellés exacts
+   « Tresses africaines », « Coiffure africaine », « Cornrows », « Tresses rasta »,
+   « Box braids », « Locks », « Knotless braids », « Tissage », « Vanilles ».
+   Google lit ces libellés pour la pertinence.
+6. **Citations / backlinks** : TripAdvisor (relancer), annuaires Maroc (Yelo.ma,
+   pages jaunes Maroc), groupes Facebook expats Marrakech, blog voyage. **NAP
+   (nom/adresse/tél) strictement identique partout.**
+
+**Ne PAS faire** : remettre « coiffures africaines » dans le nom de la fiche
+(interdit, risque suspension), acheter de faux avis (détectés + pénalité).
+
+### Texte SMS / WhatsApp post-RDV — collecte d'avis (À METTRE EN PLACE)
+
+À envoyer **2 h à 24 h après le RDV**. Lien à insérer :
+`https://g.page/r/CXqJtbaOg9FUEAE/review`
+
+**FR :**
+
+> Bonjour {prénom}, c'était un plaisir de vous accueillir au Salon Mimi 💕
+> Si vos tresses vous plaisent, un petit avis Google nous aiderait énormément à
+> faire connaître le salon 🙏 Ça prend 30 secondes : {lien}
+> À très bientôt !
+
+**EN :**
+
+> Hi {name}, it was a pleasure having you at Salon Mimi 💕
+> If you love your braids, a quick Google review would help us so much 🙏
+> It only takes 30 seconds: {lien}
+> See you soon!
+
+**ES :**
+
+> Hola {nombre}, ha sido un placer recibirte en Salon Mimi 💕
+> Si te gustan tus trenzas, una reseña en Google nos ayudaría muchísimo 🙏
+> Solo lleva 30 segundos: {lien}
+> ¡Hasta pronto!
+
+**Rappel unique (si pas d'avis après 3 jours, une seule fois) :**
+
+> Bonjour {prénom}, juste un petit rappel 😊 si vous avez 30 sec pour un avis
+> Google, ça compte beaucoup pour nous 🙏 {lien}
+
+**Règles** : envoyer le jour même / lendemain (pas 1 semaine après),
+personnaliser avec le prénom, cibler les clientes visiblement contentes, un seul
+rappel, WhatsApp de préférence.
+
+**Mise en place** :
+
+- **Immédiat (manuel)** : Mimi/Mouj copie le texte, remplace {prénom} + {lien},
+  envoie par WhatsApp le soir même. ~2 min/cliente.
+- **Plus tard (semi-auto)** : ajouter dans la PWA `public/mimi.html` (qui liste
+  déjà les réservations) un bouton « Demander un avis » qui ouvre WhatsApp avec
+  le message pré-rempli (nom de la cliente + lien). Petit chantier de dev, à
+  faire quand Mouj le décide.
+
 ### Note — pas de changement de code cette session
 
 Tout dans les dashboards GBP / Instagram / TikTok. `git` inchangé côté prod
