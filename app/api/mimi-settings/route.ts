@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
-const PIN = process.env.MIMI_PIN ?? "1234";
+import { checkMimiPin } from "@/lib/mimiAuth";
 
 const ALLOWED_KEYS = [
   "whatsapp_number",
@@ -21,15 +20,10 @@ const ALLOWED_KEYS = [
   "price_featured_cornrows",
 ];
 
-function checkPin(req: NextRequest): boolean {
-  const pin =
-    req.nextUrl.searchParams.get("pin") ?? req.headers.get("x-mimi-pin");
-  return pin === PIN;
-}
-
 export async function GET(req: NextRequest) {
-  if (!checkPin(req)) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  const auth = checkMimiPin(req);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
   const { data, error } = await supabaseAdmin
     .from("settings")
@@ -45,10 +39,14 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  if (!checkPin(req)) {
-    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  const auth = checkMimiPin(req);
+  if (!auth.ok) {
+    return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
-  const body = await req.json();
+  const body = await req.json().catch(() => null);
+  if (!body || typeof body !== "object") {
+    return NextResponse.json({ error: "Données invalides" }, { status: 400 });
+  }
   const updates = Object.entries(body).filter(([key]) =>
     ALLOWED_KEYS.includes(key),
   );

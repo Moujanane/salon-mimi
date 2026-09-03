@@ -129,13 +129,9 @@ const jsonLd = {
     longitude: -7.9892,
   },
   hasMap: MAPS_URL,
-  sameAs: [
-    MAPS_URL,
-    "https://share.google/t4j91V4ZgAESOoNwp",
-    GBP_URL,
-    INSTAGRAM_URL,
-    TIKTOK_URL,
-  ],
+  // sameAs : profils publics stables uniquement (Google ignore les liens de
+  // partage raccourcis type share.google).
+  sameAs: [MAPS_URL, GBP_URL, INSTAGRAM_URL, TIKTOK_URL],
   openingHoursSpecification: [
     {
       "@type": "OpeningHoursSpecification",

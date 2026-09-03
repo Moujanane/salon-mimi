@@ -21,7 +21,9 @@ const securityHeaders = [
       `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : ""}`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: blob: https:",
+      // Restreint aux sources réellement utilisées (images locales + tuiles de
+      // la carte Google Maps embarquée). Plus de `https:` générique.
+      "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net",
       "connect-src 'self' https://*.supabase.co https://api.resend.com",
       "media-src 'self' https://cdn.jsdelivr.net",
       "frame-src https://www.google.com https://maps.google.com",
@@ -37,6 +39,13 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      {
+        // PWA planning de Mimi : ne doit jamais être indexée (elle affiche des
+        // données de réservation). L'accès aux données est déjà protégé par PIN
+        // côté API ; ceci empêche l'indexation de la page HTML elle-même.
+        source: "/mimi:path*",
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];
   },

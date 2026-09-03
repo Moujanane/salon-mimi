@@ -605,7 +605,7 @@
         btn.disabled = true;
         btn.textContent = "Chargement…";
         document.getElementById("pin-error").style.display = "none";
-        fetch("/api/mimi?pin=" + encodeURIComponent(pin))
+        fetch("/api/mimi", { headers: { "x-mimi-pin": pin } })
           .then(function (res) {
             if (!res.ok) throw new Error("PIN");
             return res.json();
@@ -648,7 +648,7 @@
       }
 
       function loadReservations() {
-        fetch("/api/mimi?pin=" + encodeURIComponent(currentPin))
+        fetch("/api/mimi", { headers: { "x-mimi-pin": currentPin } })
           .then(function (res) {
             return res.json();
           })
@@ -810,7 +810,7 @@
       }
 
       function loadSettings() {
-        fetch("/api/mimi-settings?pin=" + encodeURIComponent(currentPin))
+        fetch("/api/mimi-settings", { headers: { "x-mimi-pin": currentPin } })
           .then(function (res) {
             return res.json();
           })
@@ -837,9 +837,12 @@
         var btn = document.getElementById("save-btn");
         btn.disabled = true;
         btn.textContent = "Enregistrement…";
-        fetch("/api/mimi-settings?pin=" + encodeURIComponent(currentPin), {
+        fetch("/api/mimi-settings", {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-mimi-pin": currentPin,
+          },
           body: JSON.stringify({
             whatsapp_number: document.getElementById("s-whatsapp").value,
             price_featured_box_braids_medium:
@@ -918,9 +921,12 @@
           if (sub) {
             sub.unsubscribe().then(function (ok) {
               if (!ok) return;
-              fetch("/api/push?pin=" + encodeURIComponent(currentPin), {
+              fetch("/api/push", {
                 method: "DELETE",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-mimi-pin": currentPin,
+                },
                 body: JSON.stringify({ endpoint: sub.endpoint }),
               });
               updateNotifUI(false);
@@ -938,17 +944,17 @@
               })
               .then(function (newSub) {
                 var s = newSub.toJSON();
-                return fetch(
-                  "/api/push?pin=" + encodeURIComponent(currentPin),
-                  {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                      endpoint: s.endpoint,
-                      keys: s.keys,
-                    }),
+                return fetch("/api/push", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "x-mimi-pin": currentPin,
                   },
-                );
+                  body: JSON.stringify({
+                    endpoint: s.endpoint,
+                    keys: s.keys,
+                  }),
+                });
               })
               .then(function (res) {
                 if (res.ok) updateNotifUI(true);

@@ -3,7 +3,6 @@ export const revalidate = 3600;
 import type { Metadata } from "next";
 import ServicesPageClient from "@/components/sections/ServicesPageClient";
 import { getSettings } from "@/lib/settings";
-import Script from "next/script";
 
 export async function generateMetadata({
   params,
@@ -169,8 +168,9 @@ export default async function ServicesPage({
 
   return (
     <>
-      <Script
-        id="services-jsonld"
+      {/* <script> natif (rendu côté serveur dans le HTML initial) plutôt que
+          next/script : Google lit le JSON-LD dès le premier crawl. */}
+      <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
