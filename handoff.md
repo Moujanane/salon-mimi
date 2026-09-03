@@ -6,6 +6,164 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 26. Session 30 août 2026 (soir) — 2e bug d'indexation + retrait Umami + audits SEO & sécurité
+
+5 commits sur `main`, tous déployés Railway et vérifiés en prod.
+
+### Bug d'indexation #2 : routing `[locale]` non validé (commit `36f8986`)
+
+Distinct du trailing slash (§23, `263dd8d`). Motif GSC « Page en double sans
+URL canonique sélectionnée par l'utilisateur » (apparu au recrawl).
+
+**Symptôme** : toute URL contenant un point (`/index.html`, `/abc.xyz`,
+`/wp-login.php`…) était ignorée par le matcher du middleware (`.*\..*`), routée
+sur `app/[locale]/page.tsx` avec `locale = "abc.xyz"`, et servait une **copie de
+la home en HTTP 200** avec `<html lang="abc.xyz">` et un `<link canonical>`
+auto-référent vers l'URL bidon. Google pouvait indexer des URLs fantômes à
+l'infini.
+
+**Cause racine** : `app/[locale]/` n'avait ni `generateStaticParams` ni
+validation de locale.
+
+**Fix `36f8986`** :
+
+- `app/[locale]/layout.tsx` : `generateStaticParams()` (fr/en/es) +
+  `export const dynamicParams = false` → seules `/fr` `/en` `/es` sont des
+  routes valides, tout le reste = 404 natif Next.js sans exécuter le code.
+  Garde `assertLocale()` dans `generateMetadata` + le layout (ceinture +
+  bretelles). Les pages `[locale]` passent en SSG.
+- `next.config.mjs` : `redirects()` `/index.html` `/index.htm` `/index.php` → `/`
+  (301).
+- `e2e/seo-canonical.spec.ts` : +19 tests routing strict.
+
+Vérifié prod : `/abc.xyz` `/wp-login.php` `/hack.php` `/sitemap.html` → **404**
+(avant : copie de la home) ; `/index.html` → 308 vers `/` ; `/fr` `/en` `/es` →
+200 canonical propre ; 8 pages `[locale]` → 200 sans régression.
+
+**RÈGLE** : ne jamais retirer `dynamicParams = false` / `generateStaticParams`
+de `app/[locale]/layout.tsx`.
+
+**À FAIRE dans GSC** : Indexation → Pages → « Page en double sans URL canonique »
+→ « Valider la correction ». Puis re-vérifier tous les motifs courant sept. 2026.
+
+### Retrait Umami (commit `d17989f`)
+
+- **Anomalie « 5/5 sur Google »** : `components/sections/TrustBadge.tsx` affichait
+  `5/5 sur Google` en dur (fiche = 4,2/13). Remplacé par « Avis clients vérifiés
+  sur Google » (fr/en/es), sans note chiffrée. La vraie note live reste affichée
+  par `GoogleReviews` plus bas.
+- **Erreur console Umami 400** : le Website ID `8e60d1e4…` n'existe plus dans
+  l'instance `umami-production-2141.up.railway.app` (base perdue lors d'un
+  redéploiement Railway ; dashboard lui-même inaccessible « Access denied »).
+  Umami retiré du site : script supprimé du `<head>` de `layout.tsx`, CSP nettoyé
+  (`script-src` + `connect-src` sans umami). Vérifié prod : 0 occurrence,
+  0 erreur console.
+- **À FAIRE (Railway)** : supprimer le service Umami + son Postgres (`Postgres-MqJ4`
+  — bien vérifier le nom pour ne pas toucher au Postgres de l'app). Ils tournent
+  pour rien.
+- Analytics future : Cloudflare Web Analytics recommandé (gratuit, léger, déjà
+  Cloudflare sur le domaine) ou Umami Cloud.
+
+### Audit sécurité — durcissement auth PIN PWA Mimi (commit `b7bd745`)
+
+**Avant** : `const PIN = process.env.MIMI_PIN ?? "1234"` dans 3 routes, PIN passé
+en query string `?pin=XXXX` (loggée par Railway/Cloudflare/proxys + historique
+navigateur), comparaison string classique, rate limit absent sur `mimi-settings`
+et `push`.
+
+**Nouveau `lib/mimiAuth.ts`** — `checkMimiPin(req)` :
+
+- PIN lu **uniquement** dans le header `x-mimi-pin` (jamais en query)
+- **Pas de fallback** : si `MIMI_PIN` absent côté serveur → 503
+- Comparaison à temps constant (`crypto.timingSafeEqual`)
+- Rate limit par IP : 3 échecs / 30 min (**en mémoire** — se réinitialise au
+  redéploiement/scale Railway ; à migrer vers un store persistant type Upstash
+  si le besoin grandit)
+
+- `app/api/mimi/route.ts`, `mimi-settings/route.ts`, `push/route.ts` : utilisent
+  `checkMimiPin`, plus de query `?pin=`, plus de fallback. `mimi-settings` et
+  `push` ont maintenant un rate limit.
+- `public/mimi.html` : les 6 `fetch` envoient `x-mimi-pin` en header.
+
+`MIMI_PIN=1993` confirmé présent dans Railway, **gardé tel quel** (recommandation
+non urgente : passer à 8+ caractères alphanumériques + prévenir Mimi).
+
+Vérifié prod : sans header → 401, mauvais PIN → 401, `?pin=1993` query → **401
+(ne marche plus)**, `x-mimi-pin: 1993` header → **200 + réservations**.
+
+**NOTE PWA** : Mimi devra peut-être vider le cache de sa PWA installée (ou
+désinstaller/réinstaller) pour récupérer le nouveau `mimi.html` — le Service
+Worker peut servir l'ancienne version quelques heures.
+
+### Quick wins SEO (dans `b7bd745`)
+
+- **P3** : `app/[locale]/services/page.tsx` — JSON-LD `ItemList` passé de
+  `next/script` à un `<script>` natif SSR (Google le lit dès le 1er crawl).
+  Bonus : −2,3 kB.
+- **P4** : `layout.tsx` — retiré `share.google/…` du `sameAs` (lien de partage
+  raccourci ignoré par Google ; garde Maps, GBP, IG, TikTok).
+- **S6** : `next.config.mjs` — CSP `img-src` restreint (plus de `https:`
+  générique ; hôtes Google Maps + jsDelivr uniquement).
+- **S8** : `next.config.mjs` — `X-Robots-Tag: noindex, nofollow` sur `/mimi:path*`
+  (la PWA affiche des données de réservation).
+
+### Résultats des audits — ce qui reste (chantiers dédiés)
+
+**SEO :**
+
+- **P1** — `Cache-Control: private, no-cache, no-store` sur TOUT le site public.
+  Cause : le middleware next-intl retourne une `NextResponse` avec `no-store` par
+  défaut, ce qui écrase le cache des pages SSG/ISR. Confirmé : les routes hors
+  middleware (`/sitemap.xml`, `/robots.txt`, `/fr/opengraph-image`, assets
+  `/_next/`) ont un `Cache-Control` normal. **Gain de perf** (92 % du trafic est
+  mobile), pas une régression. Fix délicat (le middleware tourne sur toutes les
+  pages, risque de servir des prix périmés / casser le changement de langue /
+  cache Cloudflare edge) → chantier dédié avec tests.
+- **P2** — `hreflang x-default` incohérent : header HTTP → `mimi-coiffure.com/`
+  (avec slash, 308), `<link>` HTML → `/fr`. Même cause (middleware next-intl
+  génère les `Link:` headers). Le HTML est correct, Google le privilégie.
+- **P5** — `aggregateRating` `4.2`/`13` en dur dans `layout.tsx` (lignes ~137).
+  À rendre dynamique via `getGoogleReviews()` (la note va monter avec la
+  campagne d'avis). Un rating faux/périmé peut déclencher une pénalité rich
+  results.
+- **P6** — pages contenu rasta / EN (déjà planifié §25).
+
+**Sécurité :**
+
+- **S4** — `/api/reservations` POST : endpoint public non authentifié qui écrit
+  en base + envoie emails/push. Seule protection = rate limit 5/10min en mémoire
+  par IP. Ajouter un honeypot / token anti-bot léger + rate limit persistant.
+- **S7** — `npm audit` : 10 vulns (9 high, 1 low). `npm audit fix` (non-force)
+  **bloqué par un problème de permissions du cache npm** (`~/.npm/_cacache`
+  contient des fichiers root). Débloquer : `sudo chown -R $(whoami) ~/.npm` puis
+  `npm audit fix`. Détail des vulns : `nodemailer` (3 CVE high — vérifier s'il
+  est encore utilisé, `resend` fait déjà les emails), `next` 14.2.35 (→ migration
+  Next 15), `postcss`/`brace-expansion`/`nanoid`/`js-yaml`/`glob` (surtout
+  devDeps, risque prod faible).
+- **Rate limit persistant** — les rate limiters (`/reservations`, `/contact`,
+  `mimiAuth`) sont en mémoire (`Map`), remis à zéro à chaque redéploiement /
+  scale Railway, non partagés entre instances. À migrer vers Upstash Redis ou
+  une table Supabase si le trafic malveillant augmente.
+- **Migration Next 14 → 15** — plusieurs CVE Next, gros chantier planifié.
+- **Audit RLS Supabase** — les politiques réelles vivent dans le dashboard
+  Supabase (`supabase-schema.sql` = doc morte, cf. leçon 1). Jamais auditées
+  formellement. Politiques critiques à ne jamais supprimer : voir mémoire
+  `salon-mimi-*` / bloc « Leçons apprises ».
+
+### Ce qui NE bougeait pas cette session
+
+Site public fonctionnel, 0 régression Playwright (desktop 60 + mobile 60 contre
+la prod à chaque commit).
+
+### Commits de la session (sur `main`, tous déployés + vérifiés prod)
+
+- `36f8986` fix(seo): routing [locale] strict — corrige « Page en double sans URL canonique »
+- `d17989f` fix: retire Umami (instance cassée) + corrige le badge « 5/5 sur Google »
+- `b7bd745` fix(security+seo): durcit l'auth PIN de la PWA Mimi + quick wins SEO
+- (+ `dda10c6`, `901cf5e`, `6309457`, `c7ff32f` : docs handoff §24-25)
+
+---
+
 ## 25. Session 30 août 2026 — Pivot stratégique « rasta » + suite optimisation GBP / réseaux
 
 Fait suite à la §24. **Nouvelles stats Google Maps (juillet→août 2026)** :
