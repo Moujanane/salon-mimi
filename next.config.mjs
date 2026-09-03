@@ -40,6 +40,16 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // Vieux liens de type fichier d'accueil → racine (301). Sans ça, ces URLs
+      // (qui contiennent un point, donc ignorées par le matcher du middleware)
+      // servaient une copie de la home routée sur [locale] = "index.html".
+      { source: "/index.html", destination: "/", permanent: true },
+      { source: "/index.htm", destination: "/", permanent: true },
+      { source: "/index.php", destination: "/", permanent: true },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

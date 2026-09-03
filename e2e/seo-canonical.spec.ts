@@ -127,3 +127,81 @@ test.describe("SEO — canonical ignore le paramètre ?service=", () => {
     expect(new URL(canonical!).search).toBe("");
   });
 });
+
+/**
+ * Non-régression : routing [locale] strict.
+ *
+ * Avant le fix (commit de la session), toute URL contenant un point
+ * (/index.html, /abc.xyz, ...) était ignorée par le matcher du middleware,
+ * routée sur app/[locale]/page.tsx avec locale = "abc.xyz", et servait une
+ * COPIE de la page d'accueil (HTTP 200) avec <html lang="abc.xyz"> et un
+ * <link canonical> auto-référent vers l'URL bidon. Google la classait alors
+ * en « Page en double sans URL canonique sélectionnée par l'utilisateur ».
+ *
+ * Fix : generateStaticParams + dynamicParams = false dans le layout (seules
+ * /fr /en /es sont des routes valides) + redirects index.html/htm/php → /.
+ */
+test.describe("SEO — routing [locale] strict", () => {
+  const VALID = ["/fr", "/en", "/es"] as const;
+
+  // URLs à point : AVANT le fix elles sautaient le middleware et servaient une
+  // copie de la home en 200. Doivent être 404 direct (0 redirection).
+  const INVALID_DOTTED = [
+    "/abc.xyz",
+    "/nimportequoi.html",
+    "/sitemap.html",
+    "/index.aspx",
+  ] as const;
+
+  // URLs sans point avec segment inconnu : le middleware next-intl les préfixe
+  // avec la locale par défaut (308) puis Next.js rend une vraie 404. Jamais une
+  // copie de la home. Ce comportement était déjà correct avant le fix.
+  const INVALID_PREFIXED = ["/de", "/fr-FR", "/foobar"] as const;
+
+  for (const path of VALID) {
+    test(`${path} répond 200`, async ({ request }) => {
+      const r = await request.get(path, { maxRedirects: 0 });
+      expect(r.status()).toBe(200);
+    });
+
+    test(`${path} : <html lang> vaut la locale exacte`, async ({ page }) => {
+      await page.goto(path, { waitUntil: "commit" });
+      const lang = await page.locator("html").getAttribute("lang");
+      expect(["fr", "en", "es"]).toContain(lang);
+      expect(lang).toBe(path.slice(1));
+    });
+  }
+
+  for (const path of INVALID_DOTTED) {
+    test(`${path} répond 404 direct (pas une copie de la home)`, async ({
+      request,
+    }) => {
+      const r = await request.get(path, { maxRedirects: 0 });
+      expect(
+        r.status(),
+        `${path} devrait être 404 direct (a répondu ${r.status()})`,
+      ).toBe(404);
+    });
+  }
+
+  for (const path of INVALID_PREFIXED) {
+    test(`${path} finit en 404 (jamais une copie de la home)`, async ({
+      page,
+    }) => {
+      const resp = await page.goto(path);
+      expect(resp?.status()).toBe(404);
+      // Pas le <title> de la home
+      const title = await page.title();
+      expect(title).not.toMatch(/Salon Mimi — Tresses/);
+    });
+  }
+
+  for (const file of ["/index.html", "/index.htm", "/index.php"]) {
+    test(`${file} redirige (301/308) vers la racine`, async ({ request }) => {
+      const r = await request.get(file, { maxRedirects: 0 });
+      expect([301, 308]).toContain(r.status());
+      const loc = r.headers()["location"];
+      expect(loc === "/" || loc?.endsWith("mimi-coiffure.com/")).toBe(true);
+    });
+  }
+});

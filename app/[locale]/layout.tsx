@@ -1,5 +1,6 @@
 // app/[locale]/layout.tsx
 import type { Metadata, Viewport } from "next";
+import { notFound } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { Playfair_Display, Inter } from "next/font/google";
@@ -7,8 +8,24 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import CookieBanner from "@/components/ui/CookieBanner";
 import StickyBooking from "@/components/layout/StickyBooking";
+import { routing } from "@/i18n/routing";
 import { INSTAGRAM_URL, TIKTOK_URL, MAPS_URL, GBP_URL } from "@/lib/social";
 import "../globals.css";
+
+// Seules /fr, /en, /es sont des routes valides. Toute autre valeur de [locale]
+// (URLs aléatoires, /index.html, /de, etc.) tombe en 404 natif Next.js — le code
+// ci-dessous ne s'exécute même pas. Corrige le motif GSC « Page en double sans
+// URL canonique » (une URL à point comme /abc.xyz servait une copie de la home
+// avec un canonical auto-référent).
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export const dynamicParams = false;
+
+function assertLocale(locale: string): asserts locale is "fr" | "en" | "es" {
+  if (!(routing.locales as readonly string[]).includes(locale)) notFound();
+}
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -50,6 +67,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  assertLocale(locale);
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -189,6 +207,7 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  assertLocale(locale);
   const messages = await getMessages();
 
   return (
