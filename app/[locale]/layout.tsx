@@ -221,11 +221,6 @@ export default async function LocaleLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
         />
-        <script
-          defer
-          src="https://umami-production-2141.up.railway.app/script.js"
-          data-website-id="8e60d1e4-e51e-4ac9-896f-f641486a32eb"
-        />
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>

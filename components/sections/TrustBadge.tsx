@@ -1,16 +1,19 @@
+// Pas de note chiffrée ici : la vraie note Google (live) est affichée par le
+// composant GoogleReviews plus bas. Un chiffre en dur se périmait (a affiché
+// « 5/5 » alors que la fiche était à 4,2/13).
 const items = {
   fr: [
-    { icon: "⭐", text: "5/5 sur Google" },
+    { icon: "⭐", text: "Avis clients vérifiés sur Google" },
     { icon: "📍", text: "Place Jemaa el-Fna, Marrakech" },
     { icon: "🌿", text: "Produits locaux 100% naturels" },
   ],
   en: [
-    { icon: "⭐", text: "5/5 on Google" },
+    { icon: "⭐", text: "Verified client reviews on Google" },
     { icon: "📍", text: "Jemaa el-Fna Square, Marrakech" },
     { icon: "🌿", text: "100% natural local products" },
   ],
   es: [
-    { icon: "⭐", text: "5/5 en Google" },
+    { icon: "⭐", text: "Reseñas de clientas verificadas en Google" },
     { icon: "📍", text: "Plaza Jemaa el-Fna, Marrakech" },
     { icon: "🌿", text: "Productos locales 100% naturales" },
   ],
