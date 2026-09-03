@@ -43,8 +43,9 @@ Vérifié prod : `/abc.xyz` `/wp-login.php` `/hack.php` `/sitemap.html` → **40
 **RÈGLE** : ne jamais retirer `dynamicParams = false` / `generateStaticParams`
 de `app/[locale]/layout.tsx`.
 
-**À FAIRE dans GSC** : Indexation → Pages → « Page en double sans URL canonique »
-→ « Valider la correction ». Puis re-vérifier tous les motifs courant sept. 2026.
+**GSC** : « Valider la correction » sur « Page en double sans URL canonique »
+**cliqué le 3 sept. 2026**. Re-vérifier tous les motifs courant sept. 2026
+(doivent passer à « Réussite »).
 
 ### Retrait Umami (commit `d17989f`)
 
@@ -58,11 +59,23 @@ de `app/[locale]/layout.tsx`.
   Umami retiré du site : script supprimé du `<head>` de `layout.tsx`, CSP nettoyé
   (`script-src` + `connect-src` sans umami). Vérifié prod : 0 occurrence,
   0 erreur console.
-- **À FAIRE (Railway)** : supprimer le service Umami + son Postgres (`Postgres-MqJ4`
-  — bien vérifier le nom pour ne pas toucher au Postgres de l'app). Ils tournent
-  pour rien.
+- **Nettoyage Railway — FAIT le 3 sept. 2026.** Le canvas Railway était encombré
+  de tentatives Umami accumulées. Supprimés : 2 services `umami` +
+  `umami-LPpa`, 2 `Valkey`, 4 Postgres orphelins (`Postgres-MqJ4`,
+  `Postgres-grkU`, `Postgres-cJWU`, `Postgres` isolé) + 5 volumes de stockage.
+  **Vérifié avant** que le service `salon-mimi` n'avait AUCUNE variable Postgres
+  Railway (`DATABASE_URL`, `POSTGRES_*`) — l'app utilise exclusivement Supabase.
+  Il ne reste que le service **`salon-mimi`** (+ 2 cartes-groupes vides `Umami` /
+  `PostgreSQL`, purement cosmétiques, non supprimables via ⋮ qui ne propose que
+  « Rename » — sans impact, à ignorer).
+  **Vérifié prod après suppression : ZÉRO régression.** 11 pages 200, prix
+  Supabase servis (`/api/settings`), section avis Google rendue, PWA Mimi
+  (`/api/mimi` + `/mimi.html`) 200 avec le PIN, clé VAPID push servie. Le site
+  n'utilise rien de Railway pour ses données (Supabase / Resend / Google Places /
+  clés VAPID = tout externe ou en variables d'env). Facture Railway au minimum.
 - Analytics future : Cloudflare Web Analytics recommandé (gratuit, léger, déjà
-  Cloudflare sur le domaine) ou Umami Cloud.
+  Cloudflare sur le domaine) ou Umami Cloud. Pour l'instant : Google Business +
+  GSC suffisent.
 
 ### Audit sécurité — durcissement auth PIN PWA Mimi (commit `b7bd745`)
 
