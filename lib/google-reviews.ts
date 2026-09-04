@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 export interface GoogleReview {
   author_name: string;
   rating: number;
@@ -15,7 +17,7 @@ export interface ReviewsResult {
 
 const PLACE_ID = "ChIJedvCcgDvrw0Reom1to6D0VQ";
 
-export async function getGoogleReviews(): Promise<ReviewsResult | null> {
+async function fetchGoogleReviews(): Promise<ReviewsResult | null> {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY;
   if (!apiKey) return null;
 
@@ -34,3 +36,5 @@ export async function getGoogleReviews(): Promise<ReviewsResult | null> {
     return null;
   }
 }
+
+export const getGoogleReviews = cache(fetchGoogleReviews);

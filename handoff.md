@@ -6,6 +6,110 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 28. Session 4 sept 2026 — Correctifs SEO/sécurité restants du §26 (branche `fix/seo-securite-audit-restants`, PAS ENCORE MERGÉE)
+
+Suite au §26 (30 août), 4 des 6 chantiers SEO/sécurité restants ont été traités via
+processus subagent-driven (plan écrit d'abord, implémenteur + 2 revues par tâche).
+**Tout est sur la branche `fix/seo-securite-audit-restants`, pas encore mergée sur
+`main` ni déployée.** Plan complet :
+`docs/superpowers/plans/2026-09-04-audit-seo-securite-restants.md`.
+
+### Fait
+
+1. **`nodemailer` retiré** (`1f97eae` → amendé plus tard) — dépendance morte (3 CVE
+   high), `resend` fait déjà tous les envois d'email. Zéro usage restant vérifié
+   par grep avant suppression.
+2. **`aggregateRating` JSON-LD dynamique** (`a99ce0f`) — `app/[locale]/layout.tsx`
+   appelle désormais `getGoogleReviews()` (déjà utilisée par `GoogleReviews.tsx`)
+   au lieu du `4.2`/`13` en dur, avec fallback identique si l'API échoue.
+   `lib/google-reviews.ts` : la fonction est mémoïsée avec `React.cache()` pour
+   garantir qu'un seul appel réseau est fait par rendu de page (les deux call
+   sites — layout + composant d'affichage — partagent le même appel).
+3. **Honeypot anti-bot sur `/api/reservations`** (`b14c034`) — champ caché
+   `name="website"` (invisible, `tabIndex={-1}`, hors écran) ajouté dans
+   `ReservationLayout.tsx`, transmis par les DEUX chemins d'envoi (`handleSubmit`
+   et `handleWhatsApp`). Côté serveur, un `website` non vide déclenche un faux
+   succès (`{success:true, whatsappLink:""}`, 201) sans écriture Supabase ni envoi
+   email/push — le bot ne sait pas qu'il a été détecté. Vérifié : soumission
+   normale passe, soumission avec honeypot rempli est bloquée silencieusement,
+   le rate-limit existant s'applique toujours avant (pas de bypass).
+4. **hreflang x-default du header `Link` corrigé** (`6af3884` → `ff7cd2e`) —
+   next-intl générait un header `Link` avec `hreflang="x-default"` pointant vers
+   l'apex (`https://mimi-coiffure.com/`), incohérent avec le `<link>` HTML qui
+   pointe vers `/fr`. `middleware.ts` réécrit maintenant ce segment pour qu'il
+   corresponde, **pour toutes les pages** (racine ET imbriquées — une première
+   version ne couvrait que la racine, corrigée après une revue de qualité qui a
+   testé le format réel généré par next-intl sur `/en/services`). Nouveau test
+   `e2e/seo-cache-headers.spec.ts` verrouille la cohérence sur 5 pages
+   (racines + imbriquées) + garde-fous `/admin/login` et `/mimi.html`.
+
+### PAS fait — investigué, bloqué pour une raison structurelle
+
+**P1 — `Cache-Control: no-store` sur tout le site public : PAS corrigé.**
+Diagnostic (fait pendant cette session, à ne pas refaire) : la réponse que
+`intlMiddleware(request)` retourne dans `middleware.ts` n'est **pas** la réponse
+HTTP finale envoyée au navigateur — c'est un signal de continuation interne
+(`x-middleware-next: "1"`), sans header `cache-control` du tout à ce stade. Le
+vrai `Cache-Control: private, no-cache, no-store, max-age=0, must-revalidate` est
+appliqué **plus tard**, par le moteur de rendu Next.js — un rewrite de header
+dans le middleware ne peut donc structurellement pas l'intercepter.
+
+**Cause racine identifiée** : `app/[locale]/layout.tsx` et les pages `[locale]/*`
+n'appellent jamais `setRequestLocale()` (API next-intl pour activer le rendu
+statique). Sans cet appel, next-intl lit la locale via `headers()` — une Dynamic
+API de Next.js — ce qui force le rendu **dynamique** de toutes les pages
+`[locale]`, quel que soit le `export const revalidate = 3600` déjà présent dans
+`page.tsx`. C'est une limitation documentée de next-intl (nécessite l'appel
+explicite pour le « static rendering »).
+
+**Le vrai fix** = ajouter `setRequestLocale(locale)` dans tous les layouts/pages
+`[locale]`. C'est un changement d'architecture de rendu plus large que prévu pour
+ce chantier (impact sur l'ISR, ordre des appels, risque de casser le SSG déjà en
+place pour toutes les pages `[locale]`) — **nécessite son propre plan et ses
+propres tests, à valider avec Mouj avant de commencer.**
+
+### Résultats des tests (en local, jamais contre la prod avant merge)
+
+- `npx tsc --noEmit` ✓
+- `npm run build` ✓
+- Suite Playwright complète contre le build local (`PLAYWRIGHT_BASE_URL=http://localhost:3000`) :
+  **134 passed / 2 skipped / 0 failed**, hors le test `seo-canonical.spec.ts`
+  « chaque URL du sitemap répond 200 sans redirection » — **flaky, PRÉEXISTANT,
+  sans rapport avec cette session** (voir ci-dessous).
+- **Conclusion : zéro régression** sur le périmètre touché.
+
+### Bug préexistant repéré (hors scope, signalé séparément)
+
+Le test `e2e/seo-canonical.spec.ts` (« chaque URL du sitemap répond 200 sans
+redirection ») extrait les URLs du `sitemap.xml`, qui sont **absolues** en dur
+vers `https://mimi-coiffure.com` (`app/sitemap.ts`, `const BASE_URL`). Résultat :
+même en lançant les tests avec `PLAYWRIGHT_BASE_URL=http://localhost:3000`, ce
+test précis continue d'appeler la vraie prod pour chaque URL — lent, dépendant du
+réseau externe, timeout observé (30s) le 4 sept. 2026 sans lien avec le code
+testé. Suggestion spawée en tâche séparée (`task_617d36ae`) : réécrire
+`extractLocs()` pour retirer le host absolu et requêter en relatif.
+
+### Reste à faire avant de merger cette branche
+
+1. Valider ce handoff + les 4 commits avec Mouj.
+2. Décider si `setRequestLocale()` (P1, Cache-Control) devient un chantier séparé
+   (recommandé — plan dédié, hors urgence) ou si on merge `fix/seo-securite-audit-restants`
+   tel quel maintenant et on traite P1 plus tard.
+3. Merger sur `main`, déployer Railway, puis checklist obligatoire (mémoire
+   projet) : `/admin/dashboard` affiche les réservations, `/reservation` soumet
+   normalement, une réservation test apparaît dans le dashboard, `npx playwright
+test` en full contre la prod réelle après déploiement.
+
+### Hors scope confirmé (gros chantiers, non traités)
+
+- P6 — pages contenu rasta/EN (`/tresses-rasta-marrakech`)
+- Migration Next 14 → 15 (résoudrait les CVE restantes sur `next`/`postcss`)
+- Migration des rate limiters en mémoire (`/reservations`, `/contact`,
+  `mimiAuth.ts`) vers un store persistant (Upstash/Supabase)
+- Audit formel des politiques RLS Supabase
+
+---
+
 ## 27. Session 3-4 sept 2026 — Panneau façade physique (hors code, hors git)
 
 Chantier séparé du site web : signalétique physique pour la porte d'entrée du salon (adresse : n° 302 dans la rue).

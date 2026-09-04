@@ -10,6 +10,7 @@ import CookieBanner from "@/components/ui/CookieBanner";
 import StickyBooking from "@/components/layout/StickyBooking";
 import { routing } from "@/i18n/routing";
 import { INSTAGRAM_URL, TIKTOK_URL, MAPS_URL, GBP_URL } from "@/lib/social";
+import { getGoogleReviews } from "@/lib/google-reviews";
 import "../globals.css";
 
 // Seules /fr, /en, /es sont des routes valides. Toute autre valeur de [locale]
@@ -148,12 +149,6 @@ const jsonLd = {
     },
   ],
   priceRange: "150-950 MAD",
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.2",
-    reviewCount: "13",
-    bestRating: "5",
-  },
 };
 
 const faqLd = {
@@ -206,12 +201,21 @@ export default async function LocaleLayout({
   assertLocale(locale);
   const messages = await getMessages();
 
+  const reviewsData = await getGoogleReviews();
+  const aggregateRating = {
+    "@type": "AggregateRating",
+    ratingValue: (reviewsData?.rating ?? 4.2).toFixed(1),
+    reviewCount: String(reviewsData?.user_ratings_total ?? 13),
+    bestRating: "5",
+  };
+  const jsonLdWithRating = { ...jsonLd, aggregateRating };
+
   return (
     <html lang={locale} className={`${playfair.variable} ${inter.variable}`}>
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWithRating) }}
         />
         <script
           type="application/ld+json"

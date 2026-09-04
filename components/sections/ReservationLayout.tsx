@@ -351,6 +351,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
       nombre_personnes: getVal("persons"),
       message: getVal("message"),
       locale,
+      website: getVal("website"),
     };
     try {
       const res = await fetch("/api/reservations", {
@@ -418,6 +419,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
           nombre_personnes: getVal("persons"),
           message: getVal("message"),
           locale,
+          website: getVal("website"),
         }),
       });
       if (!res.ok) throw new Error();
@@ -508,6 +510,16 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
             onSubmit={handleSubmit}
             className="flex flex-col gap-2.5"
           >
+            {/* Honeypot anti-bot — invisible pour les humains, jamais rempli */}
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              className="absolute left-[-9999px] h-0 w-0 opacity-0"
+            />
+
             <div className="flex items-center gap-2.5">
               <span className="text-ocre text-base flex-shrink-0">✦</span>
               <div className="flex items-baseline gap-2 flex-wrap">
