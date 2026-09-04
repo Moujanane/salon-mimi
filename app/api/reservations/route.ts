@@ -56,7 +56,17 @@ export async function POST(request: NextRequest) {
     nombre_personnes,
     message,
     locale,
+    // Honeypot anti-bot : champ caché jamais rempli par un humain.
+    // S'il arrive rempli, on répond un faux succès sans rien enregistrer.
+    website,
   } = body;
+
+  if (typeof website === "string" && website.trim().length > 0) {
+    return NextResponse.json(
+      { success: true, whatsappLink: "" },
+      { status: 201 },
+    );
+  }
 
   const clientLocale = locale === "en" || locale === "es" ? locale : "fr";
 
