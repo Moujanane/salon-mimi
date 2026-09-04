@@ -370,7 +370,7 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
     }
   }
 
-  function handleWhatsApp() {
+  async function handleWhatsApp() {
     const form = formRef.current;
     if (!form) return;
     const getVal = (name: string) => {
@@ -394,14 +394,38 @@ export default function ReservationLayout({ labels, prices, locale }: Props) {
     ]
       .filter(Boolean)
       .join(" — ");
-    const url = generateWhatsAppLink({
+
+    // Fallback local si l'API est indisponible — le client ne doit jamais
+    // rester bloqué, même sans traçabilité admin dans ce cas rare.
+    const fallbackUrl = generateWhatsAppLink({
       nom,
       telephone,
       service: activeSvc.label,
       dateSouhaitee: getVal("date") || undefined,
       message: details || undefined,
     });
-    window.location.href = url;
+
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nom,
+          telephone,
+          service: activeSvc.label,
+          date_souhaitee: getVal("date"),
+          heure_souhaitee: getVal("time"),
+          nombre_personnes: getVal("persons"),
+          message: getVal("message"),
+          locale,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      window.location.href = json.whatsappLink || fallbackUrl;
+    } catch {
+      window.location.href = fallbackUrl;
+    }
   }
 
   if (submitted) {

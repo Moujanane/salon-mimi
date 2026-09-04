@@ -146,6 +146,28 @@ test.describe("Tunnel de réservation (CRO)", () => {
     ).toHaveCount(0);
   });
 
+  test("le bouton Réserver par WhatsApp enregistre la réservation via l'API avant redirection", async ({
+    page,
+  }) => {
+    await page.goto("/fr/reservation");
+    const waBtn = page.getByRole("button", {
+      name: /réserver par whatsapp/i,
+    });
+    await page.locator("input[name='name']").fill("Test Playwright API");
+    await page.locator("input[name='phone']").fill("+212600000001");
+
+    const apiRequest = page.waitForRequest(
+      (req) =>
+        req.url().includes("/api/reservations") && req.method() === "POST",
+    );
+    await waBtn.click();
+    const req = await apiRequest;
+    const payload = req.postDataJSON();
+    expect(payload.nom).toBe("Test Playwright API");
+    expect(payload.telephone).toBe("+212600000001");
+    expect(payload.service).toBeTruthy();
+  });
+
   test("le bandeau de réservation sticky est visible en mobile et pointe vers /reservation", async ({
     page,
   }, testInfo) => {
