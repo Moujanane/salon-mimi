@@ -6,6 +6,71 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 27. Session 3-4 sept 2026 — Panneau façade physique (hors code, hors git)
+
+Chantier séparé du site web : signalétique physique pour la porte d'entrée du salon (adresse : n° 302 dans la rue).
+
+### Livrable
+
+Panneau publicitaire 1 m × 30 cm pour la devanture. 3 variantes conçues (A claire,
+B sombre, C terracotta) ; **B (fond brun) retenue par Mouj** — meilleur contraste
+sur porte vitrée.
+
+Contenu du panneau B :
+
+- Logo doré fourni par Mouj (femme de profil + locks, « MIMI Rasta Africain
+  Coiffure »), fond transparent, intégré tel quel
+- Titre SALON MIMI + sous-titre
+- WhatsApp +212 710 388 204 (icône verte, gros numéro — agrandi sur demande le
+  3 sept)
+- QR code → avis Google (`g.page/r/CXqJtbaOg9FUEAE/review`)
+- QR code → Instagram (`instagram.com/salonmimi.marrakech`)
+- Handles texte TikTok @mimicoiffure700 / Instagram @salonmimi.marrakech
+- **N° de rue 302** en médaillon doré bas-droite (ajouté le 4 sept)
+- Cadre décoratif berbère (double filet + losanges)
+
+### Fichiers (dans `docs/panneau-facade/`, hors git — dossier volumineux, PDF/PNG binaires)
+
+| Fichier                                   | Rôle                                                                                                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `panneau-mimi-B.pdf`                      | **Fichier à donner à l'imprimeur.** Vectoriel, échelle 1:1, 1010×310 mm (1000×300 mm visible + 5 mm fond perdu chaque bord). Polices vectorisées. |
+| `apercu-mimi-B.png`                       | Aperçu écran (2020×620 px)                                                                                                                        |
+| `panneau-B.svg`                           | Source éditable                                                                                                                                   |
+| `panneau-mimi-A.pdf` / `-C.pdf` + sources | Variantes non retenues, gardées en archive                                                                                                        |
+| `index.html`                              | Aperçu des 3 versions côte à côte dans un navigateur                                                                                              |
+| `README.md`                               | Specs impression pour l'imprimeur (support Dibond 3mm ou PVC forex 5mm, finition mate anti-reflet — porte vitrée)                                 |
+| `assets/logo-mimi-gold.png`               | Logo source (1254×1254, RGBA transparent)                                                                                                         |
+| `assets/qr-*.svg`                         | QR codes générés (niveau correction H, `qrcode` npm)                                                                                              |
+
+### Process de génération (pour reproduire / modifier)
+
+1. QR codes : `node gen-qr.js` (lib `qrcode`, installée en local non-committée)
+2. SVG du panneau : construit à la main (script Python inline, pas de fichier
+   generator committé — geometry en dur : logo x=14..238, texte centre x=262+,
+   QR bas-droite x=826/910 y=39, badge 302 translate(958,266))
+3. Export PDF/PNG : Chrome headless
+   (`/Applications/Google Chrome.app/Contents/MacOS/Google Chrome --headless
+--print-to-pdf` avec `@page{size:1010mm 310mm}` dans un wrapper HTML)
+4. Vérification taille PDF : `mdls -name kMDItemPageWidth -name
+kMDItemPageHeight fichier.pdf` → doit donner 2862.96 × 878.88 pt
+
+### En attente — prochaine session
+
+**Mouj doit apporter une meilleure photo de la devanture actuelle** (portail
+bleu, panneau existant visible avec « 302 » et affichettes tarifs/coiffures).
+Objectif : faire un montage/collage du nouveau panneau B par-dessus la photo
+réelle pour visualiser le rendu avant impression.
+
+Note technique : plusieurs tentatives de transfert de fichier ont échoué cette
+session (glisser-déposer Finder → copiait systématiquement l'ancien
+`coiffure-1.jpg`, 141×235 px/23 ko, au lieu de la vraie photo). Solution la
+plus fiable la prochaine fois : soit coller l'image directement dans le chat
+(fonctionne pour affichage mais pas lisible par les outils fichier), soit
+Fichier → Exporter depuis Aperçu/Photos avec vérification du nom dans la barre
+de titre avant export, soit donner le chemin absolu exact du fichier source.
+
+---
+
 ## 26. Session 30 août 2026 (soir) — 2e bug d'indexation + retrait Umami + audits SEO & sécurité
 
 5 commits sur `main`, tous déployés Railway et vérifiés en prod.
