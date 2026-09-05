@@ -6,6 +6,55 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## À faire — prochaine session : migration Next.js 14 → 15
+
+Recherche approfondie faite le 5 sept. 2026 (session rate limiters) pour
+évaluer l'ampleur du chantier avant de s'engager. Résultat : **recommandée,
+peu risquée, courte** — pas encore commencée, brainstorming/plan à faire
+avant de coder (règle du projet).
+
+**Pourquoi** : corrige des CVE connues sur `next` 14.2.35. Chantier identifié
+dans l'audit SEO/sécurité du 30 août 2026 (§26, reste de S7/`npm audit`).
+
+**Ce qui rend le chantier facile** :
+
+- React reste en 18 — Next 15 n'exige PAS React 19 (peer deps vérifiées :
+  `^18.2.0 || ^19.0.0`), pas de double migration
+- `next-intl` 4.x supporte déjà Next 15 nativement (peer deps vérifiées :
+  `^15.0.0` inclus) — pas de montée de version majeure nécessaire, juste un
+  bump mineur 4.12.0 → 4.14.2 possible en même temps
+- `middleware.ts` et `next.config.mjs` : aucune option dépréciée/renommée
+  trouvée, zéro changement anticipé
+- Le projet utilise déjà le pattern async `params` (`Promise<{...}>` +
+  `await params`) sur 9 fichiers page/layout — déjà conforme Next 15
+
+**Ce qu'il reste réellement à corriger (2 fichiers seulement)** :
+
+1. `app/[locale]/opengraph-image.tsx` — `params` encore synchrone
+2. `app/api/reservations/[id]/route.ts` — `params` ET `cookies()` encore
+   synchrones, dans les handlers PATCH et DELETE
+
+**Point d'attention pour le plan** :
+
+- `app/api/reservations/[id]/route.ts` (le fichier le plus exposé aux
+  breaking changes) **n'a aucune couverture Playwright** — à tester
+  manuellement après migration (changement de statut réservation, suppression
+  depuis le dashboard admin), pas seulement se fier aux tests verts.
+- **Piège opérationnel** : `playwright.config.ts` pointe par défaut sur
+  `https://mimi-coiffure.com` (prod), pas le local. Toujours passer
+  `PLAYWRIGHT_BASE_URL=http://localhost:3000` explicitement pendant la
+  migration, sinon les tests « verts » testeraient encore l'ancienne prod
+  non migrée.
+- Le fichier `docs/superpowers/plans/2026-05-26-migration-nextjs15.md`
+  mentionné par erreur dans une session précédente **n'existe pas** (vérifié
+  par recherche exhaustive dans le repo et l'historique git) — repartir de
+  zéro pour le plan, ne pas chercher à le retrouver.
+
+**Process à suivre** : brainstorming → spec → plan → exécution (règle du
+projet, comme pour les chantiers P1/rate-limiters déjà faits cette session).
+
+---
+
 ## 31. Session 5 sept 2026 — Rate limiters persistants Upstash Redis (EN PROD)
 
 Chantier de l'audit SEO/sécurité du 30 août 2026 (§26) : les rate limiters de
