@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { checkWindowLimit } from "@/lib/rateLimit";
 
 function esc(str: string | undefined): string {
   if (!str) return "";
@@ -11,20 +12,12 @@ function esc(str: string | undefined): string {
     .replace(/'/g, "&#x27;");
 }
 
-const rateLimitMap = new Map<string, { count: number; ts: number }>();
-
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for") ?? "unknown";
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  const inWindow = entry && now - entry.ts < 60_000;
-  if (inWindow && entry.count >= 3) {
+  const allowed = await checkWindowLimit(`contact:${ip}`, 3, 60);
+  if (!allowed) {
     return NextResponse.json({ error: "Trop de demandes" }, { status: 429 });
   }
-  rateLimitMap.set(
-    ip,
-    inWindow ? { count: entry.count + 1, ts: entry.ts } : { count: 1, ts: now },
-  );
 
   const body = await req.json().catch(() => null);
   if (!body)
