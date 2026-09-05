@@ -8,9 +8,9 @@ export const contentType = "image/png";
 export default async function OgImage({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const locale = params?.locale ?? "fr";
+  const { locale } = await params;
 
   const titles: Record<string, string> = {
     fr: "Tresses africaines & Rasta",
