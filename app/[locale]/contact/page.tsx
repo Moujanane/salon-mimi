@@ -1,6 +1,7 @@
 export const revalidate = 3600;
 
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import Image from "next/image";
 import { getSettings } from "@/lib/settings";
 import { GOOGLE_REVIEW_URL } from "@/lib/social";
@@ -102,6 +103,7 @@ export default async function ContactPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const settings = await getSettings();
   const data = content[locale] ?? content.fr;
 
