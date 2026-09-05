@@ -8,9 +8,10 @@ const VALID_STATUTS = ["en_attente", "confirmee", "annulee"] as const;
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const cookieStore = cookies();
+  const { id } = await params;
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -41,7 +42,7 @@ export async function PATCH(
   const { error } = await supabaseAdmin
     .from("reservations")
     .update({ statut: statut as (typeof VALID_STATUTS)[number] })
-    .eq("id", params.id);
+    .eq("id", id);
 
   if (error) {
     console.error("Erreur mise à jour statut:", error);
@@ -56,9 +57,10 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const cookieStore = cookies();
+  const { id } = await params;
+  const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -82,7 +84,7 @@ export async function DELETE(
   const { error } = await supabaseAdmin
     .from("reservations")
     .delete()
-    .eq("id", params.id);
+    .eq("id", id);
 
   if (error) {
     console.error("Erreur suppression réservation:", error);
