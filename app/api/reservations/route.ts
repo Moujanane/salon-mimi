@@ -6,22 +6,7 @@ import { generateWhatsAppLink } from "@/lib/whatsapp";
 import { sendNotificationEmail } from "@/lib/sendNotificationEmail";
 import { sendClientConfirmationEmail } from "@/lib/sendClientConfirmationEmail";
 import { sendPushToMimi } from "@/lib/sendPushToMimi";
-
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const windowMs = 10 * 60 * 1000;
-  const maxRequests = 5;
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + windowMs });
-    return true;
-  }
-  if (entry.count >= maxRequests) return false;
-  entry.count++;
-  return true;
-}
+import { checkWindowLimit } from "@/lib/rateLimit";
 
 const VALID_SERVICES = [
   "Tresses africaines",
@@ -38,7 +23,8 @@ const VALID_SERVICES = [
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
-  if (!checkRateLimit(ip)) {
+  const allowed = await checkWindowLimit(`reservations:${ip}`, 5, 600);
+  if (!allowed) {
     return NextResponse.json(
       { error: "Trop de tentatives, réessaie dans 10 minutes." },
       { status: 429 },
