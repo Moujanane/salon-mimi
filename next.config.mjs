@@ -44,7 +44,10 @@ const nextConfig = {
         // PWA planning de Mimi : ne doit jamais être indexée (elle affiche des
         // données de réservation). L'accès aux données est déjà protégé par PIN
         // côté API ; ceci empêche l'indexation de la page HTML elle-même.
-        source: "/mimi:path*",
+        // path-to-regexp v8 (Next 15) refuse le modificateur `*` sur un
+        // paramètre sans délimiteur (`/mimi:path*`). La forme regex nommée
+        // `:path(.*)` est équivalente : matche /mimi, /mimi.html, /mimi/...
+        source: "/mimi:path(.*)",
         headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
       },
     ];

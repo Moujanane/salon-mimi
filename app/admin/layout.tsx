@@ -1,4 +1,5 @@
 // app/admin/layout.tsx
+import Link from "next/link";
 import "@/app/globals.css";
 
 export const metadata = {
@@ -17,27 +18,27 @@ export default function AdminLayout({
           <span className="font-playfair text-or text-lg">
             Salon Mimi — Admin
           </span>
-          <a
+          <Link
             href="/fr"
             className="text-xs text-white/50 hover:text-white transition-colors"
           >
             ← Retour au site
-          </a>
+          </Link>
         </header>
         <nav className="bg-white border-b border-gray-100 px-6">
           <div className="max-w-6xl mx-auto flex gap-6">
-            <a
+            <Link
               href="/admin/dashboard"
               className="text-sm text-gray-600 hover:text-brun py-3 border-b-2 border-transparent hover:border-brun transition-colors"
             >
               Réservations
-            </a>
-            <a
+            </Link>
+            <Link
               href="/admin/settings"
               className="text-sm text-gray-600 hover:text-brun py-3 border-b-2 border-transparent hover:border-brun transition-colors"
             >
               Paramètres
-            </a>
+            </Link>
           </div>
         </nav>
         <main className="max-w-6xl mx-auto px-4 py-10">{children}</main>
