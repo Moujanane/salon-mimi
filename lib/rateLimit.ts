@@ -31,6 +31,22 @@ const redis = url && token ? new Redis({ url, token }) : null;
  * `key` doit déjà inclure un préfixe distinguant l'appelant (ex.
  * "reservations:1.2.3.4") pour éviter toute collision entre routes.
  */
+const limiters = new Map<string, Ratelimit>();
+
+function getLimiter(max: number, windowSeconds: number): Ratelimit {
+  const cacheKey = `${max}:${windowSeconds}`;
+  let limiter = limiters.get(cacheKey);
+  if (!limiter) {
+    limiter = new Ratelimit({
+      redis: redis!,
+      limiter: Ratelimit.slidingWindow(max, `${windowSeconds} s`),
+      prefix: "ratelimit",
+    });
+    limiters.set(cacheKey, limiter);
+  }
+  return limiter;
+}
+
 export async function checkWindowLimit(
   key: string,
   max: number,
@@ -39,11 +55,7 @@ export async function checkWindowLimit(
   if (!redis) return true;
 
   try {
-    const limiter = new Ratelimit({
-      redis,
-      limiter: Ratelimit.slidingWindow(max, `${windowSeconds} s`),
-      prefix: "ratelimit",
-    });
+    const limiter = getLimiter(max, windowSeconds);
     const { success } = await limiter.limit(key);
     return success;
   } catch (err) {
