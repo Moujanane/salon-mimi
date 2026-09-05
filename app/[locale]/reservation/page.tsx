@@ -1,7 +1,7 @@
 // app/[locale]/reservation/page.tsx
 export const revalidate = 3600;
 
-import { getTranslations } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import ReservationLayout from "@/components/sections/ReservationLayout";
 import { getSettings } from "@/lib/settings";
 import type { Metadata } from "next";
@@ -46,6 +46,7 @@ export default async function ReservationPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const t = await getTranslations({ locale, namespace: "booking" });
   const settings = await getSettings();
 
