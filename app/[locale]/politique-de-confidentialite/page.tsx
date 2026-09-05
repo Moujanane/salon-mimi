@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 
 export const revalidate = 86400;
 
@@ -35,6 +36,7 @@ export default async function PolitiqueConfidentialitePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
 
   if (locale === "en") return <PrivacyEn />;
   if (locale === "es") return <PrivacyEs />;
