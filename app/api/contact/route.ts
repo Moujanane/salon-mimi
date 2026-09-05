@@ -13,7 +13,8 @@ function esc(str: string | undefined): string {
 }
 
 export async function POST(req: NextRequest) {
-  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   const allowed = await checkWindowLimit(`contact:${ip}`, 3, 60);
   if (!allowed) {
     return NextResponse.json({ error: "Trop de demandes" }, { status: 429 });
