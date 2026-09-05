@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { checkWindowLimit } from "@/lib/rateLimit";
+import { checkWindowLimit, getClientIp } from "@/lib/rateLimit";
 
 function esc(str: string | undefined): string {
   if (!str) return "";
@@ -13,8 +13,7 @@ function esc(str: string | undefined): string {
 }
 
 export async function POST(req: NextRequest) {
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const ip = getClientIp(req);
   const allowed = await checkWindowLimit(`contact:${ip}`, 3, 60);
   if (!allowed) {
     return NextResponse.json({ error: "Trop de demandes" }, { status: 429 });

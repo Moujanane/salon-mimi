@@ -6,7 +6,7 @@ import { generateWhatsAppLink } from "@/lib/whatsapp";
 import { sendNotificationEmail } from "@/lib/sendNotificationEmail";
 import { sendClientConfirmationEmail } from "@/lib/sendClientConfirmationEmail";
 import { sendPushToMimi } from "@/lib/sendPushToMimi";
-import { checkWindowLimit } from "@/lib/rateLimit";
+import { checkWindowLimit, getClientIp } from "@/lib/rateLimit";
 
 const VALID_SERVICES = [
   "Tresses africaines",
@@ -22,7 +22,7 @@ const VALID_SERVICES = [
 ];
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown";
+  const ip = getClientIp(request);
   const allowed = await checkWindowLimit(`reservations:${ip}`, 5, 600);
   if (!allowed) {
     return NextResponse.json(

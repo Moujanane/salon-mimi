@@ -11,6 +11,7 @@
 
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
+import type { NextRequest } from "next/server";
 
 const url = process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -22,6 +23,29 @@ if (!url || !token) {
 }
 
 const redis = url && token ? new Redis({ url, token }) : null;
+
+/**
+ * Extrait l'IP cliente réelle d'une requête, de façon fiable derrière
+ * Cloudflare (le proxy devant Railway pour ce projet).
+ *
+ * `cf-connecting-ip` est posé par Cloudflare et contient toujours la vraie
+ * IP du visiteur — contrairement à `x-forwarded-for`, qui peut contenir
+ * plusieurs IPs séparées par virgule ET dont la valeur peut varier d'une
+ * requête à l'autre pour un même visiteur selon le nœud edge Cloudflare qui
+ * traite la requête (observé en prod le 5 sept. 2026 : 3 requêtes
+ * consécutives du même testeur ont produit 3 x-forwarded-for différents,
+ * empêchant tout rate limit par IP de fonctionner).
+ *
+ * Fallback sur `x-forwarded-for` (premier segment, sans espace) si
+ * `cf-connecting-ip` est absent — utile en dev local ou si le site change
+ * un jour de CDN.
+ */
+export function getClientIp(req: NextRequest): string {
+  const cfIp = req.headers.get("cf-connecting-ip");
+  if (cfIp) return cfIp;
+
+  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+}
 
 /**
  * Compteur par fenêtre glissante : "au plus `max` requêtes par

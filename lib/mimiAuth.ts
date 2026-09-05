@@ -22,14 +22,11 @@ import {
   isFailureLimitExceeded,
   recordFailure,
   clearFailures,
+  getClientIp,
 } from "@/lib/rateLimit";
 
 const WINDOW_SECONDS = 30 * 60;
 const MAX_FAILURES = 3;
-
-function clientIp(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-}
 
 function constantTimeEqual(a: string, b: string): boolean {
   const bufA = Buffer.from(a, "utf8");
@@ -59,7 +56,7 @@ export async function checkMimiPin(req: NextRequest): Promise<MimiAuthResult> {
     };
   }
 
-  const ip = clientIp(req);
+  const ip = getClientIp(req);
   const key = `mimi-auth:${ip}`;
 
   if (await isFailureLimitExceeded(key, MAX_FAILURES)) {
