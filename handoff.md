@@ -21,8 +21,9 @@ Branche `fix/seo-securite-audit-restants` (4 commits du §28) mergée sur `main`
     en dur) — fix `a99ce0f` actif
   - `/fr/reservation` → 200, `/admin/dashboard` → 307 (redirect login normal)
   - Playwright **en full contre la vraie prod** : 136 passed / 2 skipped / 0 failed
-- **Non vérifié (nécessite action manuelle de Mouj)** : soumettre une
-  réservation test et confirmer qu'elle apparaît dans `/admin/dashboard`.
+- Réservation test soumise par Mouj sur `/fr/reservation` → confirmée
+  visible dans `/admin/dashboard`. Checklist obligatoire complète, zéro
+  régression.
 
 P1 (`Cache-Control no-store`, cause `setRequestLocale()` manquant) reste
 volontairement hors scope — chantier séparé à planifier, cf. §28.
