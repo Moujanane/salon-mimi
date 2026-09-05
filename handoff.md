@@ -6,7 +6,30 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 28. Session 4 sept 2026 — Correctifs SEO/sécurité restants du §26 (branche `fix/seo-securite-audit-restants`, PAS ENCORE MERGÉE)
+## 29. Session 5 sept 2026 — Merge + déploiement du §28 (EN PROD)
+
+Branche `fix/seo-securite-audit-restants` (4 commits du §28) mergée sur `main`
+(`db68174`) et poussée vers `origin/main`. Déploiement Railway déclenché et
+**confirmé actif en prod** :
+
+- `tsc --noEmit` ✓, `npm run build` ✓
+- Playwright contre build local : 136 passed / 2 skipped / 0 failed
+- Après déploiement, vérifié directement sur `https://mimi-coiffure.com` :
+  - Header `Link` hreflang `x-default` → pointe maintenant vers `/fr` (plus
+    vers la racine avec slash) — fix `ff7cd2e` actif
+  - JSON-LD `aggregateRating` → `4.3`/`17` avis (dynamique, plus le `4.2`/`13`
+    en dur) — fix `a99ce0f` actif
+  - `/fr/reservation` → 200, `/admin/dashboard` → 307 (redirect login normal)
+  - Playwright **en full contre la vraie prod** : 136 passed / 2 skipped / 0 failed
+- **Non vérifié (nécessite action manuelle de Mouj)** : soumettre une
+  réservation test et confirmer qu'elle apparaît dans `/admin/dashboard`.
+
+P1 (`Cache-Control no-store`, cause `setRequestLocale()` manquant) reste
+volontairement hors scope — chantier séparé à planifier, cf. §28.
+
+---
+
+## 28. Session 4 sept 2026 — Correctifs SEO/sécurité restants du §26 (branche `fix/seo-securite-audit-restants`, MERGÉE ET DÉPLOYÉE — voir §29)
 
 Suite au §26 (30 août), 4 des 6 chantiers SEO/sécurité restants ont été traités via
 processus subagent-driven (plan écrit d'abord, implémenteur + 2 revues par tâche).
