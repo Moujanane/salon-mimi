@@ -1,6 +1,7 @@
 export const revalidate = 3600;
 
 import type { Metadata } from "next";
+import { setRequestLocale } from "next-intl/server";
 import GalerieClient from "@/components/sections/GalerieClient";
 
 export async function generateMetadata({
@@ -55,6 +56,7 @@ export default async function GaleriePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  setRequestLocale(locale);
   const displayLocale = locale || "fr";
 
   return (
