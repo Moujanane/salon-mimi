@@ -6,7 +6,7 @@
 
 **Architecture:** Ajout d'un seul appel `setRequestLocale(locale)` (API `next-intl/server`) dans le layout `[locale]` et dans chacune des 8 pages, immédiatement après la résolution de `locale` et avant tout appel `getTranslations`/`getMessages`. Aucune autre logique ne change.
 
-**Tech Stack:** Next.js 14 App Router, next-intl, TypeScript strict, Vitest, Playwright.
+**Tech Stack:** Next.js 14 App Router, next-intl, TypeScript strict, Playwright (`npx playwright test`, testDir `e2e/` — pas de script npm dédié, pas de Vitest sur ce projet malgré ce que CLAUDE.md laisse penser).
 
 ---
 
@@ -34,12 +34,11 @@ Run: `npx tsc --noEmit && npm run build 2>&1 | grep -E "^(┌|├|└|●|ƒ|○
 
 Noter le résultat : les 8 routes `[locale]/*` doivent apparaître marquées `●` (SSG) dans la légende Next.js — **mais ce marqueur ment actuellement** (SSG apparent alors que le rendu reste dynamique à cause de `getRequestConfig`/`requestLocale` non résolu statiquement). Ce n'est donc pas un test suffisant à lui seul ; il sert de point de comparaison avec le comportement runtime réel vérifié après coup (Étape finale, Cache-Control observé en prod). Ne pas bloquer sur ce point : juste noter la sortie actuelle pour référence.
 
-- [ ] **Étape 0.2 : Lancer la suite de tests existante (référence avant changement)**
+- [ ] **Étape 0.2 : Lancer la suite Playwright existante (référence avant changement)**
 
-Run: `npm run test`
-Expected: tous les tests Vitest passent (aucune régression pré-existante à confondre avec le futur changement).
+Il n'y a pas de script `npm run test` ni de Vitest sur ce projet — seul Playwright existe (`testDir: "./e2e"` dans `playwright.config.ts`), lancé directement via `npx playwright test`.
 
-Run: `npm start & sleep 3 && PLAYWRIGHT_BASE_URL=http://localhost:3000 npx playwright test 2>&1 | tail -5; kill %1`
+Run: `npm run build && npm start & sleep 5 && PLAYWRIGHT_BASE_URL=http://localhost:3000 npx playwright test 2>&1 | tail -5; kill %1`
 Expected: `136 passed / 2 skipped` (référence connue, cf. handoff session 5 sept. 2026).
 
 ---
@@ -506,12 +505,7 @@ Expected: build réussi (exit code 0).
 Run: `grep -A 30 "Route (app)" /tmp/build-output.txt`
 Expected : chacune des 8 routes `[locale]/*` (home, a-propos, contact, galerie, mentions-legales, politique-de-confidentialite, reservation, services) apparaît marquée `●` (SSG), avec ses 3 sous-routes `/fr`, `/en`, `/es` listées dessous — comme dans le build de référence de la session du 5 sept. 2026 (voir handoff §29). Aucune de ces 8 routes ne doit apparaître marquée `ƒ` (dynamique).
 
-- [ ] **Step 3: Vitest**
-
-Run: `npm run test`
-Expected: tous les tests passent, aucune régression par rapport à la baseline (Étape 0.2).
-
-- [ ] **Step 4: Playwright contre le build local**
+- [ ] **Step 3: Playwright contre le build local**
 
 ```bash
 npm start &
@@ -522,7 +516,7 @@ kill %1
 
 Expected: `136 passed / 2 skipped`, 0 échec (même référence que la baseline Étape 0.2 et que la session du 5 sept. 2026).
 
-- [ ] **Step 5: Vérification manuelle navigateur (build local, avant déploiement)**
+- [ ] **Step 4: Vérification manuelle navigateur (build local, avant déploiement)**
 
 ```bash
 npm start &
@@ -535,9 +529,9 @@ kill %1
 
 Expected : en local, `next start` peut encore renvoyer un `Cache-Control` différent de la prod Railway (pas de CDN local) — l'important ici est l'absence d'erreur serveur (pas de 500) sur les 3 URLs et un `Cache-Control` qui n'est plus explicitement `no-store` si la page a bien basculé en SSG. Si `no-store` persiste en local uniquement, ce n'est pas bloquant — la vérification décisive se fait en prod (Task 11).
 
-- [ ] **Step 6: Commit de vérification (si des ajustements ont été faits pendant cette tâche)**
+- [ ] **Step 5: Commit de vérification (si des ajustements ont été faits pendant cette tâche)**
 
-Si les Steps 1-5 n'ont nécessité aucune modification de code, ne rien committer ici (rien à committer). Si un ajustement a été nécessaire (ex. ordre d'import incorrect détecté par `tsc`), committer ce fix isolément :
+Si les Steps 1-4 n'ont nécessité aucune modification de code, ne rien committer ici (rien à committer). Si un ajustement a été nécessaire (ex. ordre d'import incorrect détecté par `tsc`), committer ce fix isolément :
 
 ```bash
 git add -A
