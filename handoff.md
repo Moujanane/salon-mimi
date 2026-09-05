@@ -6,6 +6,63 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 30. Session 5 sept 2026 — Fix P1 Cache-Control via setRequestLocale (EN PROD)
+
+Chantier P1 de l'audit SEO/sécurité du 30 août 2026 (§26), identifié comme bloqué
+en §28 : tout le site public servait `Cache-Control: private, no-cache, no-store,
+max-age=0, must-revalidate` malgré les `revalidate` déjà en place, parce que
+next-intl n'appelait jamais `setRequestLocale()` — l'API qui active le rendu
+statique (SSG).
+
+**Process complet appliqué** : brainstorming → spec
+(`docs/superpowers/specs/2026-09-05-setrequestlocale-cache-fix-design.md`) →
+plan (`docs/superpowers/plans/2026-09-05-setrequestlocale-cache-fix.md`) →
+exécution subagent-driven (implémenteur + spec reviewer + code quality reviewer
+par fichier, dans un worktree isolé `worktree-fix-setrequestlocale-cache`).
+
+### Fix
+
+`setRequestLocale(locale)` ajouté dans 9 fichiers, juste après la résolution de
+`locale` et avant tout autre appel next-intl :
+`app/[locale]/layout.tsx`, `page.tsx`, `a-propos/page.tsx`, `contact/page.tsx`,
+`galerie/page.tsx`, `mentions-legales/page.tsx`,
+`politique-de-confidentialite/page.tsx`, `reservation/page.tsx`,
+`services/page.tsx`. Aucun changement de logique métier, de `revalidate`, ni de
+composants client (`ReservationLayout`, `GalerieClient`, `ServicesPageClient`
+inchangés).
+
+9 commits, chacun revu à deux étages (conformité spec puis qualité code) avant
+de passer au suivant — tous approuvés sans itération de correction nécessaire.
+
+### Vérification
+
+- `tsc --noEmit` ✓, `npm run build` ✓, Playwright local 136 passed / 2 skipped
+- Déployé sur `main` (commit `f7463d1`, fast-forward propre depuis le worktree)
+- **En prod, vérifié sur les 24 URLs (8 pages × 3 langues)** : `Cache-Control`
+  passé de `no-store` à `s-maxage=3600, stale-while-revalidate` partout — zéro
+  exception
+- Navigation manuelle : home (avis Google 4.3/17 affichés), `/en/services`
+  (prix corrects), `/fr/reservation?service=box-braids` (service présélectionné,
+  prix affiché, formulaire actif)
+- Playwright en full contre la vraie prod : 136 passed / 2 skipped / 0 failed
+- Réservation test soumise par Mouj → confirmée visible dans `/admin/dashboard`
+
+**Conclusion : chantier P1 clos, zéro régression.** Des 6 chantiers identifiés
+par l'audit du 30 août 2026 (§26), il ne reste que P6 (pages contenu rasta/EN,
+bloqué sur le shooting photos) et le reste de S7/rate limiters/audit RLS
+(mémoire projet `salon-mimi-*`) comme non traités.
+
+### Note technique — CLAUDE.md à corriger
+
+Ce projet **n'a pas de script `npm run test` ni de Vitest**, contrairement à ce
+que `CLAUDE.md` (racine du projet) indique. Seul Playwright existe
+(`testDir: "./e2e"` dans `playwright.config.ts`), lancé directement via
+`npx playwright test` — pas de script npm dédié pour l'e2e non plus. Découvert
+et corrigé dans le plan pendant cette session ; `CLAUDE.md` référence toujours
+Vitest à tort, à mettre à jour dans une session future.
+
+---
+
 ## 29. Session 5 sept 2026 — Merge + déploiement du §28 (EN PROD)
 
 Branche `fix/seo-securite-audit-restants` (4 commits du §28) mergée sur `main`
