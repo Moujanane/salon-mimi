@@ -11,18 +11,21 @@
 //    requête est rejetée (503). Un déploiement sans la variable ne doit pas
 //    ouvrir l'accès avec un PIN devinable.
 //  - Comparaison à temps constant (crypto.timingSafeEqual).
-//  - Rate limit par IP : 3 tentatives échouées / 30 min. En mémoire (se
-//    réinitialise à chaque redéploiement/scale Railway — limite connue, à
-//    remplacer par un store persistant type Upstash si le besoin grandit).
+//  - Rate limit par IP : 3 tentatives échouées / 30 min. Persistant via
+//    Upstash Redis (lib/rateLimit.ts) — ne se réinitialise plus à chaque
+//    redéploiement/scale Railway, contrairement à l'ancienne implémentation
+//    en mémoire.
 
 import { timingSafeEqual } from "crypto";
 import type { NextRequest } from "next/server";
+import {
+  isFailureLimitExceeded,
+  recordFailure,
+  clearFailures,
+} from "@/lib/rateLimit";
 
-const WINDOW_MS = 30 * 60 * 1000;
+const WINDOW_SECONDS = 30 * 60;
 const MAX_FAILURES = 3;
-
-type Entry = { failures: number; resetAt: number };
-const attempts = new Map<string, Entry>();
 
 function clientIp(req: NextRequest): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
@@ -43,10 +46,10 @@ export type MimiAuthResult =
 /**
  * Vérifie le PIN Mimi d'une requête API.
  * Usage :
- *   const auth = checkMimiPin(req);
+ *   const auth = await checkMimiPin(req);
  *   if (!auth.ok) return NextResponse.json({ error: auth.error }, { status: auth.status });
  */
-export function checkMimiPin(req: NextRequest): MimiAuthResult {
+export async function checkMimiPin(req: NextRequest): Promise<MimiAuthResult> {
   const expected = process.env.MIMI_PIN;
   if (!expected) {
     return {
@@ -57,9 +60,9 @@ export function checkMimiPin(req: NextRequest): MimiAuthResult {
   }
 
   const ip = clientIp(req);
-  const now = Date.now();
-  const entry = attempts.get(ip);
-  if (entry && now < entry.resetAt && entry.failures >= MAX_FAILURES) {
+  const key = `mimi-auth:${ip}`;
+
+  if (await isFailureLimitExceeded(key, MAX_FAILURES)) {
     return {
       ok: false,
       status: 429,
@@ -69,15 +72,10 @@ export function checkMimiPin(req: NextRequest): MimiAuthResult {
 
   const provided = req.headers.get("x-mimi-pin") ?? "";
   if (provided && constantTimeEqual(provided, expected)) {
-    attempts.delete(ip);
+    await clearFailures(key);
     return { ok: true };
   }
 
-  // Échec : incrémente le compteur
-  if (!entry || now >= entry.resetAt) {
-    attempts.set(ip, { failures: 1, resetAt: now + WINDOW_MS });
-  } else {
-    entry.failures++;
-  }
+  await recordFailure(key, WINDOW_SECONDS);
   return { ok: false, status: 401, error: "PIN incorrect" };
 }

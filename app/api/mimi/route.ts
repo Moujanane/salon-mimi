@@ -3,7 +3,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { checkMimiPin } from "@/lib/mimiAuth";
 
 export async function GET(request: NextRequest) {
-  const auth = checkMimiPin(request);
+  const auth = await checkMimiPin(request);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }

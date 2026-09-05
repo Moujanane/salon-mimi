@@ -21,7 +21,7 @@ const ALLOWED_KEYS = [
 ];
 
 export async function GET(req: NextRequest) {
-  const auth = checkMimiPin(req);
+  const auth = await checkMimiPin(req);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const auth = checkMimiPin(req);
+  const auth = await checkMimiPin(req);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }

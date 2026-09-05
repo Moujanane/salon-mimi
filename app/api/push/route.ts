@@ -10,7 +10,7 @@ export async function GET() {
 
 // Enregistrer un abonnement push (réservé à la PWA Mimi).
 export async function POST(req: NextRequest) {
-  const auth = checkMimiPin(req);
+  const auth = await checkMimiPin(req);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 
 // Supprimer un abonnement push (réservé à la PWA Mimi).
 export async function DELETE(req: NextRequest) {
-  const auth = checkMimiPin(req);
+  const auth = await checkMimiPin(req);
   if (!auth.ok) {
     return NextResponse.json({ error: auth.error }, { status: auth.status });
   }
