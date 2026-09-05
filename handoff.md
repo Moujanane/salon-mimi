@@ -6,6 +6,106 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 31. Session 5 sept 2026 — Rate limiters persistants Upstash Redis (EN PROD)
+
+Chantier de l'audit SEO/sécurité du 30 août 2026 (§26) : les rate limiters de
+`/api/reservations`, `/api/contact` et du PIN PWA Mimi (`lib/mimiAuth.ts`)
+étaient en mémoire process (`Map`), remis à zéro à chaque redéploiement/scale
+Railway. Migrés vers Upstash Redis (base `gorgeous-yak-138078`, plan gratuit,
+région `eu-west-2`).
+
+**Process complet** : brainstorming → spec
+(`docs/superpowers/specs/2026-09-05-rate-limiters-persistants-design.md`) →
+plan (`docs/superpowers/plans/2026-09-05-rate-limiters-persistants.md`) →
+exécution subagent-driven dans un worktree isolé
+(`worktree-fix-rate-limiters-upstash`).
+
+### Fix principal
+
+Nouveau `lib/rateLimit.ts` : deux familles de limiteurs au-dessus d'un client
+Redis singleton — `checkWindowLimit` (fenêtre glissante, via
+`@upstash/ratelimit`) pour reservations/contact, et
+`isFailureLimitExceeded`/`recordFailure`/`clearFailures` (compteur d'échecs
+réinitialisable) pour le PIN Mimi. Fail-open partout : toute erreur Redis
+autorise la requête plutôt que de bloquer un utilisateur légitime. Seuils
+strictement inchangés (5/10min, 3/min, 3 échecs/30min).
+
+Une revue de code a signalé que `checkWindowLimit` recréait une instance
+`Ratelimit` à chaque appel (annulait le cache interne de la lib) — corrigé
+avant merge (instances mises en cache par `(max, windowSeconds)`).
+
+`checkMimiPin()` passe de synchrone à async — les 5 appelants (dans
+`app/api/mimi/route.ts`, `mimi-settings/route.ts`, `push/route.ts`) mis à
+jour avec `await`, vérifiés individuellement par un reviewer dédié (risque
+identifié : un `await` manqué aurait cassé silencieusement 100% des requêtes
+PIN Mimi).
+
+### Deux bugs supplémentaires découverts en testant le rate limit EN PROD
+
+Ces bugs préexistaient (hors scope du plan initial), mais rendaient le
+rate limit inefficace en conditions réelles — corrigés dans la foulée :
+
+1. **`/api/contact` ne coupait pas `x-forwarded-for` sur la virgule**
+   (contrairement à `/api/reservations`, qui le faisait déjà). Fix : split
+   sur la virgule, comme l'autre route.
+
+2. **`x-forwarded-for` instable derrière Cloudflare** — observé en testant
+   4 requêtes consécutives depuis le même poste : 3 valeurs différentes de
+   `x-forwarded-for` reçues (le edge Cloudflare qui traite la requête varie),
+   rendant tout rate limit par IP inefficace (chaque requête crée une
+   nouvelle clé Redis au lieu de s'accumuler). **Fix** : nouvelle fonction
+   `getClientIp()` dans `lib/rateLimit.ts`, qui lit `cf-connecting-ip` en
+   priorité (toujours stable, posé par Cloudflare) avec fallback sur
+   `x-forwarded-for`. Appliqué aux 3 endroits qui identifient un client par
+   IP (`reservations`, `contact`, `mimiAuth`).
+
+**Règle à retenir** : sur ce projet (derrière Cloudflare), toujours utiliser
+`getClientIp()` de `lib/rateLimit.ts` pour identifier un client par IP —
+ne jamais lire `x-forwarded-for` directement, ce header n'est pas fiable
+pour ce site.
+
+### Vérification
+
+- `tsc --noEmit` ✓, `npm run build` ✓, Playwright local 136/136
+- Déployé sur `main` en plusieurs commits successifs (le dernier `80d20a3`),
+  chacun re-testé en prod immédiatement
+- **Rate limit confirmé fonctionnel en prod** : après le fix `cf-connecting-ip`,
+  8 requêtes consécutives sur `/api/contact` depuis la même IP → les 5
+  premières autorisées (algorithme sliding window, pas un seuil strict), les
+  suivantes bloquées en 429, confirmé sur plusieurs requêtes de suite. IP
+  stable confirmée dans les clés Redis (vérifié via l'API REST Upstash).
+- **Fail-open confirmé** : sans credentials Upstash, aucune requête bloquée
+  (testé en local en désactivant temporairement les variables d'env)
+- Playwright en full contre la vraie prod : résultats variables (130-136
+  passed) à cause d'un flaky préexistant, sans rapport avec ce chantier —
+  voir note ci-dessous
+- Checklist obligatoire : `/admin/dashboard` (307 redirect login normal),
+  `/reservation` (200), PIN `/mimi.html` testé et confirmé fonctionnel par
+  Mouj
+
+### Flaky repéré et non traité ici (tâche séparée créée)
+
+`e2e/site.spec.ts:41` ("la page services s'affiche") échoue de façon
+reproductible contre la prod : timeout Playwright de 30s dépassé sur
+l'événement `load`, à cause de 3 vidéos hébergées sur jsDelivr
+(`cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-{1,2,3}.mp4`)
+qui prennent chacune 6 à 11 secondes à charger (mesuré). Aucun rapport avec
+ce chantier — confirmé par `curl` direct que la page HTML répond en moins
+d'1 seconde pour un vrai visiteur. Tâche de suivi créée
+(`task_e3d10024`) pour ajuster le test (`waitUntil: "domcontentloaded"`
+ou attendre le H1 plutôt que `load`) et/ou revoir le `preload` des balises
+vidéo sur `/fr/services`.
+
+### Piste à retenir pour un futur chantier
+
+L'algorithme sliding window d'`@upstash/ratelimit` répartit le comptage sur
+deux clés Redis consécutives avec des poids différents (observé : 1 et 3
+sur un total pondéré) — comportement normal de la lib, pas un bug, mais à
+garder en tête si un futur test suppose un seuil strict "exactement N puis
+blocage immédiat".
+
+---
+
 ## 30. Session 5 sept 2026 — Fix P1 Cache-Control via setRequestLocale (EN PROD)
 
 Chantier P1 de l'audit SEO/sécurité du 30 août 2026 (§26), identifié comme bloqué
