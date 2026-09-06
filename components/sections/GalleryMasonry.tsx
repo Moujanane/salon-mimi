@@ -99,6 +99,117 @@ function PhotoCell({
   );
 }
 
+function Lightbox({
+  items,
+  index,
+  onClose,
+  onPrev,
+  onNext,
+}: {
+  items: GalleryItem[];
+  index: number;
+  onClose: () => void;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
+  const item = items[index];
+  const closeBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  // Handlers courants gardés dans une ref : la lightbox ne rattache pas ses
+  // effets quand le parent re-render (il passe de nouvelles closures à chaque
+  // fois). Sans ça, le verrou de scroll pourrait se figer sur "hidden".
+  const handlers = useRef({ onClose, onPrev, onNext });
+  handlers.current = { onClose, onPrev, onNext };
+
+  useEffect(() => {
+    closeBtnRef.current?.focus();
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") handlers.current.onClose();
+      if (e.key === "ArrowLeft") handlers.current.onPrev();
+      if (e.key === "ArrowRight") handlers.current.onNext();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  if (!item) return null;
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Média en plein écran"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
+      onClick={onClose}
+    >
+      <button
+        ref={closeBtnRef}
+        type="button"
+        onClick={onClose}
+        aria-label="Fermer"
+        className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-2xl text-white hover:bg-white/20"
+      >
+        ×
+      </button>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onPrev();
+        }}
+        aria-label="Précédent"
+        className="absolute left-2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-3xl text-white hover:bg-white/20 md:left-6"
+      >
+        ‹
+      </button>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onNext();
+        }}
+        aria-label="Suivant"
+        className="absolute right-2 z-10 flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-3xl text-white hover:bg-white/20 md:right-6"
+      >
+        ›
+      </button>
+
+      <div
+        className="max-h-[88vh] max-w-[92vw]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {item.type === "video" ? (
+          <video
+            key={item.id}
+            src={item.url}
+            poster={item.poster_url ?? undefined}
+            controls
+            autoPlay
+            muted
+            playsInline
+            className="max-h-[88vh] max-w-[92vw] rounded-lg bg-black"
+          />
+        ) : (
+          <img
+            key={item.id}
+            src={item.url}
+            alt={item.alt}
+            className="max-h-[88vh] max-w-[92vw] rounded-lg object-contain"
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function GalleryMasonry({ items }: { items: GalleryItem[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -124,16 +235,20 @@ export default function GalleryMasonry({ items }: { items: GalleryItem[] }) {
         ))}
       </div>
 
-      {/* Lightbox ajoutée en Task 4 — placeholder d'état pour l'instant */}
       {openIndex !== null && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/95"
-          onClick={() => setOpenIndex(null)}
-        >
-          <p className="text-white">Lightbox — Task 4</p>
-        </div>
+        <Lightbox
+          items={items}
+          index={openIndex}
+          onClose={() => setOpenIndex(null)}
+          onPrev={() =>
+            setOpenIndex((i) =>
+              i === null ? null : (i - 1 + items.length) % items.length,
+            )
+          }
+          onNext={() =>
+            setOpenIndex((i) => (i === null ? null : (i + 1) % items.length))
+          }
+        />
       )}
     </div>
   );
