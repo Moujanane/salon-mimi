@@ -165,10 +165,12 @@ Exporter. Reste dans le repo, nettoyage optionnel plus tard.
   poubelle au survol de sa vignette dans `/admin/galerie`.
 - **Finir la checklist manuelle** : ajout d'une vidéo (< 8 Mo), glisser une
   vignette pour réordonner, bouton « Exporter le PDF ».
-- **Vérifier la limite de taille de requête Railway** : le `POST /api/gallery`
-  bufferise tout le corps AVANT le contrôle de taille (commenté dans
-  `app/api/gallery/route.ts`). Si un gros upload photo échoue bizarrement,
-  c'est là. Le garde-fou applicatif est à 20 Mo.
+
+**Limite de taille d'upload — point clos** : Railway n'expose aucun réglage
+(limite edge Envoy = plusieurs centaines de Mo, hors de portée). Le seul
+plafond utile est le garde-fou applicatif à 20 Mo dans `app/api/gallery/
+route.ts` (413 au-delà). Les photos de Mouj font toutes < 10 Mo et `sharp` les
+recompresse à l'upload. Rien à configurer, rien à surveiller.
 
 ### Pistes pour une prochaine session
 
