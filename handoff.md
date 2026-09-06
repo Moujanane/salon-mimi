@@ -2194,9 +2194,17 @@ Politiques critiques à ne jamais supprimer :
 
 Les navigateurs bloquent les popups ouvertes de façon asynchrone. Toujours utiliser un lien `<a href>` ou un bouton cliqué par l'utilisateur pour ouvrir WhatsApp ou toute URL externe.
 
-### Couleur des inputs sur fond clair
+### Couleur des inputs sur fond clair — DÉJÀ ARRIVÉ 2 FOIS
 
-Les inputs sans `text-gray-900` explicite héritent d'une couleur qui peut se confondre avec le fond. Toujours ajouter `text-gray-900` sur les champs de formulaire admin.
+Tout `<input>` / `<textarea>` sur fond clair (admin ou public) **DOIT** avoir
+`text-gray-900` (+ `placeholder:text-gray-400`). Sans classe de couleur
+explicite, le texte hérite d'une couleur qui se confond avec le fond → saisie
+invisible → on croit le champ « mort ».
+
+Occurrences : `SettingsForm.tsx` (juin 2026), `AddMediaForm.tsx` (sept 2026).
+**À vérifier systématiquement en code review** de tout composant contenant un
+champ de saisie. Ne pas se contenter de reprendre le code d'une spec :
+l'ajouter si absent.
 
 ### `useState(initial)` et hydration React
 
