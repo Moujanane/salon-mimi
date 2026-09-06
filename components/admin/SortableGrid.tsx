@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -47,6 +48,11 @@ function SortableTile({
   const thumb =
     item.type === "video" ? (item.poster_url ?? item.url) : item.url;
 
+  // Lecture de la vidéo DANS la vignette (pour vérifier avant/après mise en
+  // ligne). Le clic sur le bouton ▶ stoppe la propagation pour ne pas
+  // déclencher un drag dnd-kit.
+  const [playing, setPlaying] = useState(false);
+
   return (
     <div
       ref={setNodeRef}
@@ -56,7 +62,16 @@ function SortableTile({
       title={`#${item.sort_order} · ${item.type === "video" ? "vidéo" : "photo"}\n${item.alt}`}
       className="group relative aspect-square overflow-hidden rounded-lg bg-gray-200 cursor-grab active:cursor-grabbing"
     >
-      {isVideoWithoutPoster ? (
+      {item.type === "video" && playing ? (
+        <video
+          src={item.url}
+          poster={item.poster_url ?? undefined}
+          controls
+          autoPlay
+          playsInline
+          className="h-full w-full bg-black object-contain"
+        />
+      ) : isVideoWithoutPoster ? (
         <video
           src={`${item.url}#t=0.1`}
           preload="metadata"
@@ -72,13 +87,21 @@ function SortableTile({
           className="h-full w-full object-cover pointer-events-none"
         />
       )}
-      {item.type === "video" && (
-        <span
-          aria-hidden="true"
+      {item.type === "video" && !playing && (
+        <button
+          type="button"
+          aria-label="Lire la vidéo"
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            setPlaying(true);
+          }}
           className="absolute inset-0 flex items-center justify-center text-white text-2xl drop-shadow"
         >
-          ▶
-        </span>
+          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-black/45 transition-transform group-hover:scale-110">
+            ▶
+          </span>
+        </button>
       )}
       <button
         type="button"
