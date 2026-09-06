@@ -148,7 +148,7 @@ export default function AddMediaForm({
           ref={fileRef}
           type="file"
           accept="image/jpeg,image/png,image/webp,video/mp4"
-          className="block w-full text-sm"
+          className="block w-full text-sm text-gray-900 file:mr-3 file:rounded file:border-0 file:bg-brun file:px-3 file:py-1.5 file:text-sm file:text-white"
         />
       </div>
       <div className="flex-1">
@@ -160,7 +160,7 @@ export default function AddMediaForm({
           value={alt}
           onChange={(e) => setAlt(e.target.value)}
           placeholder="ex : Box braids bohème Salon Mimi Marrakech"
-          className="block w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+          className="block w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 placeholder:text-gray-400"
         />
       </div>
       <button
@@ -171,10 +171,12 @@ export default function AddMediaForm({
         {busy ? "Envoi en cours…" : "Ajouter"}
       </button>
       {error && (
-        <p className="w-full text-sm text-red-600 sm:w-auto">{error}</p>
+        <p className="w-full text-sm font-medium text-red-600 sm:basis-full">
+          {error}
+        </p>
       )}
       {notice && (
-        <p className="w-full text-sm text-amber-700 sm:w-auto">{notice}</p>
+        <p className="w-full text-sm text-amber-700 sm:basis-full">{notice}</p>
       )}
     </form>
   );
