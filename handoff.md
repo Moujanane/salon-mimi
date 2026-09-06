@@ -6,6 +6,170 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 34. Session 6 sept 2026 — Médias clientes + chantier AI-readiness (EN PROD)
+
+Deux livraisons dans la même session. Tout en prod (`main`, commits `c8d2d18`
+puis `6577ba3`), Railway auto-déploie.
+
+### 34.1 — Intégration de médias clientes de septembre
+
+Mouj a déposé 5 vidéos + 2 photos dans
+`~/Desktop/salon-mimi-media/Pub/Photo Clients Mimi/` (le dossier `~/Bureau` est
+l'alias FR de `~/Desktop`, même chemin).
+
+**Retenu (6 fichiers sur 7)** :
+
+| Source                          | Traitement              | Nom final                         | Destination                                          |
+| ------------------------------- | ----------------------- | --------------------------------- | ---------------------------------------------------- |
+| `Video2.jpeg` (900×1600, salon) | redim. 563×1000, 105 ko | `cornrows-mimi-2509-1.jpeg`       | `public/images/` → galerie section Cornrows & Fulani |
+| `Photo1.jpeg` (936×919)         | renommé, 80 ko          | `boho-mimi-2509-1.jpeg`           | `public/images/` → galerie section Boho & Goddess    |
+| `Video1.mp4` (enfant, 13s)      | H.264 CRF 28, 1.2 Mo    | `salon-mimi-enfants-2509-1.mp4`   | repo média → jsDelivr → galerie Vidéos               |
+| `Video3.mp4` (enfant, 17s)      | H.264, 1.6 Mo           | `salon-mimi-enfants-2509-2.mp4`   | repo média → jsDelivr → galerie Vidéos               |
+| `Video4.mp4` (twists, 11s)      | H.264, 1.8 Mo           | `salon-mimi-twists-2509-1.mp4`    | repo média → jsDelivr → galerie Vidéos               |
+| `Video2.mp4` (box braids, 29s)  | H.264, 6.5 → 4.1 Mo     | `salon-mimi-boxbraids-2509-1.mp4` | repo média → jsDelivr → galerie Vidéos               |
+
+**Écarté** : `Video5.mp4` (boho) — sous-titres incrustés d'un repost TikTok qui
+montent jusqu'à 65 % de la hauteur et bougent, impossible à croper proprement.
+À garder pour Instagram uniquement.
+
+**Rappels d'archi confirmés cette session** :
+
+- Les **vidéos ne vont PAS dans le repo du site**. Elles vivent dans le repo
+  séparé `github.com/Moujanane/salon-mimi-media` (racine), servies par jsDelivr
+  (`https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/<fichier>`). Les
+  **photos** vont dans `public/images/` du site.
+- jsDelivr met **12-24 h** à rafraîchir son cache après un push sur le repo
+  média : les nouvelles vidéos peuvent renvoyer 404 le temps de la propagation,
+  les posters (images de `public/images/`) s'affichent en attendant. Comportement
+  normal, se résout seul.
+- Le `git commit` du repo média utilise l'identité auto `Mouj@mbp-de-nadja.home`
+  (pas de `user.email` configuré sur ce Mac). Sans conséquence, mais à savoir.
+
+Fichier code touché : `components/sections/GalerieClient.tsx` (2 photos dans
+`SECTIONS`, 4 vidéos dans `VIDEOS[]`).
+
+### 34.2 — 3 posts Google Business Profile rédigés
+
+Dans `docs/gbp-posts-2026-09/` (hors git — dossier `docs/` non tracké) :
+`README.md` (procédure) + 3 images carré 1080 sans texte incrusté.
+
+- **Post 1 — Cornrows dessin** : photo neuve `gbp-post1-cornrows.jpg` (la seule
+  vraie photo de qualité "fiche Google" du lot déposé)
+- **Post 2 — Box braids bohème** : `tresses-mimi-6.jpeg` recadré sur une seule
+  vue pour retirer le texte "100% cheveux naturels"
+- **Post 3 — Tresses enfants** : `s-tresse-fille1.png` recadré
+
+Textes FR prêts à coller. Bouton **Réserver** → `/fr/reservation`. Rythme
+1 post/semaine. Les 4 vidéos ne sont PAS dans les posts (Google Business affiche
+mal les vidéos filmées main + règle §24 "Google Business ≠ Instagram").
+
+**Constat** : sur les 7 fichiers déposés, une seule photo était de qualité fiche
+Google. Le shooting photos (checklist §24) reste la priorité.
+
+### 34.3 — Chantier AI-readiness (SEO données structurées) — 3 lots
+
+Objectif : que le JSON-LD, les mentions légales, le footer et les emails
+affichent **tous les mêmes valeurs**, pour qu'un agent de recherche
+(AI Overviews, ChatGPT, Perplexity) recoupe le site avec Google Business Profile
+sans tomber sur des contradictions. Pas d'"agentic" au sens fort (Google/IA qui
+réserve tout seul) : ça dépend de programmes partenaires (Reserve with Google /
+OpenTable) inaccessibles à un salon indépendant à Marrakech.
+
+**Nouveau fichier `lib/salon-info.ts`** — source unique de vérité : identité du
+salon (nom, adresse, géoloc), fourchette de prix, `@id` d'entité, fallback de
+note, langues, date de dernière révision + 5 helpers JSON-LD
+(`postalAddressLd`, `priceRangeLabel`, `offerCatalogLd`, `areaServedLd`,
+`reserveActionLd`).
+
+| Lot | Commit    | Contenu                                      |
+| --- | --------- | -------------------------------------------- |
+| 1   | `793fbf4` | Cohérence des données                        |
+| 2   | `16266d2` | `hasOfferCatalog` (16 offres)                |
+| 3   | `6577ba3` | Fraîcheur, portée géo, action de réservation |
+
+**Lot 1 — corrections d'incohérences (`layout.tsx` + 7 fichiers)** :
+
+- Ajout `"@id": "https://mimi-coiffure.com/#salon"` sur le `HairSalon`, repris
+  par `Service.provider` (page services) et `Person.worksFor` (page a-propos)
+  pour relier toutes les mentions à une entité unique.
+- `priceRange` : dérivé des vrais prix de `services-data.ts` → `150–950 MAD`
+  (min soin argan 150, max package Faux Locks 950). L'ancienne valeur avait un
+  format non standard et contredisait la FAQ.
+- `aggregateRating` fallback : `4.2 / 13` (faux) → `4.5 / 6` (chiffres réels
+  dashboard GBP), utilisé seulement quand l'API Google Reviews ne répond pas.
+- Réponse FAQ tarifs : était **fausse** ("65 à 220 MAD, tresses dès 125 MAD").
+  Remplacée par les vrais chiffres (150 à 950, box braids 550, knotless 700,
+  cornrows 300, départ locks 900).
+- Réponse FAQ services : liste complétée (cornrows, faux locks, Marley twists,
+  enfants).
+- **Orthographe de l'adresse unifiée en "Place Jamaa El Fna"** (était
+  "Place Jemaa el-Fna" dans les données structurées, le footer et les
+  traductions ; "Jamaa El Fna" dans le contenu visible). Fichiers alignés :
+  `layout`, `services`, `a-propos`, `contact`, `mentions-legales`,
+  `politique-de-confidentialite`, `TrustBadge`, `messages/fr|en|es.json`
+  (clé `footer.address`).
+  **NON touché** : l'identifiant Google Maps `Jemaa%20el-Fna` dans les URLs
+  d'embed `google.com/maps` (imposé par Google, ne jamais changer).
+
+**Lot 2 — `hasOfferCatalog`** :
+
+- Helper `offerCatalogLd()` dérive **16 offres** de `services-data.ts`
+  (14 services + 2 forfaits). Chaque offre : `itemOffered` (un `Service` avec
+  `name`, `serviceType` par catégorie, `description`), `price` numérique exact,
+  `priceCurrency: MAD`, `availability: InStock`, `url` vers `/fr/reservation`.
+- Effet : un agent peut citer le prix exact d'une coiffure précise.
+- **⚠ Maintenance** : ces prix viennent de `services-data.ts`, PAS de
+  `settings.price_*` (l'admin éditable par Mimi, système séparé et
+  approximatif). Si un prix change dans `/admin/settings`, le mettre aussi
+  dans `services-data.ts` (c'était déjà le cas pour la homepage).
+
+**Lot 3 — signaux de fraîcheur / portée / action** :
+
+- `knowsLanguage: ["fr","en","es"]`
+- `areaServed` : objet `City` "Marrakech" (remplace un string plat, harmonisé
+  aussi dans `services/page.tsx`)
+- `potentialAction` : `ReserveAction` avec `EntryPoint` vers `/fr/reservation`
+  (Desktop + Mobile web). **Ne crée PAS de réservation automatique** — le flux
+  reste formulaire → confirmation WhatsApp. C'est un pointeur normalisé.
+- `dateModified` : `SALON.lastReviewed` = `"2026-09-06"`.
+  **⚠ Maintenance** : à bumper à la main dans `lib/salon-info.ts` quand
+  adresse / horaires / prestations / tarifs changent.
+
+**Vérifications (chaque lot)** : `tsc --noEmit` OK, `next build` propre 38/38
+pages, JSON-LD rendu parsé et validé (toutes clés présentes, aucune structure
+invalide), Playwright full suite **71 passed, 1 skipped, 0 failed** (le skipped
+= `api-reservations-id.spec.ts`, connu, pas d'infra login admin).
+
+**Validation Google** : Rich Results Test sur `mimi-coiffure.com/fr` →
+**3 éléments valides, 0 erreur** ("Commerces et services à proximité" + FAQ +
+Offers). Exploration Google du 6 sept 2026 15:19.
+
+### Reste à faire (checklist déploiement handoff — par précaution)
+
+Rien de fonctionnel n'a bougé (réservation, dashboard, paiement intacts), mais
+la règle du projet demande de vérifier après chaque déploiement :
+
+1. `/admin/dashboard` — les réservations s'affichent
+2. `/fr/reservation` — le formulaire fonctionne (envoi WhatsApp + email)
+3. Créer une réservation test → elle apparaît dans le dashboard
+4. `/fr/galerie` onglet Vidéos — les 4 nouvelles vidéos jouent (attendre 12-24 h
+   la propagation jsDelivr avant de conclure à un bug)
+5. Publier le 1er post GBP (`docs/gbp-posts-2026-09/`)
+
+### Pistes non traitées (évoquées, pas commencées)
+
+- **WhatsApp Agent Kit** : discuté. Verdict = pas maintenant. Migration vers
+  l'API WhatsApp Business trop lourde (Mimi perd son WhatsApp perso sur ce
+  numéro, validation Meta longue) pour le volume actuel. Alternatives plus
+  rentables si besoin : rappel automatique la veille par email (infra Resend
+  déjà en place), amélioration de la notif push avec lien WhatsApp pré-rempli,
+  réponses rapides dans l'app WhatsApp Business (zéro dev).
+- **Lots AI-readiness suivants** possibles : `Review` individuels dans le
+  JSON-LD, `openingHoursSpecification` par jour avec exceptions, pages de
+  service dédiées (`/fr/box-braids-marrakech` etc.).
+
+---
+
 ## 32. Session 5-6 sept 2026 — Migration Next.js 14 → 15 (EN PROD)
 
 Chantier prioritaire du handoff (corrige les CVE de la branche `next` 14.x,
