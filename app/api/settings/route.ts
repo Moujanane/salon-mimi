@@ -1,21 +1,7 @@
 // app/api/settings/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { cookies } from "next/headers";
-import { createServerClient } from "@supabase/ssr";
-
-async function getAuthUser() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll() } },
-  );
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
-}
+import { getAuthUser } from "@/lib/adminAuth";
 
 // Clés accessibles sans authentification (affichage public : prix, WhatsApp)
 const PUBLIC_KEYS = [
