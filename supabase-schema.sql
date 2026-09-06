@@ -108,3 +108,55 @@ create policy "service_role_all"
   to service_role
   using (true)
   with check (true);
+
+-- ============================================================
+-- Table: gallery_items
+-- ============================================================
+-- Médias de la galerie publique (/[locale]/galerie), destinés à être gérés
+-- depuis /admin (Spec 2, à venir). Remplace les tableaux SECTIONS[] / VIDEOS[]
+-- codés en dur dans components/sections/GalerieClient.tsx.
+-- Fichiers hébergés dans le bucket Storage public "gallery".
+-- Activé en prod par la variable NEXT_PUBLIC_GALLERY_DYNAMIC="true".
+create table if not exists gallery_items (
+  id uuid primary key default gen_random_uuid(),
+  type text not null check (type in ('photo', 'video')),
+  url text not null,
+  poster_url text,
+  alt text not null default '',
+  sort_order integer not null default 0,
+  width integer,
+  height integer,
+  created_at timestamptz default now()
+);
+
+-- Contrainte UNIQUE sur url : empêche les doublons de médias et permet à
+-- scripts/migrate-gallery.ts d'utiliser upsert(onConflict:"url"). Sans elle,
+-- la migration échoue avec l'erreur PostgREST 42P10.
+alter table gallery_items
+  add constraint gallery_items_url_key unique (url);
+
+alter table gallery_items enable row level security;
+
+-- Lecture publique : le site sert la galerie à tous les visiteurs (client anon).
+-- CRITIQUE : sans cette policy la galerie publique est vide en prod.
+create policy "gallery_items_select_anon"
+  on gallery_items for select
+  to anon
+  using (true);
+
+-- Lecture admin (dashboard).
+create policy "gallery_items_select_authenticated"
+  on gallery_items for select
+  to authenticated
+  using (true);
+
+-- Écriture réservée au service_role : toutes les mutations (INSERT/UPDATE/
+-- DELETE) passent par les API routes admin de la Spec 2, côté serveur.
+create policy "gallery_items_service_role_all"
+  on gallery_items for all
+  to service_role
+  using (true)
+  with check (true);
+
+create index if not exists gallery_items_sort_idx
+  on gallery_items (sort_order);
