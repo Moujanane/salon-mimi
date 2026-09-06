@@ -3,6 +3,7 @@ export const revalidate = 3600;
 import type { Metadata } from "next";
 import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
+import { SALON } from "@/lib/salon-info";
 
 export async function generateMetadata({
   params,
@@ -184,8 +185,9 @@ export default async function AProposPage({
           : "Peluquera especialista en trenzas africanas",
     worksFor: {
       "@type": "HairSalon",
-      name: "Salon Mimi",
-      url: "https://mimi-coiffure.com",
+      "@id": SALON.id,
+      name: SALON.legalName,
+      url: SALON.url,
     },
     knowsAbout: [
       "tresses africaines",
@@ -198,10 +200,10 @@ export default async function AProposPage({
     ],
     address: {
       "@type": "PostalAddress",
-      streetAddress: "Place Jemaa el-Fna",
-      addressLocality: "Marrakech",
-      postalCode: "40000",
-      addressCountry: "MA",
+      streetAddress: SALON.address.streetAddress,
+      addressLocality: SALON.address.addressLocality,
+      postalCode: SALON.address.postalCode,
+      addressCountry: SALON.address.addressCountry,
     },
   };
 

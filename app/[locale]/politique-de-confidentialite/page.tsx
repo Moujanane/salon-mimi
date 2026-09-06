@@ -59,8 +59,8 @@ function PrivacyFr() {
             Qui sommes-nous
           </h2>
           <p>
-            Le Salon Mimi est un salon de coiffure afro situé Place Jemaa
-            el-Fna, Médina, Marrakech 40000, Maroc. Ce site est accessible à
+            Le Salon Mimi est un salon de coiffure afro situé Place Jamaa El
+            Fna, Médina, Marrakech 40000, Maroc. Ce site est accessible à
             l&apos;adresse <span className="text-white">mimi-coiffure.com</span>
             .
           </p>
@@ -188,7 +188,7 @@ function PrivacyEn() {
             Who we are
           </h2>
           <p>
-            Salon Mimi is an afro hair salon located at Jemaa el-Fna Square,
+            Salon Mimi is an afro hair salon located at Jamaa El Fna Square,
             Medina, Marrakech 40000, Morocco. This website is accessible at{" "}
             <span className="text-white">mimi-coiffure.com</span>.
           </p>
@@ -301,8 +301,8 @@ function PrivacyEs() {
             Quiénes somos
           </h2>
           <p>
-            Salon Mimi es un salón de peluquería afro ubicado en la Plaza Jemaa
-            el-Fna, Medina, Marrakech 40000, Marruecos. Este sitio web es
+            Salon Mimi es un salón de peluquería afro ubicado en la Plaza Jamaa
+            El Fna, Medina, Marrakech 40000, Marruecos. Este sitio web es
             accesible en <span className="text-white">mimi-coiffure.com</span>.
           </p>
         </section>

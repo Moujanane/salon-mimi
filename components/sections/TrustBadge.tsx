@@ -4,17 +4,17 @@
 const items = {
   fr: [
     { icon: "⭐", text: "Avis clients vérifiés sur Google" },
-    { icon: "📍", text: "Place Jemaa el-Fna, Marrakech" },
+    { icon: "📍", text: "Place Jamaa El Fna, Marrakech" },
     { icon: "🌿", text: "Produits locaux 100% naturels" },
   ],
   en: [
     { icon: "⭐", text: "Verified client reviews on Google" },
-    { icon: "📍", text: "Jemaa el-Fna Square, Marrakech" },
+    { icon: "📍", text: "Jamaa El Fna Square, Marrakech" },
     { icon: "🌿", text: "100% natural local products" },
   ],
   es: [
     { icon: "⭐", text: "Reseñas de clientas verificadas en Google" },
-    { icon: "📍", text: "Plaza Jemaa el-Fna, Marrakech" },
+    { icon: "📍", text: "Plaza Jamaa El Fna, Marrakech" },
     { icon: "🌿", text: "Productos locales 100% naturales" },
   ],
 };

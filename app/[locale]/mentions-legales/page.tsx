@@ -64,7 +64,7 @@ function LegalFr() {
             <br />
             Entreprise individuelle
             <br />
-            Place Jemaa el-Fna, Médina, Marrakech 40000, Maroc
+            Place Jamaa El Fna, Médina, Marrakech 40000, Maroc
             <br />
             Téléphone : +212 7 10 38 82 04
             <br />
@@ -145,7 +145,7 @@ function LegalEn() {
             <br />
             Sole proprietorship
             <br />
-            Jemaa el-Fna Square, Medina, Marrakech 40000, Morocco
+            Jamaa El Fna Square, Medina, Marrakech 40000, Morocco
             <br />
             Phone: +212 7 10 38 82 04
             <br />
@@ -214,7 +214,7 @@ function LegalEs() {
             <br />
             Empresa individual
             <br />
-            Plaza Jemaa el-Fna, Medina, Marrakech 40000, Marruecos
+            Plaza Jamaa El Fna, Medina, Marrakech 40000, Marruecos
             <br />
             Teléfono: +212 7 10 38 82 04
             <br />

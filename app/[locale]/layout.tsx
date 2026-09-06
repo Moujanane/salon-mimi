@@ -10,6 +10,7 @@ import CookieBanner from "@/components/ui/CookieBanner";
 import StickyBooking from "@/components/layout/StickyBooking";
 import { routing } from "@/i18n/routing";
 import { INSTAGRAM_URL, TIKTOK_URL, MAPS_URL, GBP_URL } from "@/lib/social";
+import { SALON, priceRangeLabel, postalAddressLd } from "@/lib/salon-info";
 import { getGoogleReviews } from "@/lib/google-reviews";
 import "../globals.css";
 
@@ -111,23 +112,18 @@ export async function generateMetadata({
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "HairSalon",
-  name: "Salon Mimi",
-  url: "https://mimi-coiffure.com",
-  telephone: "+212710388204",
+  "@id": SALON.id,
+  name: SALON.legalName,
+  url: SALON.url,
+  telephone: SALON.telephone,
   image: "https://mimi-coiffure.com/images/hero-salon.jpg",
   description:
     "Salon de coiffure Rasta et Africaine à Marrakech. Spécialisé en tresses africaines, box braids, locks, knotless braids. Situé Place Jamaa El Fna, Médina de Marrakech.",
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: "Place Jemaa el-Fna",
-    addressLocality: "Marrakech",
-    postalCode: "40000",
-    addressCountry: "MA",
-  },
+  address: postalAddressLd(),
   geo: {
     "@type": "GeoCoordinates",
-    latitude: 31.6258,
-    longitude: -7.9892,
+    latitude: SALON.geo.latitude,
+    longitude: SALON.geo.longitude,
   },
   hasMap: MAPS_URL,
   // sameAs : profils publics stables uniquement (Google ignore les liens de
@@ -148,7 +144,7 @@ const jsonLd = {
       closes: "19:00",
     },
   ],
-  priceRange: "150-950 MAD",
+  priceRange: priceRangeLabel(),
 };
 
 const faqLd = {
@@ -168,7 +164,7 @@ const faqLd = {
       name: "Quels services de tresses propose le salon Mimi ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Le salon Mimi propose des tresses africaines, tresses rasta, box braids, knotless braids, tresses Fulani, tresses Boho, locks et dreads, cheveux attachés, perruques et tissage.",
+        text: "Le salon Mimi propose des tresses africaines, tresses rasta, box braids, knotless braids, tresses Fulani, tresses Boho, cornrows, locks et dreads, faux locks, Marley twists, cheveux attachés, perruques et tissage. Il coiffe aussi les enfants.",
       },
     },
     {
@@ -184,7 +180,7 @@ const faqLd = {
       name: "Quels sont les tarifs du salon Mimi Marrakech ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Les tarifs du salon Mimi varient entre 65 MAD et 220 MAD selon la prestation. Les tresses africaines commencent à 125 MAD.",
+        text: "Les tarifs vont de 150 MAD (soin argan, mini braids enfant) à 950 MAD (package Faux Locks avec bijoux). Les box braids medium sont à 550 MAD, les knotless braids à 700 MAD, les cornrows tête entière à 300 MAD, le départ de locks à 900 MAD.",
       },
     },
   ],
@@ -205,8 +201,12 @@ export default async function LocaleLayout({
   const reviewsData = await getGoogleReviews();
   const aggregateRating = {
     "@type": "AggregateRating",
-    ratingValue: (reviewsData?.rating ?? 4.2).toFixed(1),
-    reviewCount: String(reviewsData?.user_ratings_total ?? 13),
+    ratingValue: (
+      reviewsData?.rating ?? SALON.ratingFallback.ratingValue
+    ).toFixed(1),
+    reviewCount: String(
+      reviewsData?.user_ratings_total ?? SALON.ratingFallback.reviewCount,
+    ),
     bestRating: "5",
   };
   const jsonLdWithRating = { ...jsonLd, aggregateRating };

@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import ServicesPageClient from "@/components/sections/ServicesPageClient";
 import { getSettings } from "@/lib/settings";
+import { SALON } from "@/lib/salon-info";
 
 export async function generateMetadata({
   params,
@@ -148,12 +149,13 @@ export default async function ServicesPage({
         name: locale === "en" ? s.nameEn : locale === "es" ? s.nameEs : s.name,
         provider: {
           "@type": "HairSalon",
-          name: "Salon Mimi",
+          "@id": SALON.id,
+          name: SALON.legalName,
           address: {
             "@type": "PostalAddress",
-            streetAddress: "Place Jemaa el-Fna",
-            addressLocality: "Marrakech",
-            addressCountry: "MA",
+            streetAddress: SALON.address.streetAddress,
+            addressLocality: SALON.address.addressLocality,
+            addressCountry: SALON.address.addressCountry,
           },
         },
         areaServed: "Marrakech",

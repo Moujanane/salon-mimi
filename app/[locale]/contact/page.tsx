@@ -58,7 +58,7 @@ const content: Record<
 > = {
   fr: {
     title: "Contact & Accès — Salon Mimi Marrakech",
-    address: "Place Jemaa el-Fna, Médina, Marrakech 40000, Maroc",
+    address: "Place Jamaa El Fna, Médina, Marrakech 40000, Maroc",
     hours: "Horaires",
     hoursDetail: "Tous les jours : 9h – 23h",
     waLabel: "Contacter sur WhatsApp",
@@ -71,7 +71,7 @@ const content: Record<
   },
   en: {
     title: "Contact & Location — Salon Mimi Marrakech",
-    address: "Jemaa el-Fna Square, Medina, Marrakech 40000, Morocco",
+    address: "Jamaa El Fna Square, Medina, Marrakech 40000, Morocco",
     hours: "Opening hours",
     hoursDetail: "Every day: 9am – 11pm",
     waLabel: "Contact on WhatsApp",
@@ -84,7 +84,7 @@ const content: Record<
   },
   es: {
     title: "Contacto y Ubicación — Salon Mimi Marrakech",
-    address: "Plaza Jemaa el-Fna, Medina, Marrakech 40000, Marruecos",
+    address: "Plaza Jamaa El Fna, Medina, Marrakech 40000, Marruecos",
     hours: "Horario",
     hoursDetail: "Todos los días: 9h – 23h",
     waLabel: "Contactar por WhatsApp",
@@ -200,7 +200,7 @@ export default async function ContactPage({
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Salon Mimi — Place Jemaa el-Fna Marrakech"
+                title="Salon Mimi — Place Jamaa El Fna Marrakech"
               />
             </div>
           </div>
