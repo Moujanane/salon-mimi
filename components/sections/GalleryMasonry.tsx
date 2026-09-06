@@ -56,6 +56,15 @@ function VideoCell({
           className="h-full w-full object-cover"
           loading="lazy"
         />
+      ) : near ? (
+        // Pas de poster : 1re frame de la vidéo (chargée seulement à l'approche)
+        <video
+          src={`${item.url}#t=0.1`}
+          preload="metadata"
+          muted
+          playsInline
+          className="h-full w-full object-cover"
+        />
       ) : (
         <span className="absolute inset-0 bg-gray-800" />
       )}

@@ -41,6 +41,9 @@ function SortableTile({
     opacity: isDragging ? 0.4 : 1,
   };
 
+  // Vidéo : on préfère le poster ; sans poster, on affiche la 1re frame de la
+  // vidéo elle-même (preload metadata) pour éviter une vignette vide.
+  const isVideoWithoutPoster = item.type === "video" && !item.poster_url;
   const thumb =
     item.type === "video" ? (item.poster_url ?? item.url) : item.url;
 
@@ -53,12 +56,22 @@ function SortableTile({
       title={`#${item.sort_order} · ${item.type === "video" ? "vidéo" : "photo"}\n${item.alt}`}
       className="group relative aspect-square overflow-hidden rounded-lg bg-gray-200 cursor-grab active:cursor-grabbing"
     >
-      <img
-        src={thumb}
-        alt={item.alt}
-        loading="lazy"
-        className="h-full w-full object-cover pointer-events-none"
-      />
+      {isVideoWithoutPoster ? (
+        <video
+          src={`${item.url}#t=0.1`}
+          preload="metadata"
+          muted
+          playsInline
+          className="h-full w-full object-cover pointer-events-none"
+        />
+      ) : (
+        <img
+          src={thumb}
+          alt={item.alt}
+          loading="lazy"
+          className="h-full w-full object-cover pointer-events-none"
+        />
+      )}
       {item.type === "video" && (
         <span
           aria-hidden="true"

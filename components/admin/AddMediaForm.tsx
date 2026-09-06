@@ -7,8 +7,13 @@ const MAX_VIDEO = 8 * 1024 * 1024;
 
 /**
  * Pour une vidéo : extrait dimensions + une frame de poster côté navigateur.
- * Retourne { width, height, poster } ou null si l'extraction échoue ou traîne
- * (certains MP4 de téléphone n'émettent jamais l'event `seeked`).
+ * Retourne { width, height, poster } ou null si l'extraction échoue.
+ *
+ * Les MP4 de téléphone (iPhone/Android) n'émettent pas toujours `seeked` de
+ * façon fiable sur un élément en pause. On lance donc `play()` en muet pour
+ * forcer le décodage, on capture une frame dès `timeupdate`, puis on met en
+ * pause. Fallback : capture à `loadeddata` (première frame) si `timeupdate`
+ * ne vient pas.
  */
 async function probeVideo(
   file: File,
@@ -16,8 +21,16 @@ async function probeVideo(
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file);
     const video = document.createElement("video");
-    video.preload = "metadata";
+    video.preload = "auto";
     video.muted = true;
+    video.playsInline = true;
+    // hors écran, mais dans le DOM : certains navigateurs ne décodent pas une
+    // <video> jamais attachée
+    video.style.position = "fixed";
+    video.style.left = "-9999px";
+    video.style.width = "1px";
+    video.style.height = "1px";
+    document.body.appendChild(video);
 
     let settled = false;
     const finish = (
@@ -26,44 +39,66 @@ async function probeVideo(
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      try {
+        video.pause();
+      } catch {
+        /* ignore */
+      }
+      video.remove();
       URL.revokeObjectURL(url);
       resolve(value);
     };
 
-    // Garde-fou : si aucun event utile ne se déclenche, on abandonne au bout
-    // de 10 s et on laisse le serveur gérer l'absence de poster/dimensions.
-    const timer = setTimeout(() => finish(null), 10_000);
+    // Garde-fou global : 12 s puis on abandonne, le serveur gère l'absence
+    // de poster/dimensions.
+    const timer = setTimeout(() => finish(null), 12_000);
 
-    video.onloadedmetadata = () => {
+    const capture = () => {
       const width = video.videoWidth;
       const height = video.videoHeight;
-      const t = Math.min(1, (video.duration || 2) / 2);
-      video.currentTime = t;
-      video.onseeked = () => {
-        // Poster réduit (longueur max 1280 px) : sur un téléphone une frame 4K
-        // brute peut être lente à encoder ou dépasser la limite du canvas.
-        const scale = Math.min(1, 1280 / Math.max(width, height, 1));
-        const canvas = document.createElement("canvas");
-        canvas.width = Math.max(1, Math.round(width * scale));
-        canvas.height = Math.max(1, Math.round(height * scale));
-        const ctx = canvas.getContext("2d");
-        if (!ctx) {
-          finish(null);
-          return;
-        }
+      if (width === 0 || height === 0) return; // pas encore prêt
+      const scale = Math.min(1, 1280 / Math.max(width, height, 1));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(width * scale));
+      canvas.height = Math.max(1, Math.round(height * scale));
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        finish(null);
+        return;
+      }
+      try {
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob(
-          (blob) => {
-            finish(blob ? { width, height, poster: blob } : null);
-          },
-          "image/jpeg",
-          0.8,
-        );
-      };
+      } catch {
+        finish(null);
+        return;
+      }
+      canvas.toBlob(
+        (blob) => {
+          finish(blob ? { width, height, poster: blob } : null);
+        },
+        "image/jpeg",
+        0.8,
+      );
+    };
+
+    video.onloadeddata = () => {
+      // 1re tentative : la première frame est déjà là
+      capture();
+      if (!settled) {
+        // 2e tentative : lecture muette pour forcer le décodage, capture au
+        // premier timeupdate (~quelques dizaines de ms de lecture)
+        video.play().catch(() => {
+          /* autoplay bloqué : on reste sur loadeddata / le timeout */
+        });
+      }
+    };
+    video.ontimeupdate = () => {
+      if (video.currentTime > 0) capture();
     };
     video.onerror = () => finish(null);
 
     video.src = url;
+    video.load();
   });
 }
 
