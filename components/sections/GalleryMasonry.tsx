@@ -13,16 +13,16 @@ function ratioOf(item: GalleryItem): string {
   return DEFAULT_RATIO;
 }
 
-/** Une cellule vidéo : poster + badge lecture, fichier chargé seulement à l'approche. */
-function VideoCell({
-  item,
-  onOpen,
-}: {
-  item: GalleryItem;
-  onOpen: () => void;
-}) {
-  const ref = useRef<HTMLButtonElement | null>(null);
+/**
+ * Une cellule vidéo. Tant qu'on n'a pas cliqué : poster (ou 1re frame) + badge
+ * ▶, aucun octet de vidéo chargé. Au clic : la vidéo se charge et joue DANS la
+ * vignette, avec le son et les contrôles, dans son ratio réel (pas de plein
+ * écran). Un 2e clic met en pause via les contrôles natifs.
+ */
+function VideoCell({ item }: { item: GalleryItem }) {
+  const ref = useRef<HTMLDivElement | null>(null);
   const [near, setNear] = useState(false);
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
@@ -40,14 +40,33 @@ function VideoCell({
     return () => io.disconnect();
   }, [near]);
 
+  if (playing) {
+    return (
+      <div
+        ref={ref}
+        className="relative w-full overflow-hidden rounded-xl bg-black"
+        style={{ aspectRatio: ratioOf(item) }}
+      >
+        <video
+          src={item.url}
+          poster={item.poster_url ?? undefined}
+          controls
+          autoPlay
+          playsInline
+          className="h-full w-full bg-black object-contain"
+        />
+      </div>
+    );
+  }
+
   return (
     <button
-      ref={ref}
+      ref={ref as unknown as React.RefObject<HTMLButtonElement>}
       type="button"
-      onClick={onOpen}
+      onClick={() => setPlaying(true)}
       className="group relative block w-full overflow-hidden rounded-xl bg-gray-800"
       style={{ aspectRatio: ratioOf(item) }}
-      aria-label={item.alt || "Voir la vidéo"}
+      aria-label={item.alt || "Lire la vidéo"}
     >
       {near && item.poster_url ? (
         <img
@@ -57,7 +76,7 @@ function VideoCell({
           loading="lazy"
         />
       ) : near ? (
-        // Pas de poster : 1re frame de la vidéo (chargée seulement à l'approche)
+        // Pas de poster : 1re frame de la vidéo (métadonnées seulement)
         <video
           src={`${item.url}#t=0.1`}
           preload="metadata"
@@ -72,7 +91,7 @@ function VideoCell({
         aria-hidden="true"
         className="absolute inset-0 flex items-center justify-center"
       >
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/45 text-white text-lg">
+        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/45 text-white text-lg transition-transform group-hover:scale-110">
           ▶
         </span>
       </span>
@@ -195,32 +214,24 @@ function Lightbox({
         className="max-h-[88vh] max-w-[92vw]"
         onClick={(e) => e.stopPropagation()}
       >
-        {item.type === "video" ? (
-          <video
-            key={item.id}
-            src={item.url}
-            poster={item.poster_url ?? undefined}
-            controls
-            autoPlay
-            muted
-            playsInline
-            className="max-h-[88vh] max-w-[92vw] rounded-lg bg-black"
-          />
-        ) : (
-          <img
-            key={item.id}
-            src={item.url}
-            alt={item.alt}
-            className="max-h-[88vh] max-w-[92vw] rounded-lg object-contain"
-          />
-        )}
+        {/* La lightbox n'affiche que des photos (les vidéos se lisent dans
+            leur vignette). */}
+        <img
+          key={item.id}
+          src={item.url}
+          alt={item.alt}
+          className="max-h-[88vh] max-w-[92vw] rounded-lg object-contain"
+        />
       </div>
     </div>
   );
 }
 
 export default function GalleryMasonry({ items }: { items: GalleryItem[] }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  // La lightbox ne concerne que les photos ; les vidéos se lisent dans leur
+  // vignette. On travaille donc sur la sous-liste des photos et son index.
+  const photos = items.filter((it) => it.type === "photo");
+  const [openPhoto, setOpenPhoto] = useState<number | null>(null);
 
   if (items.length === 0) {
     return (
@@ -233,29 +244,34 @@ export default function GalleryMasonry({ items }: { items: GalleryItem[] }) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
       <div className="[column-fill:balance] [column-gap:12px] [columns:2] md:[columns:3]">
-        {items.map((item, i) => (
+        {items.map((item) => (
           <div key={item.id} className="mb-3 break-inside-avoid">
             {item.type === "video" ? (
-              <VideoCell item={item} onOpen={() => setOpenIndex(i)} />
+              <VideoCell item={item} />
             ) : (
-              <PhotoCell item={item} onOpen={() => setOpenIndex(i)} />
+              <PhotoCell
+                item={item}
+                onOpen={() =>
+                  setOpenPhoto(photos.findIndex((p) => p.id === item.id))
+                }
+              />
             )}
           </div>
         ))}
       </div>
 
-      {openIndex !== null && (
+      {openPhoto !== null && photos.length > 0 && (
         <Lightbox
-          items={items}
-          index={openIndex}
-          onClose={() => setOpenIndex(null)}
+          items={photos}
+          index={openPhoto}
+          onClose={() => setOpenPhoto(null)}
           onPrev={() =>
-            setOpenIndex((i) =>
-              i === null ? null : (i - 1 + items.length) % items.length,
+            setOpenPhoto((i) =>
+              i === null ? null : (i - 1 + photos.length) % photos.length,
             )
           }
           onNext={() =>
-            setOpenIndex((i) => (i === null ? null : (i + 1) % items.length))
+            setOpenPhoto((i) => (i === null ? null : (i + 1) % photos.length))
           }
         />
       )}
