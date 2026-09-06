@@ -59,7 +59,10 @@ function VideoCell({
       ) : (
         <span className="absolute inset-0 bg-gray-800" />
       )}
-      <span className="absolute inset-0 flex items-center justify-center">
+      <span
+        aria-hidden="true"
+        className="absolute inset-0 flex items-center justify-center"
+      >
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-black/45 text-white text-lg">
           ▶
         </span>
@@ -109,10 +112,7 @@ export default function GalleryMasonry({ items }: { items: GalleryItem[] }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <div
-        className="[column-gap:12px] [columns:2] md:[columns:3]"
-        style={{ columnFill: "balance" }}
-      >
+      <div className="[column-fill:balance] [column-gap:12px] [columns:2] md:[columns:3]">
         {items.map((item, i) => (
           <div key={item.id} className="mb-3 break-inside-avoid">
             {item.type === "video" ? (
