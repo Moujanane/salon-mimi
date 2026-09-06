@@ -23,9 +23,9 @@ const securityHeaders = [
       "font-src 'self' https://fonts.gstatic.com",
       // Restreint aux sources réellement utilisées (images locales + tuiles de
       // la carte Google Maps embarquée). Plus de `https:` générique.
-      "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net",
+      "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://*.googleusercontent.com https://*.supabase.co https://cdn.jsdelivr.net",
       "connect-src 'self' https://*.supabase.co https://api.resend.com",
-      "media-src 'self' https://cdn.jsdelivr.net",
+      "media-src 'self' https://*.supabase.co https://cdn.jsdelivr.net",
       "frame-src https://www.google.com https://maps.google.com",
       "frame-ancestors 'none'",
     ].join("; "),
@@ -34,6 +34,15 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
   async headers() {
     return [
       {
