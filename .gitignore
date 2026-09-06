@@ -45,3 +45,4 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 .superpowers/
+gallery-sheet.html

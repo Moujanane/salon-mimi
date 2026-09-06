@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start -p ${PORT:-3000}",
     "lint": "next lint",
-    "migrate:gallery": "tsx scripts/migrate-gallery.ts"
+    "migrate:gallery": "tsx scripts/migrate-gallery.ts",
+    "gallery:sheet": "tsx scripts/gallery-contact-sheet.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
