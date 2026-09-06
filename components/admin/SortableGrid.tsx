@@ -50,6 +50,7 @@ function SortableTile({
       style={style}
       {...attributes}
       {...listeners}
+      title={`#${item.sort_order} · ${item.type === "video" ? "vidéo" : "photo"}\n${item.alt}`}
       className="group relative aspect-square overflow-hidden rounded-lg bg-gray-200 cursor-grab active:cursor-grabbing"
     >
       <img
