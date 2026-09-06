@@ -39,6 +39,12 @@ export default function AdminLayout({
             >
               Paramètres
             </Link>
+            <Link
+              href="/admin/galerie"
+              className="text-sm text-gray-600 hover:text-brun py-3 border-b-2 border-transparent hover:border-brun transition-colors"
+            >
+              Galerie
+            </Link>
           </div>
         </nav>
         <main className="max-w-6xl mx-auto px-4 py-10">{children}</main>
