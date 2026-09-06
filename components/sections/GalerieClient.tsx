@@ -274,31 +274,17 @@ const SECTIONS: GallerySection[] = [
   },
 ];
 
+// Vidéos écartées le 6 sept 2026 : montages IA/Canva avec texte incrusté
+// (pomelli-video-1/2/3, POLLO-AI) — contraires à la règle §24 du handoff
+// (« Google Business ≠ Instagram », pas de visuels avec texte superposé), et
+// salon-mimi-0606-2 qui faisait doublon exact avec salon-mimi-0606-1.
+// Les fichiers restent dans le repo salon-mimi-media, ils ne sont juste plus
+// référencés ici.
 const VIDEOS = [
-  {
-    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-1.mp4",
-    title: "Tresses africaines",
-    poster: "/images/pomelli-image-5.png",
-  },
-  {
-    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-2.mp4",
-    title: "Knotless braids",
-    poster: "/images/pomelli-image-2.png",
-  },
-  {
-    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/pomelli-video-3.mp4",
-    title: "Box braids",
-    poster: "/images/pomelli-image-3.png",
-  },
   {
     src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/Salon-Mimi.mp4",
     title: "Salon Mimi — Marrakech",
     poster: "/images/s-tressage-mains.jpg",
-  },
-  {
-    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/POLLO-AI.mp4",
-    title: "Tresses & Extensions",
-    poster: "/images/s-box-braids-longues.jpg",
   },
   {
     src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/tresses-mimi-wa-1.mp4",
@@ -314,11 +300,6 @@ const VIDEOS = [
     src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-0606-1.mp4",
     title: "Tresses — Salon Mimi",
     poster: "/images/tresses-mimi-7.jpeg",
-  },
-  {
-    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-0606-2.mp4",
-    title: "Tresses africaines Marrakech",
-    poster: "/images/s-tressage-action.jpg",
   },
   {
     src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-vid-1.mp4",
