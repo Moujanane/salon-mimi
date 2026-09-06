@@ -1,6 +1,15 @@
-export const revalidate = 3600;
+// Rendu à la demande, jamais pré-rendu ni mis en cache au niveau page.
+// Historique : la version `revalidate = 3600` faisait pré-rendre la page au
+// build de Railway ; quand ce pré-rendu échouait (fetch Supabase indisponible
+// pendant le build), Next mettait en cache un 404 pour toute la fenêtre de
+// revalidation (`x-nextjs-cache: HIT` sur une 404). Le fetch des médias garde
+// malgré tout son propre cache : `getGalleryItems()` utilise `unstable_cache`
+// (revalidate 1 h, tag `gallery-items`), donc pas d'appels Supabase répétés.
+export const dynamic = "force-dynamic";
+export const fetchCache = "default-no-store";
 
 import type { Metadata } from "next";
+import { unstable_noStore as noStore } from "next/cache";
 import { setRequestLocale } from "next-intl/server";
 import GalerieClient from "@/components/sections/GalerieClient";
 import GalleryMasonry from "@/components/sections/GalleryMasonry";
@@ -65,6 +74,7 @@ export default async function GaleriePage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
+  noStore();
   const { locale } = await params;
   setRequestLocale(locale);
   const displayLocale = locale || "fr";
