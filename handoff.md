@@ -76,13 +76,26 @@ local avec les vraies clés Supabase, puis flag ON dans Railway. Vérifié en
 prod : grille masonry, lightbox, lazy-load, FR/EN/ES 200, HTML SSR contient
 les URLs médias (SEO OK).
 
-**Incident déploiement** : après plusieurs pushs rapprochés, Railway a servi
-un build incohérent (`Failed to fetch RSC payload` + `Cannot read properties
-of undefined (reading 'call')` dans le webpack runtime). **Fix : Redeploy
-Railway avec cache de build vidé.** Le code était bon (marchait en local avec
-le même build). À retenir : après plusieurs déploiements dans la journée, si
-erreurs RSC/webpack bizarres en prod → Redeploy propre avant de chercher un
-bug.
+**Incidents déploiement Railway (2 fois dans la session, même cause)** :
+après plusieurs pushs rapprochés dans la journée, Railway a servi des builds
+incohérents.
+
+1. `Failed to fetch RSC payload` + `Cannot read properties of undefined
+(reading 'call')` dans le webpack runtime, sur `/admin/galerie`.
+2. `/fr/galerie` (et `/en/`, `/es/`) → **404** alors que la page SSG est bien
+   générée par le build (visible dans la sortie `npm run build`, `●
+/[locale]/galerie`).
+
+**Fix des deux : Railway → Deployments → ⋮ → Redeploy, en cochant l'option de
+vidage du cache de build.** Le code était bon à chaque fois (mêmes builds
+servaient `/fr/galerie` en 200 en local).
+
+**⚠ À RETENIR pour les prochaines sessions** : quand plusieurs déploiements
+Railway s'enchaînent dans la même journée, le build servi peut devenir
+incohérent (chunks mélangés, pages SSG manquantes, erreurs RSC/webpack en
+prod uniquement). **Avant de chercher un bug dans le code : reproduire en
+local avec `npm run build && npm run start`. Si ça marche en local → Redeploy
+Railway cache vidé.** Ne pas empiler les pushs correctifs.
 
 ### 35.3 — Spec 2 : admin galerie
 
@@ -135,17 +148,40 @@ stylisé + messages erreur/notice en pleine largeur (`basis-full`).
 `gallery-sheet.html` gitignoré) est rendu obsolète par cette page + le bouton
 Exporter. Reste dans le repo, nettoyage optionnel plus tard.
 
-### État en fin de session
+### État en fin de session (tout EN PROD, vérifié)
 
-- Galerie publique : dynamique, en prod, flag ON. Rollback = flag OFF.
-- Admin galerie : en prod. Test manuel fait par Mouj : ajout photo OK.
-- **Reste à faire par Mouj** : supprimer la photo de test `qsQsqSQsqSQ`
-  (`sort_order` 40) via la poubelle ; finir la checklist manuelle (ajout
-  vidéo, drag, export PDF) ; vérifier que Railway a une limite de taille de
-  requête raisonnable (le POST bufferise tout le corps avant le contrôle de
-  taille — commenté dans `app/api/gallery/route.ts`).
-- **Spec 3 possible** : édition du `alt` depuis l'admin (nouveau champ + route
-  PATCH), catégories/filtres sur la galerie publique.
+- **Galerie publique** : dynamique, flag `NEXT_PUBLIC_GALLERY_DYNAMIC=true`.
+  `/fr/galerie`, `/en/galerie`, `/es/galerie` → 200 après le 2e Redeploy
+  Railway. Grille masonry + lightbox OK. Rollback = flag OFF.
+- **Admin galerie** `/admin/galerie` : en prod. Ajout photo testé par Mouj →
+  OK (photo compressée, apparaît dans la grille et sur le site).
+- **AI-readiness** : 3 lots en prod, Rich Results Test 0 erreur.
+- **Commits de la session** : `793fbf4` → `25f4626` sur `main` (voir
+  `git log`).
+
+### Reste à faire par Mouj
+
+- **Supprimer la photo de test** `qsQsqSQsqSQ` (`sort_order` 40) via l'icône
+  poubelle au survol de sa vignette dans `/admin/galerie`.
+- **Finir la checklist manuelle** : ajout d'une vidéo (< 8 Mo), glisser une
+  vignette pour réordonner, bouton « Exporter le PDF ».
+- **Vérifier la limite de taille de requête Railway** : le `POST /api/gallery`
+  bufferise tout le corps AVANT le contrôle de taille (commenté dans
+  `app/api/gallery/route.ts`). Si un gros upload photo échoue bizarrement,
+  c'est là. Le garde-fou applicatif est à 20 Mo.
+
+### Pistes pour une prochaine session
+
+- **Spec 3 galerie** : édition du `alt` depuis l'admin (champ éditable sous
+  chaque vignette + nouvelle route `PATCH /api/gallery/[id]`) ; filtres par
+  catégorie sur la galerie publique (ajouter une colonne `category` à
+  `gallery_items`).
+- **Nettoyage** : retirer `scripts/gallery-contact-sheet.ts` + le script
+  `gallery:sheet` de `package.json` (obsolète depuis l'admin galerie) ;
+  supprimer l'ancien `components/sections/GalerieClient.tsx` + le flag
+  `NEXT_PUBLIC_GALLERY_DYNAMIC` une fois le nouveau rendu validé sur la durée.
+- **Dette** : `app/api/reservations/[id]/route.ts` inline encore sa propre
+  auth au lieu d'importer `getAuthUser` de `lib/adminAuth.ts`.
 
 ---
 
