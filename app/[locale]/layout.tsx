@@ -10,7 +10,12 @@ import CookieBanner from "@/components/ui/CookieBanner";
 import StickyBooking from "@/components/layout/StickyBooking";
 import { routing } from "@/i18n/routing";
 import { INSTAGRAM_URL, TIKTOK_URL, MAPS_URL, GBP_URL } from "@/lib/social";
-import { SALON, priceRangeLabel, postalAddressLd } from "@/lib/salon-info";
+import {
+  SALON,
+  priceRangeLabel,
+  postalAddressLd,
+  offerCatalogLd,
+} from "@/lib/salon-info";
 import { getGoogleReviews } from "@/lib/google-reviews";
 import "../globals.css";
 
@@ -145,6 +150,7 @@ const jsonLd = {
     },
   ],
   priceRange: priceRangeLabel(),
+  hasOfferCatalog: offerCatalogLd(),
 };
 
 const faqLd = {
