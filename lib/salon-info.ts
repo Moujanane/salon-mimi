@@ -66,6 +66,20 @@ export const SALON = {
     ratingValue: 4.5,
     reviewCount: 6,
   },
+
+  /**
+   * Langues parlées au salon. Utilisé pour `knowsLanguage` (BCP 47) — signale
+   * à un agent de recherche que la clientèle touristique est prise en charge.
+   */
+  languages: ["fr", "en", "es"],
+
+  /**
+   * Date de la dernière révision des informations du salon (adresse, horaires,
+   * prestations, tarifs). Alimente `dateModified` dans le JSON-LD — signal de
+   * fraîcheur pour les moteurs génératifs.
+   * À bumper à la main quand une de ces infos change. Format YYYY-MM-DD.
+   */
+  lastReviewed: "2026-09-06",
 } as const;
 
 /** Fourchette de prix formatée pour le champ `priceRange` de schema.org. */
@@ -143,5 +157,37 @@ export function offerCatalogLd() {
     "@type": "OfferCatalog" as const,
     name: "Prestations Salon Mimi",
     itemListElement: [...serviceOffers, ...packageOffers],
+  };
+}
+
+/** Zone desservie schema.org (City). Remplace un simple string "Marrakech". */
+export function areaServedLd() {
+  return {
+    "@type": "City" as const,
+    name: SALON.address.addressLocality,
+  };
+}
+
+/**
+ * Action de réservation schema.org (ReserveAction) : pointe explicitement vers
+ * la page de prise de rendez-vous. Ne crée PAS de réservation automatique — le
+ * flux reste formulaire puis confirmation WhatsApp. C'est un pointeur normalisé
+ * qu'un agent peut suivre pour amener l'utilisateur au bon endroit.
+ */
+export function reserveActionLd() {
+  return {
+    "@type": "ReserveAction" as const,
+    target: {
+      "@type": "EntryPoint" as const,
+      urlTemplate: RESERVATION_URL,
+      actionPlatform: [
+        "http://schema.org/DesktopWebPlatform",
+        "http://schema.org/MobileWebPlatform",
+      ],
+    },
+    result: {
+      "@type": "Reservation" as const,
+      name: "Rendez-vous au Salon Mimi",
+    },
   };
 }

@@ -158,7 +158,7 @@ export default async function ServicesPage({
             addressCountry: SALON.address.addressCountry,
           },
         },
-        areaServed: "Marrakech",
+        areaServed: { "@type": "City", name: "Marrakech" },
         offers: {
           "@type": "Offer",
           price: s.price,

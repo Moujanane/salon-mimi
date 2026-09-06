@@ -15,6 +15,8 @@ import {
   priceRangeLabel,
   postalAddressLd,
   offerCatalogLd,
+  areaServedLd,
+  reserveActionLd,
 } from "@/lib/salon-info";
 import { getGoogleReviews } from "@/lib/google-reviews";
 import "../globals.css";
@@ -151,6 +153,10 @@ const jsonLd = {
   ],
   priceRange: priceRangeLabel(),
   hasOfferCatalog: offerCatalogLd(),
+  areaServed: areaServedLd(),
+  knowsLanguage: SALON.languages,
+  potentialAction: reserveActionLd(),
+  dateModified: SALON.lastReviewed,
 };
 
 const faqLd = {
