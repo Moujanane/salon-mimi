@@ -2176,6 +2176,37 @@ supabase-schema.sql                      — table settings + colonnes réservat
 
 ## 5. Pièges à ne pas reproduire
 
+### Méthode de développement — éviter les cycles en V (leçon session galerie sept 2026)
+
+La session galerie a produit trop d'aller-retours : vidéo affichée sans lecture
+possible, champ de saisie blanc/blanc, CSP `blob:` manquant — tous découverts
+par Mouj en test manuel APRÈS déploiement, pas avant. Règles pour ne plus
+reproduire :
+
+1. **Décisions d'UX à plusieurs issues plausibles = question à Mouj dans le
+   brainstorming**, avec 2-3 options concrètes + tradeoffs. Ne pas trancher
+   seul dans la spec. Appliquer les évidences par défaut (« afficher une vidéo
+   = permettre sa lecture ») et ne poser la question que sur le _comment_.
+2. **Vérifier l'environnement de test AVANT de coder** tout chantier
+   Supabase/admin. Le `.env.local` de ce Mac a des clés placeholder
+   (`xxxxx.supabase.co`) → impossible de faire tourner galerie/admin avec de
+   vraies données en local → tout retombe sur les tests prod de Mouj. Régler ça
+   d'abord (vraies clés, compte de test, ou seed).
+3. **Vérification navigateur qui EXÉCUTE les parcours utilisateur avant le
+   merge** — pas seulement une review de code. Contre le build prod local :
+   ouvrir la page, cliquer, taper dans les champs, uploader. C'est cette étape
+   qui manquait.
+4. **Croiser chaque composant validé avec cette section « Pièges »** (le bug
+   input blanc/blanc y était depuis juin et n'a pas été appliqué).
+5. **Un seul merge, un seul déploiement par lot cohérent.** Pas de pushs
+   correctifs en rafale (→ 3 incidents Railway, voir §35).
+6. **Symptôme qui se répète = cause racine, pas re-contournement.** Le 404
+   galerie a été « corrigé » par Redeploy 2 fois avant qu'on trouve la vraie
+   cause (`revalidate = 3600` cachant un 404 au build).
+7. **Demander la console / les logs AVANT de faire des hypothèses.** Le bug
+   vidéo : hypothèses codec/event/timeout alors que la console disait
+   `blob: violates media-src`.
+
 ### RLS Supabase
 
 Le fichier `supabase-schema.sql` est de la documentation morte. Les politiques réelles vivent dans le dashboard Supabase. Ne jamais supprimer une politique sans tester immédiatement `/admin/dashboard`.
