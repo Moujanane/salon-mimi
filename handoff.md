@@ -6,6 +6,149 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 35. Session 6 sept 2026 (suite) — Galerie dynamique + admin galerie (EN PROD)
+
+Trois chantiers enchaînés dans la session, tous déployés sur `main` (Railway
+auto-deploy). Process complet à chaque fois : brainstorming → spec → plan →
+exécution subagent-driven (fresh subagent par tâche + review spec puis review
+qualité) → merge → test.
+
+### 35.1 — Chantier AI-readiness (données structurées) — 3 lots
+
+Objectif : que le JSON-LD, les mentions légales, le footer et les emails
+affichent tous les mêmes valeurs, pour qu'un agent de recherche (AI Overviews,
+ChatGPT, Perplexity) recoupe le site avec Google Business Profile sans
+contradiction.
+
+Nouveau fichier **`lib/salon-info.ts`** : source unique de vérité (identité,
+adresse, géoloc, fourchette de prix, `@id` d'entité, fallback de note, langues,
+`lastReviewed`). 5 helpers JSON-LD.
+
+| Lot | Commit    | Contenu                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| --- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | `793fbf4` | Cohérence : `@id` `mimi-coiffure.com/#salon` sur HairSalon + repris par Service.provider et Person.worksFor ; `priceRange` `150–950 MAD` dérivé des vrais prix ; `aggregateRating` fallback `4.2/13` → `4.5/6` ; réponse FAQ tarifs (était fausse : « 65 à 220 MAD ») remplacée par les vrais chiffres ; **orthographe adresse unifiée en « Place Jamaa El Fna »** (était « Jemaa el-Fna » dans le JSON-LD, le footer et `messages/fr\|en\|es.json` clé `footer.address`). NON touché : l'ID Google Maps `Jemaa%20el-Fna` dans les URLs d'embed. |
+| 2   | `16266d2` | `hasOfferCatalog` : 16 offres (14 services + 2 forfaits) dérivées de `services-data.ts`, chacune avec `price` numérique exact. Un agent peut citer le prix d'une coiffure précise.                                                                                                                                                                                                                                                                                                                                                               |
+| 3   | `6577ba3` | `knowsLanguage ["fr","en","es"]`, `areaServed` objet `City`, `potentialAction` `ReserveAction` → `/fr/reservation` (ne crée PAS de résa auto, juste un pointeur), `dateModified` = `SALON.lastReviewed`.                                                                                                                                                                                                                                                                                                                                         |
+
+**Validation** : Rich Results Test sur `mimi-coiffure.com/fr` → 3 éléments
+valides, 0 erreur. Playwright 71 passed / 0 failed.
+
+**⚠ Maintenance** : `SALON.lastReviewed` dans `lib/salon-info.ts` à bumper
+quand adresse/horaires/prix changent. Les prix du `hasOfferCatalog` viennent
+de `services-data.ts`, PAS de `settings.price_*` (l'admin de Mimi).
+
+### 35.2 — Spec 1 : galerie dynamique + refonte visuelle publique
+
+Spec : `docs/superpowers/specs/2026-09-06-galerie-dynamique-design.md`.
+Plan : `docs/superpowers/plans/2026-09-06-galerie-dynamique.md`.
+
+**Ce qui a changé** : la page `/[locale]/galerie` ne lit plus les tableaux
+`SECTIONS[]` / `VIDEOS[]` codés en dur dans `GalerieClient.tsx`. Elle lit une
+**table Supabase `gallery_items`** + un **bucket Storage public `gallery`**.
+
+- **Table `gallery_items`** (colonnes : `id`, `type` 'photo'|'video', `url`,
+  `poster_url`, `alt`, `sort_order`, `width`, `height`, `created_at`). RLS :
+  `anon` + `authenticated` → SELECT, `service_role` → ALL. **Contrainte
+  `unique (url)`** ajoutée (nécessaire à l'upsert du script de migration).
+  Reflétée dans `supabase-schema.sql`.
+- **`lib/gallery.ts`** : `getGalleryItems()` — lecture serveur cachée
+  (`unstable_cache`, tag `"gallery-items"`, `revalidate: 3600`, tri secondaire
+  `created_at`).
+- **`components/sections/GalleryMasonry.tsx`** (nouveau) : grille masonry
+  CSS-colonnes (2 mobile / 3 desktop), photos + vidéos mélangées dans l'ordre
+  `sort_order`, lazy-load des vidéos (IntersectionObserver + poster), lightbox
+  plein écran maison (clavier ‹ › Échap, focus trap léger, `body.overflow`).
+  Vidéo lightbox : `muted autoPlay`.
+- **`next.config.mjs`** : `images.remotePatterns` pour `*.supabase.co` +
+  `img-src` / `media-src` CSP élargis au host Supabase Storage. **Sans ça,
+  `/galerie` plante quand le flag est ON** (lacune trouvée au review).
+- **Flag `NEXT_PUBLIC_GALLERY_DYNAMIC`** (Railway) : `"true"` → nouveau rendu,
+  absent/`"false"` → ancien `GalerieClient` (conservé, non supprimé). Variable
+  `NEXT_PUBLIC_`, bakée au build → changement = redéploiement Railway (~2 min).
+  **Rollback** = repasser le flag à `false`.
+- **`scripts/migrate-gallery.ts`** (`npm run migrate:gallery`) : migration
+  UNIQUE des ~38 médias existants (photos `public/images/`, vidéos jsDelivr)
+  vers le bucket + la table. Idempotent (upsert `onConflict:"url"`). Lancé une
+  fois le 6 sept → 40 lignes. `tsx` ajouté en devDep, `sharp` déjà là.
+
+**Déploiement** : flag OFF d'abord (rien ne bouge), puis migration lancée en
+local avec les vraies clés Supabase, puis flag ON dans Railway. Vérifié en
+prod : grille masonry, lightbox, lazy-load, FR/EN/ES 200, HTML SSR contient
+les URLs médias (SEO OK).
+
+**Incident déploiement** : après plusieurs pushs rapprochés, Railway a servi
+un build incohérent (`Failed to fetch RSC payload` + `Cannot read properties
+of undefined (reading 'call')` dans le webpack runtime). **Fix : Redeploy
+Railway avec cache de build vidé.** Le code était bon (marchait en local avec
+le même build). À retenir : après plusieurs déploiements dans la journée, si
+erreurs RSC/webpack bizarres en prod → Redeploy propre avant de chercher un
+bug.
+
+### 35.3 — Spec 2 : admin galerie
+
+Spec : `docs/superpowers/specs/2026-09-06-galerie-admin-design.md`.
+Plan : `docs/superpowers/plans/2026-09-06-galerie-admin.md`.
+
+Nouvelle page **`/admin/galerie`** (3e onglet de la nav admin, même auth
+`getUser()` que le reste). Mouj gère les médias sans passer par Supabase.
+
+- **`lib/adminAuth.ts`** (nouveau) : `getAuthUser()` extrait de
+  `app/api/settings/route.ts` (qui l'importe désormais). NB :
+  `app/api/reservations/[id]/route.ts` inline encore sa propre auth — à
+  migrer un jour, hors périmètre.
+- **`lib/slug.ts`** : `slugify()` (nom de fichier Storage sûr, sortie
+  `[a-z0-9-]` uniquement) + `storagePathFromUrl()`.
+- **3 API routes** protégées (401 sans session), écritures via
+  `supabaseAdmin`, `revalidateTag("gallery-items")` après chaque mutation :
+  - `POST /api/gallery` : ajout. Photos compressées serveur via `sharp`
+    (rotate EXIF, resize 1400px, JPEG q80, `limitInputPixels` anti-bombe,
+    try/catch → 400 « Image illisible »). Vidéos ≤ 8 Mo stockées telles quelles
+    (pas de ffmpeg sur Railway) ; poster + dimensions **extraits côté
+    navigateur** (`<video>` + `<canvas>`, timeout 10 s si `seeked` ne se
+    déclenche pas). `alt` obligatoire ≥ 10 car. Garde-fou global 20 Mo.
+    `GET` = relecture (fallback du réordonnancement).
+  - `DELETE /api/gallery/[id]` : supprime la ligne + les fichiers Storage
+    (best-effort, log si échec Storage).
+  - `PATCH /api/gallery/order` : réordonnancement en lot (`[{id, sort_order}]`).
+- **Composants** : `GalleryAdmin` (orchestrateur, état optimiste + rollback),
+  `AddMediaForm`, `SortableGrid` (drag-and-drop `@dnd-kit`, poubelle par
+  vignette avec `window.confirm`, `stopPropagation` pour ne pas lancer un drag,
+  infobulle `title` avec `#sort_order` + description au survol).
+- **Bouton « Exporter le PDF »** : `lib/galleryPdf.ts`, `jspdf` en **import
+  dynamique** (chargé au clic seulement). Récap de toute la galerie (vignettes
+  600px + `#sort_order` + description), grille 3 colonnes, téléchargement
+  `galerie-salon-mimi-<date>.pdf`.
+- **Deps ajoutées** : `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`,
+  `jspdf` ; `sharp` déplacé devDeps → deps (utilisé au runtime par le POST).
+- **e2e** `e2e/galerie-admin.spec.ts` : contrats 401 + redirect login (le
+  parcours authentifié n'est pas automatisable sans login admin Playwright,
+  même limite que `api-reservations-id.spec.ts`).
+
+**Bug corrigé après déploiement** (`c73c3d2`) : le champ Description du
+formulaire d'ajout n'avait pas de classe `text-*` → **texte blanc sur fond
+blanc, saisie invisible** (leçon connue du projet : inputs sans `text-gray-900`
+sur fond clair). L'ajout fonctionnait en réalité, seul l'affichage était
+cassé. Corrigé : `text-gray-900` + placeholder gris + bouton « Parcourir »
+stylisé + messages erreur/notice en pleine largeur (`basis-full`).
+
+**Le script CLI `gallery:sheet`** (`scripts/gallery-contact-sheet.ts`,
+`gallery-sheet.html` gitignoré) est rendu obsolète par cette page + le bouton
+Exporter. Reste dans le repo, nettoyage optionnel plus tard.
+
+### État en fin de session
+
+- Galerie publique : dynamique, en prod, flag ON. Rollback = flag OFF.
+- Admin galerie : en prod. Test manuel fait par Mouj : ajout photo OK.
+- **Reste à faire par Mouj** : supprimer la photo de test `qsQsqSQsqSQ`
+  (`sort_order` 40) via la poubelle ; finir la checklist manuelle (ajout
+  vidéo, drag, export PDF) ; vérifier que Railway a une limite de taille de
+  requête raisonnable (le POST bufferise tout le corps avant le contrôle de
+  taille — commenté dans `app/api/gallery/route.ts`).
+- **Spec 3 possible** : édition du `alt` depuis l'admin (nouveau champ + route
+  PATCH), catégories/filtres sur la galerie publique.
+
+---
+
 ## 34. Session 6 sept 2026 — Médias clientes + chantier AI-readiness (EN PROD)
 
 Deux livraisons dans la même session. Tout en prod (`main`, commits `c8d2d18`
