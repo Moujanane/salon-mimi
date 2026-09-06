@@ -26,6 +26,8 @@ glisser-déposer.
 - **Supprimer** un média en un clic (icône poubelle + confirmation) : ligne DB
   - fichier(s) Storage supprimés.
 - **Réordonner** par glisser-déposer, sauvegarde automatique.
+- **Exporter** un PDF récapitulatif de toute la galerie (vignettes +
+  descriptions + `sort_order`) en un clic, généré côté navigateur.
 - Chaque modification invalide le cache de la galerie publique
   (`revalidateTag("gallery-items")`) → mise à jour immédiate du site.
 - Toutes les écritures passent par des API routes protégées par l'auth admin,
@@ -41,6 +43,10 @@ glisser-déposer.
 - Gestion des catégories / sections : la galerie publique est une grille brute
   (décidé en Spec 1). Pas de colonne `category`.
 - Multi-upload (plusieurs fichiers d'un coup) : un fichier à la fois.
+- Le script CLI `npm run gallery:sheet` et son `gallery-sheet.html` sont rendus
+  obsolètes par cette page (qui EST la planche visuelle) + le bouton Exporter.
+  Le script reste dans le repo, mais un nettoyage optionnel post-Spec 2 pourra
+  le retirer.
 
 ## Architecture
 
@@ -130,6 +136,34 @@ md:grid-cols-4`), chaque cellule = `SortableTile`. Utilise `@dnd-kit/core` +
     `onDelete(id)` retire la tuile de l'état local.
   - Le clic sur la poubelle ne doit PAS déclencher un drag
     (`onPointerDown` stopPropagation sur le bouton).
+
+### Bouton « Exporter le PDF »
+
+En haut de `GalleryAdmin`, à côté du titre, un bouton **« Exporter le PDF »**.
+Génération **entièrement côté navigateur** (aucune route serveur, aucun
+Chromium sur Railway), via `jspdf`.
+
+- Import **dynamique** de `jspdf` au clic (`const { jsPDF } = await
+import("jspdf")`) — la lib (~350 Ko) n'est chargée que si on clique, et
+  n'impacte jamais le bundle de la page ni le site public.
+- Pour chaque média (dans l'ordre `sort_order`) :
+  - charger la vignette : `poster_url` pour une vidéo, `url` pour une photo.
+    Fetch → `Blob` → `FileReader` en data URL (les URLs Supabase Storage sont
+    publiques et CORS-ouvertes, donc `fetch` direct fonctionne ; en secours,
+    passer par un `<img crossOrigin="anonymous">` + canvas).
+  - réduire à ~600 px de large via un `<canvas>` avant de l'ajouter (limite le
+    poids du PDF).
+  - `doc.addImage(dataUrl, "JPEG", x, y, w, h)` en grille 3 colonnes.
+  - sous chaque vignette : `#<sort_order>` + type (photo/vidéo) + `alt`
+    (tronqué), en petit.
+  - saut de page automatique quand `y` dépasse la hauteur utile.
+- En-tête de page 1 : « Galerie Salon Mimi — <N> médias — <date> ».
+- `doc.save("galerie-salon-mimi-<AAAA-MM-JJ>.pdf")` → téléchargement direct.
+- Pendant la génération : bouton désactivé + « Génération… » (le chargement des
+  ~40 images prend quelques secondes). Si une image échoue à charger : la
+  sauter, mettre un cadre gris « image indisponible », continuer.
+- `jspdf` va en **dependencies** (utilisé au runtime, même si seulement sur la
+  page admin).
 
 ### API routes
 
@@ -221,12 +255,16 @@ alt, sort_order, width, height").order("sort_order")`.
 ### Dépendances à ajouter
 
 ```
-npm i @dnd-kit/core @dnd-kit/sortable @dnd-kit/modifiers
+npm i @dnd-kit/core @dnd-kit/sortable @dnd-kit/modifiers jspdf
 ```
 
-(~15 Ko gzip total, standard React, accessible clavier.)
-`sharp` est déjà en devDependencies (ajouté en Spec 1) — le passer en
-**dependencies** puisque `POST /api/gallery` l'utilise au runtime en prod.
+- `@dnd-kit/*` : ~15 Ko gzip total, standard React, accessible clavier
+  (réordonnancement).
+- `jspdf` : ~350 Ko, chargé **uniquement en import dynamique au clic** sur
+  « Exporter le PDF » — n'entre pas dans le bundle de la page ni du site
+  public.
+- `sharp` : déjà en devDependencies (ajouté en Spec 1) — le passer en
+  **dependencies** puisque `POST /api/gallery` l'utilise au runtime en prod.
 
 ## Sécurité
 
@@ -281,26 +319,29 @@ npm i @dnd-kit/core @dnd-kit/sortable @dnd-kit/modifiers
      sur `/fr/galerie`
   6. Supprimer une photo → confirmation → disparaît des deux côtés, fichier
      absent du bucket
-  7. Vérifier `/admin/dashboard` et `/fr/reservation` toujours OK (non-régression)
+  7. **Exporter le PDF** → un fichier `galerie-salon-mimi-<date>.pdf` se
+     télécharge, contient toutes les vignettes + descriptions + `#sort_order`
+  8. Vérifier `/admin/dashboard` et `/fr/reservation` toujours OK (non-régression)
 
 ## Fichiers touchés
 
-| Fichier                             | Nature                                              |
-| ----------------------------------- | --------------------------------------------------- |
-| `app/admin/galerie/page.tsx`        | **créé** — page server, auth + fetch                |
-| `app/admin/layout.tsx`              | + lien de nav « Galerie »                           |
-| `components/admin/GalleryAdmin.tsx` | **créé** — orchestrateur client                     |
-| `components/admin/AddMediaForm.tsx` | **créé** (ou inline dans GalleryAdmin)              |
-| `components/admin/SortableGrid.tsx` | **créé** (ou inline) — dnd-kit                      |
-| `app/api/gallery/route.ts`          | **créé** — `POST` (ajout) + `GET` (relecture)       |
-| `app/api/gallery/[id]/route.ts`     | **créé** — `DELETE`                                 |
-| `app/api/gallery/order/route.ts`    | **créé** — `PATCH` (réordonnancement)               |
-| `lib/adminAuth.ts`                  | **créé** — `getAuthUser()` extrait                  |
-| `app/api/settings/route.ts`         | refactor : importe `getAuthUser` de `lib/adminAuth` |
-| `lib/slug.ts`                       | **créé** — `slugify()` + `storagePathFromUrl()`     |
-| `e2e/galerie-admin.spec.ts`         | **créé** — contrats 401 + redirect                  |
-| `package.json`                      | + `@dnd-kit/*`, `sharp` en dependencies             |
-| `supabase-schema.sql`               | inchangé (RLS déjà correcte)                        |
+| Fichier                             | Nature                                                |
+| ----------------------------------- | ----------------------------------------------------- |
+| `app/admin/galerie/page.tsx`        | **créé** — page server, auth + fetch                  |
+| `app/admin/layout.tsx`              | + lien de nav « Galerie »                             |
+| `components/admin/GalleryAdmin.tsx` | **créé** — orchestrateur client + bouton Exporter     |
+| `components/admin/AddMediaForm.tsx` | **créé** (ou inline dans GalleryAdmin)                |
+| `components/admin/SortableGrid.tsx` | **créé** (ou inline) — dnd-kit                        |
+| `lib/galleryPdf.ts`                 | **créé** — génération du PDF (import dynamique jspdf) |
+| `app/api/gallery/route.ts`          | **créé** — `POST` (ajout) + `GET` (relecture)         |
+| `app/api/gallery/[id]/route.ts`     | **créé** — `DELETE`                                   |
+| `app/api/gallery/order/route.ts`    | **créé** — `PATCH` (réordonnancement)                 |
+| `lib/adminAuth.ts`                  | **créé** — `getAuthUser()` extrait                    |
+| `app/api/settings/route.ts`         | refactor : importe `getAuthUser` de `lib/adminAuth`   |
+| `lib/slug.ts`                       | **créé** — `slugify()` + `storagePathFromUrl()`       |
+| `e2e/galerie-admin.spec.ts`         | **créé** — contrats 401 + redirect                    |
+| `package.json`                      | + `@dnd-kit/*`, `sharp` en dependencies               |
+| `supabase-schema.sql`               | inchangé (RLS déjà correcte)                          |
 
 ## Risques
 
