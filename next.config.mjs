@@ -25,7 +25,9 @@ const securityHeaders = [
       // la carte Google Maps embarquée). Plus de `https:` générique.
       "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://*.googleusercontent.com https://*.supabase.co https://cdn.jsdelivr.net",
       "connect-src 'self' https://*.supabase.co https://api.resend.com",
-      "media-src 'self' https://*.supabase.co https://cdn.jsdelivr.net",
+      // blob: nécessaire pour l'extraction du poster vidéo côté admin
+      // (URL.createObjectURL sur le fichier choisi avant upload).
+      "media-src 'self' blob: https://*.supabase.co https://cdn.jsdelivr.net",
       "frame-src https://www.google.com https://maps.google.com",
       "frame-ancestors 'none'",
     ].join("; "),
