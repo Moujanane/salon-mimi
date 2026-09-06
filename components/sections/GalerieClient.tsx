@@ -126,6 +126,10 @@ const SECTIONS: GallerySection[] = [
         src: "/images/s-fulani.jpg",
         alt: "Tresses Fulani Salon Mimi Marrakech",
       },
+      {
+        src: "/images/cornrows-mimi-2509-1.jpeg",
+        alt: "Cornrows dessin spirale Salon Mimi Marrakech — tresses collées géométriques",
+      },
     ],
   },
   {
@@ -145,6 +149,10 @@ const SECTIONS: GallerySection[] = [
       {
         src: "/images/s-tressage-mains.jpg",
         alt: "Mains tresseuse Salon Mimi Marrakech — savoir-faire africain",
+      },
+      {
+        src: "/images/boho-mimi-2509-1.jpeg",
+        alt: "Tresses boho cornrows et boucles Salon Mimi Marrakech — effet naturel",
       },
     ],
   },
@@ -321,6 +329,26 @@ const VIDEOS = [
     src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-vid-2.mp4",
     title: "Salon Mimi — Place Jamaa El Fna",
     poster: "/images/s-boho.jpg",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-boxbraids-2509-1.mp4",
+    title: "Box braids longues",
+    poster: "/images/s-box-braids-xl.jpg",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-twists-2509-1.mp4",
+    title: "Twists",
+    poster: "/images/s-marley.webp",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-enfants-2509-1.mp4",
+    title: "Tresses enfants",
+    poster: "/images/s-tresse-fille1.png",
+  },
+  {
+    src: "https://cdn.jsdelivr.net/gh/Moujanane/salon-mimi-media/salon-mimi-enfants-2509-2.mp4",
+    title: "Cornrows enfants",
+    poster: "/images/s-tresse-garcon.png",
   },
 ];
 
