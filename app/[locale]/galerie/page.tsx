@@ -3,6 +3,8 @@ export const revalidate = 3600;
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import GalerieClient from "@/components/sections/GalerieClient";
+import GalleryMasonry from "@/components/sections/GalleryMasonry";
+import { getGalleryItems } from "@/lib/gallery";
 
 export async function generateMetadata({
   params,
@@ -50,6 +52,14 @@ const subtitles: Record<string, string> = {
   es: "Nuestras creaciones",
 };
 
+const indexText: Record<string, string> = {
+  fr: "Tresses africaines, box braids, knotless braids, cornrows, locks, tresses rasta et coiffures enfants réalisées au Salon Mimi, Place Jamaa El Fna, Marrakech.",
+  en: "African braids, box braids, knotless braids, cornrows, locks, rasta braids and children's styles done at Salon Mimi, Jamaa El Fna Square, Marrakech.",
+  es: "Trenzas africanas, box braids, knotless braids, cornrows, locks, trenzas rasta y peinados infantiles realizados en el Salon Mimi, Plaza Jamaa El Fna, Marrakech.",
+};
+
+const GALLERY_DYNAMIC = process.env.NEXT_PUBLIC_GALLERY_DYNAMIC === "true";
+
 export default async function GaleriePage({
   params,
 }: {
@@ -58,6 +68,8 @@ export default async function GaleriePage({
   const { locale } = await params;
   setRequestLocale(locale);
   const displayLocale = locale || "fr";
+
+  const items = GALLERY_DYNAMIC ? await getGalleryItems() : [];
 
   return (
     <div className="bg-fond min-h-screen">
@@ -71,14 +83,14 @@ export default async function GaleriePage({
       </div>
       <div className="max-w-2xl mx-auto px-4 pt-10 text-center">
         <p className="text-brun/60 text-sm leading-relaxed">
-          {displayLocale === "en"
-            ? "African braids, box braids, knotless braids, cornrows, locks and rasta — all realised at Salon Mimi, Jamaa El Fna Square, Marrakech."
-            : displayLocale === "es"
-              ? "Trenzas africanas, box braids, knotless braids, cornrows, locks y rasta — realizadas en el Salon Mimi, Plaza Jamaa El Fna, Marrakech."
-              : "Tresses africaines, box braids, knotless braids, cornrows, locks et rasta — réalisées au Salon Mimi, Place Jamaa El Fna, Marrakech."}
+          {indexText[displayLocale] ?? indexText.fr}
         </p>
       </div>
-      <GalerieClient locale={displayLocale} />
+      {GALLERY_DYNAMIC ? (
+        <GalleryMasonry items={items} />
+      ) : (
+        <GalerieClient locale={displayLocale} />
+      )}
     </div>
   );
 }
