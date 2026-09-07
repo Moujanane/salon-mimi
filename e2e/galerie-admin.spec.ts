@@ -31,6 +31,14 @@ test.describe("Admin galerie — sécurité", () => {
     expect(res.status()).toBe(401);
   });
 
+  test("PATCH /api/gallery/[id] sans session -> 401", async ({ request }) => {
+    const res = await request.patch(
+      "/api/gallery/00000000-0000-0000-0000-000000000000",
+      { data: { alt: "Nouvelle description assez longue" } },
+    );
+    expect(res.status()).toBe(401);
+  });
+
   test("PATCH /api/gallery/order sans session -> 401", async ({ request }) => {
     const res = await request.patch("/api/gallery/order", {
       data: { order: [] },

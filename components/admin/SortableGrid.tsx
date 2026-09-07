@@ -19,13 +19,93 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import type { GalleryItem } from "@/lib/gallery";
+import { GALLERY_CATEGORIES } from "@/lib/gallery-categories";
+
+type EditMeta = (
+  id: string,
+  patch: { alt?: string; category?: string | null },
+) => Promise<boolean>;
+
+// Panneau d'édition sous une vignette : description + catégorie. En dehors du
+// nœud sortable (pas de listeners de drag ici), donc taper dans les champs ne
+// déclenche jamais un déplacement.
+function MetaEditor({
+  item,
+  onEditMeta,
+}: {
+  item: GalleryItem;
+  onEditMeta: EditMeta;
+}) {
+  const [alt, setAlt] = useState(item.alt);
+  const [category, setCategory] = useState(item.category ?? "");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState("");
+
+  const dirty = alt.trim() !== item.alt || (category || null) !== item.category;
+  const tooShort = alt.trim().length < 10;
+
+  async function save() {
+    if (!dirty || tooShort) return;
+    setBusy(true);
+    setMsg("");
+    const ok = await onEditMeta(item.id, {
+      alt: alt.trim(),
+      category: category || null,
+    });
+    setBusy(false);
+    setMsg(ok ? "Enregistré" : "Échec");
+    if (ok) setTimeout(() => setMsg(""), 2000);
+  }
+
+  return (
+    <div className="mt-1.5 space-y-1.5">
+      <textarea
+        value={alt}
+        onChange={(e) => setAlt(e.target.value)}
+        rows={2}
+        aria-label="Description du média"
+        className="block w-full resize-none rounded border border-gray-300 bg-white px-2 py-1 text-xs text-gray-900 placeholder:text-gray-400"
+        placeholder="Description pour Google (10 car. min.)"
+      />
+      <div className="flex items-center gap-1.5">
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          aria-label="Catégorie du média"
+          className="min-w-0 flex-1 rounded border border-gray-300 bg-white px-1.5 py-1 text-xs text-gray-900"
+        >
+          <option value="">Non classé</option>
+          {GALLERY_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={save}
+          disabled={!dirty || tooShort || busy}
+          className="shrink-0 rounded bg-brun px-2 py-1 text-xs text-white disabled:opacity-40"
+        >
+          {busy ? "…" : "Enregistrer"}
+        </button>
+      </div>
+      {tooShort && dirty && (
+        <p className="text-[11px] text-red-600">10 caractères minimum.</p>
+      )}
+      {msg && <p className="text-[11px] text-gray-500">{msg}</p>}
+    </div>
+  );
+}
 
 function SortableTile({
   item,
   onDelete,
+  onEditMeta,
 }: {
   item: GalleryItem;
   onDelete: (id: string) => void;
+  onEditMeta: EditMeta;
 }) {
   const {
     attributes,
@@ -54,82 +134,86 @@ function SortableTile({
   const [playing, setPlaying] = useState(false);
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      title={`#${item.sort_order} · ${item.type === "video" ? "vidéo" : "photo"}\n${item.alt}`}
-      className="group relative aspect-square overflow-hidden rounded-lg bg-gray-200 cursor-grab active:cursor-grabbing"
-    >
-      {item.type === "video" && playing ? (
-        <video
-          src={item.url}
-          poster={item.poster_url ?? undefined}
-          controls
-          autoPlay
-          playsInline
-          className="h-full w-full bg-black object-contain"
-        />
-      ) : isVideoWithoutPoster ? (
-        <video
-          src={`${item.url}#t=0.1`}
-          preload="metadata"
-          muted
-          playsInline
-          className="h-full w-full object-cover pointer-events-none"
-        />
-      ) : (
-        <img
-          src={thumb}
-          alt={item.alt}
-          loading="lazy"
-          className="h-full w-full object-cover pointer-events-none"
-        />
-      )}
-      {item.type === "video" && !playing && (
+    <div ref={setNodeRef} style={style}>
+      <div
+        {...attributes}
+        {...listeners}
+        title={`#${item.sort_order} · ${item.type === "video" ? "vidéo" : "photo"}\n${item.alt}`}
+        className="group relative aspect-square overflow-hidden rounded-lg bg-gray-200 cursor-grab active:cursor-grabbing"
+      >
+        {item.type === "video" && playing ? (
+          <video
+            src={item.url}
+            poster={item.poster_url ?? undefined}
+            controls
+            autoPlay
+            playsInline
+            className="h-full w-full bg-black object-contain"
+          />
+        ) : isVideoWithoutPoster ? (
+          <video
+            src={`${item.url}#t=0.1`}
+            preload="metadata"
+            muted
+            playsInline
+            className="h-full w-full object-cover pointer-events-none"
+          />
+        ) : (
+          <img
+            src={thumb}
+            alt={item.alt}
+            loading="lazy"
+            className="h-full w-full object-cover pointer-events-none"
+          />
+        )}
+        {item.type === "video" && !playing && (
+          <button
+            type="button"
+            aria-label="Lire la vidéo"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              setPlaying(true);
+            }}
+            className="absolute inset-0 flex items-center justify-center text-white text-2xl drop-shadow"
+          >
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-black/45 transition-transform group-hover:scale-110">
+              ▶
+            </span>
+          </button>
+        )}
         <button
           type="button"
-          aria-label="Lire la vidéo"
+          aria-label="Supprimer ce média"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => {
             e.stopPropagation();
-            setPlaying(true);
+            if (
+              window.confirm(
+                `Supprimer définitivement ce média ?\n\n${item.alt}`,
+              )
+            ) {
+              onDelete(item.id);
+            }
           }}
-          className="absolute inset-0 flex items-center justify-center text-white text-2xl drop-shadow"
+          className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
         >
-          <span className="flex h-11 w-11 items-center justify-center rounded-full bg-black/45 transition-transform group-hover:scale-110">
-            ▶
-          </span>
+          <svg
+            viewBox="0 0 24 24"
+            className="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+          </svg>
         </button>
-      )}
-      <button
-        type="button"
-        aria-label="Supprimer ce média"
-        onPointerDown={(e) => e.stopPropagation()}
-        onClick={(e) => {
-          e.stopPropagation();
-          if (
-            window.confirm(`Supprimer définitivement ce média ?\n\n${item.alt}`)
-          ) {
-            onDelete(item.id);
-          }
-        }}
-        className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          className="h-4 w-4"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
-          <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-        </svg>
-      </button>
-      <span className="absolute left-2 bottom-2 rounded bg-black/50 px-1.5 py-0.5 text-[11px] text-white">
-        #{item.sort_order}
-      </span>
+        <span className="absolute left-2 bottom-2 rounded bg-black/50 px-1.5 py-0.5 text-[11px] text-white">
+          #{item.sort_order}
+        </span>
+      </div>
+
+      <MetaEditor item={item} onEditMeta={onEditMeta} />
     </div>
   );
 }
@@ -138,10 +222,12 @@ export default function SortableGrid({
   items,
   onReorder,
   onDelete,
+  onEditMeta,
 }: {
   items: GalleryItem[];
   onReorder: (next: GalleryItem[]) => void;
   onDelete: (id: string) => void;
+  onEditMeta: EditMeta;
 }) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -171,7 +257,12 @@ export default function SortableGrid({
       >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {items.map((item) => (
-            <SortableTile key={item.id} item={item} onDelete={onDelete} />
+            <SortableTile
+              key={item.id}
+              item={item}
+              onDelete={onDelete}
+              onEditMeta={onEditMeta}
+            />
           ))}
         </div>
       </SortableContext>

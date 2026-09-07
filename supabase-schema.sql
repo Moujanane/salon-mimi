@@ -112,11 +112,9 @@ create policy "service_role_all"
 -- ============================================================
 -- Table: gallery_items
 -- ============================================================
--- Médias de la galerie publique (/[locale]/galerie), destinés à être gérés
--- depuis /admin (Spec 2, à venir). Remplace les tableaux SECTIONS[] / VIDEOS[]
--- codés en dur dans components/sections/GalerieClient.tsx.
--- Fichiers hébergés dans le bucket Storage public "gallery".
--- Activé en prod par la variable NEXT_PUBLIC_GALLERY_DYNAMIC="true".
+-- Médias de la galerie publique (/[locale]/galerie), gérés depuis
+-- /admin/galerie (Spec 2). Fichiers hébergés dans le bucket Storage public
+-- "gallery". Rendu par components/sections/GalleryMasonry.tsx.
 create table if not exists gallery_items (
   id uuid primary key default gen_random_uuid(),
   type text not null check (type in ('photo', 'video')),
@@ -126,6 +124,9 @@ create table if not exists gallery_items (
   sort_order integer not null default 0,
   width integer,
   height integer,
+  -- category : Spec 3 galerie — filtres publics. Liste FIXE côté appli
+  -- (lib/gallery-categories.ts). NULL = non classé (apparaît dans « Tout »).
+  category text,
   created_at timestamptz default now()
 );
 
@@ -160,3 +161,6 @@ create policy "gallery_items_service_role_all"
 
 create index if not exists gallery_items_sort_idx
   on gallery_items (sort_order);
+
+create index if not exists gallery_items_category_idx
+  on gallery_items (category);

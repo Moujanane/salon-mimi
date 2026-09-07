@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { GalleryItem } from "@/lib/gallery";
+import { GALLERY_CATEGORIES } from "@/lib/gallery-categories";
 
 const MAX_VIDEO = 8 * 1024 * 1024;
 
@@ -108,6 +109,7 @@ export default function AddMediaForm({
   onAdded: (item: GalleryItem) => void;
 }) {
   const [alt, setAlt] = useState("");
+  const [category, setCategory] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -140,6 +142,7 @@ export default function AddMediaForm({
       const fd = new FormData();
       fd.append("file", file);
       fd.append("alt", alt.trim());
+      if (category) fd.append("category", category);
 
       if (isVideo) {
         const probed = await probeVideo(file);
@@ -162,6 +165,7 @@ export default function AddMediaForm({
       }
       onAdded(json as GalleryItem);
       setAlt("");
+      setCategory("");
       if (fileRef.current) fileRef.current.value = "";
     } catch {
       setError("Erreur réseau pendant l'envoi.");
@@ -197,6 +201,23 @@ export default function AddMediaForm({
           placeholder="ex : Box braids bohème Salon Mimi Marrakech"
           className="block w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900 placeholder:text-gray-400"
         />
+      </div>
+      <div className="sm:w-44">
+        <label className="mb-1 block text-xs font-medium text-gray-600">
+          Catégorie (optionnel)
+        </label>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="block w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-sm text-gray-900"
+        >
+          <option value="">Non classé</option>
+          {GALLERY_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
       </div>
       <button
         type="submit"

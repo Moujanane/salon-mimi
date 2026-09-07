@@ -48,6 +48,33 @@ export default function GalleryAdmin({
     }
   }
 
+  // Édition des métadonnées d'un média (description et/ou catégorie).
+  // Rendu optimiste + rollback si l'API échoue. Retourne true si sauvegardé.
+  async function handleEditMeta(
+    id: string,
+    patch: { alt?: string; category?: string | null },
+  ): Promise<boolean> {
+    const prev = items;
+    setItems((cur) =>
+      cur.map((it) => (it.id === id ? { ...it, ...patch } : it)),
+    );
+    setNotice("");
+    const res = await fetch(`/api/gallery/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    });
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}));
+      setNotice(json.error ?? "Échec de l'enregistrement.");
+      setItems(prev);
+      return false;
+    }
+    const fresh = (await res.json()) as GalleryItem;
+    setItems((cur) => cur.map((it) => (it.id === id ? fresh : it)));
+    return true;
+  }
+
   async function handleExport() {
     setPdfBusy(true);
     setNotice("");
@@ -92,6 +119,7 @@ export default function GalleryAdmin({
         items={items}
         onReorder={persistOrder}
         onDelete={handleDelete}
+        onEditMeta={handleEditMeta}
       />
     </div>
   );

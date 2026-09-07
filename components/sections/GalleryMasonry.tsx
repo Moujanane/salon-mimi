@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import type { GalleryItem } from "@/lib/gallery";
+import { GALLERY_CATEGORIES } from "@/lib/gallery-categories";
 
 const DEFAULT_RATIO = "4 / 5";
 
@@ -111,6 +112,7 @@ function PhotoCell({
     <button
       type="button"
       onClick={onOpen}
+      data-testid="gallery-photo"
       className="group relative block w-full overflow-hidden rounded-xl bg-gray-800"
       style={{ aspectRatio: ratioOf(item) }}
       aria-label={item.alt || "Agrandir la photo"}
@@ -228,10 +230,37 @@ function Lightbox({
 }
 
 export default function GalleryMasonry({ items }: { items: GalleryItem[] }) {
-  // La lightbox ne concerne que les photos ; les vidéos se lisent dans leur
-  // vignette. On travaille donc sur la sous-liste des photos et son index.
-  const photos = items.filter((it) => it.type === "photo");
   const [openPhoto, setOpenPhoto] = useState<number | null>(null);
+  const [filter, setFilter] = useState<string | null>(null);
+
+  // Catégories réellement présentes, dans l'ordre de la liste fixe. Si aucun
+  // média n'est classé, la barre de filtres ne s'affiche pas.
+  const categories = useMemo(() => {
+    const present = new Set(
+      items.map((it) => it.category).filter((c): c is string => !!c),
+    );
+    return GALLERY_CATEGORIES.filter((c) => present.has(c));
+  }, [items]);
+
+  // Si le filtre courant n'existe plus (liste rechargée), on repasse à « Tout ».
+  const activeFilter =
+    filter && (categories as readonly string[]).includes(filter)
+      ? filter
+      : null;
+
+  const visible = activeFilter
+    ? items.filter((it) => it.category === activeFilter)
+    : items;
+
+  // La lightbox ne concerne que les photos, et seulement celles visibles.
+  const photos = visible.filter((it) => it.type === "photo");
+
+  // Changer de filtre réordonne `photos` : l'index de la lightbox ne pointe
+  // plus sur la même image. On la ferme.
+  function changeFilter(next: string | null) {
+    setOpenPhoto(null);
+    setFilter(next);
+  }
 
   if (items.length === 0) {
     return (
@@ -243,22 +272,60 @@ export default function GalleryMasonry({ items }: { items: GalleryItem[] }) {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-12">
-      <div className="[column-fill:balance] [column-gap:12px] [columns:2] md:[columns:3]">
-        {items.map((item) => (
-          <div key={item.id} className="mb-3 break-inside-avoid">
-            {item.type === "video" ? (
-              <VideoCell item={item} />
-            ) : (
-              <PhotoCell
-                item={item}
-                onOpen={() =>
-                  setOpenPhoto(photos.findIndex((p) => p.id === item.id))
-                }
-              />
-            )}
-          </div>
-        ))}
-      </div>
+      {categories.length > 0 && (
+        <div className="mb-8 flex flex-wrap justify-center gap-2">
+          <button
+            type="button"
+            onClick={() => changeFilter(null)}
+            aria-pressed={activeFilter === null}
+            className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+              activeFilter === null
+                ? "border-nuit bg-nuit text-or"
+                : "border-brun/30 text-brun hover:border-brun"
+            }`}
+          >
+            Tout
+          </button>
+          {categories.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => changeFilter(c)}
+              aria-pressed={activeFilter === c}
+              className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
+                activeFilter === c
+                  ? "border-nuit bg-nuit text-or"
+                  : "border-brun/30 text-brun hover:border-brun"
+              }`}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {visible.length === 0 ? (
+        <p className="py-12 text-center text-brun/50">
+          Aucun média dans cette catégorie pour l’instant.
+        </p>
+      ) : (
+        <div className="[column-fill:balance] [column-gap:12px] [columns:2] md:[columns:3]">
+          {visible.map((item) => (
+            <div key={item.id} className="mb-3 break-inside-avoid">
+              {item.type === "video" ? (
+                <VideoCell item={item} />
+              ) : (
+                <PhotoCell
+                  item={item}
+                  onOpen={() =>
+                    setOpenPhoto(photos.findIndex((p) => p.id === item.id))
+                  }
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {openPhoto !== null && photos.length > 0 && (
         <Lightbox

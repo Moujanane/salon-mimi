@@ -5,6 +5,7 @@ import sharp from "sharp";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { getAuthUser } from "@/lib/adminAuth";
 import { slugify } from "@/lib/slug";
+import { normalizeCategory } from "@/lib/gallery-categories";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
@@ -22,7 +23,9 @@ export async function GET() {
 
   const { data, error } = await supabaseAdmin
     .from("gallery_items")
-    .select("id, type, url, poster_url, alt, sort_order, width, height")
+    .select(
+      "id, type, url, poster_url, alt, sort_order, width, height, category",
+    )
     .order("sort_order", { ascending: true });
 
   if (error)
@@ -42,6 +45,7 @@ export async function POST(request: NextRequest) {
   const form = await request.formData();
   const file = form.get("file");
   const alt = String(form.get("alt") ?? "").trim();
+  const category = normalizeCategory(form.get("category"));
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Fichier manquant" }, { status: 400 });
@@ -166,8 +170,11 @@ export async function POST(request: NextRequest) {
       sort_order: nextOrder,
       width,
       height,
+      category,
     })
-    .select("id, type, url, poster_url, alt, sort_order, width, height")
+    .select(
+      "id, type, url, poster_url, alt, sort_order, width, height, category",
+    )
     .single();
 
   if (insErr)

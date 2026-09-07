@@ -18,7 +18,16 @@ export type GalleryItem = {
   sort_order: number;
   width: number | null;
   height: number | null;
+  category: string | null;
 };
+
+// Colonnes lues partout. `category` est optionnelle en base tant que la
+// migration Spec 3 n'est pas passée : fetchGalleryItems retente sans elle si
+// PostgREST se plaint d'une colonne inconnue (code 42703).
+const SELECT_WITH_CATEGORY =
+  "id, type, url, poster_url, alt, sort_order, width, height, category";
+const SELECT_LEGACY =
+  "id, type, url, poster_url, alt, sort_order, width, height";
 
 async function fetchGalleryItems(): Promise<GalleryItem[]> {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -29,18 +38,31 @@ async function fetchGalleryItems(): Promise<GalleryItem[]> {
   }
 
   const client = createClient(url, key);
-  const { data, error } = await client
-    .from("gallery_items")
-    .select("id, type, url, poster_url, alt, sort_order, width, height")
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: true });
 
-  if (error || !data) {
-    console.error("[gallery] échec de lecture de gallery_items", error);
+  const run = (columns: string) =>
+    client
+      .from("gallery_items")
+      .select(columns)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+
+  let res = await run(SELECT_WITH_CATEGORY);
+
+  // Colonne category encore absente (migration Spec 3 non appliquée) :
+  // on relit sans elle et on complète avec category: null.
+  if (res.error?.code === "42703") {
+    res = await run(SELECT_LEGACY);
+  }
+
+  if (res.error || !res.data) {
+    console.error("[gallery] échec de lecture de gallery_items", res.error);
     return [];
   }
 
-  return data as GalleryItem[];
+  return (res.data as unknown as Record<string, unknown>[]).map((row) => ({
+    ...row,
+    category: (row.category as string | null) ?? null,
+  })) as GalleryItem[];
 }
 
 export const getGalleryItems = unstable_cache(
