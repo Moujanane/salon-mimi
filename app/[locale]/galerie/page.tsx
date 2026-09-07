@@ -11,7 +11,6 @@ export const fetchCache = "default-no-store";
 import type { Metadata } from "next";
 import { unstable_noStore as noStore } from "next/cache";
 import { setRequestLocale } from "next-intl/server";
-import GalerieClient from "@/components/sections/GalerieClient";
 import GalleryMasonry from "@/components/sections/GalleryMasonry";
 import { getGalleryItems } from "@/lib/gallery";
 
@@ -67,8 +66,6 @@ const indexText: Record<string, string> = {
   es: "Trenzas africanas, box braids, knotless braids, cornrows, locks, trenzas rasta y peinados infantiles realizados en el Salon Mimi, Plaza Jamaa El Fna, Marrakech.",
 };
 
-const GALLERY_DYNAMIC = process.env.NEXT_PUBLIC_GALLERY_DYNAMIC === "true";
-
 export default async function GaleriePage({
   params,
 }: {
@@ -79,7 +76,7 @@ export default async function GaleriePage({
   setRequestLocale(locale);
   const displayLocale = locale || "fr";
 
-  const items = GALLERY_DYNAMIC ? await getGalleryItems() : [];
+  const items = await getGalleryItems();
 
   return (
     <div className="bg-fond min-h-screen">
@@ -96,11 +93,7 @@ export default async function GaleriePage({
           {indexText[displayLocale] ?? indexText.fr}
         </p>
       </div>
-      {GALLERY_DYNAMIC ? (
-        <GalleryMasonry items={items} />
-      ) : (
-        <GalerieClient locale={displayLocale} />
-      )}
+      <GalleryMasonry items={items} />
     </div>
   );
 }

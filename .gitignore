@@ -11,6 +11,7 @@
 
 # next.js
 /.next/
+.next/
 /out/
 
 # production
@@ -46,3 +47,6 @@ node_modules/
 /playwright/.auth/
 .superpowers/
 gallery-sheet.html
+
+# worktrees Claude Code (isolés, jamais versionnés)
+.claude/worktrees/

@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start -p ${PORT:-3000}",
     "lint": "next lint",
-    "migrate:gallery": "tsx scripts/migrate-gallery.ts",
-    "gallery:sheet": "tsx scripts/gallery-contact-sheet.ts"
+    "migrate:gallery": "tsx scripts/migrate-gallery.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 
 // Ces tests s'exécutent contre l'URL PLAYWRIGHT_BASE_URL (prod par défaut,
-// localhost:3100 en local). Le comportement dépend du flag
-// NEXT_PUBLIC_GALLERY_DYNAMIC de l'environnement testé.
+// localhost:3100 en local). La galerie est servie par GalleryMasonry à partir
+// de la table Supabase gallery_items (lecture cachée, tag "gallery-items").
 
 test.describe("Galerie", () => {
   test("la page répond et affiche un titre", async ({ page }) => {
@@ -25,13 +25,9 @@ test.describe("Galerie", () => {
   test("ouvrir puis fermer un média en plein écran", async ({ page }) => {
     await page.goto("/fr/galerie");
 
-    const cell = page
-      .locator(
-        "button[aria-label*='photo'], button[aria-label*='vidéo'], button[aria-label*='Agrandir'], button[aria-label*='Voir']",
-      )
-      .first();
+    const cell = page.getByTestId("gallery-photo").first();
     const hasLightbox = (await cell.count()) > 0;
-    test.skip(!hasLightbox, "Lightbox absente (ancien rendu, flag off)");
+    test.skip(!hasLightbox, "Aucune photo en galerie sur cet environnement");
 
     await cell.click();
     const dialog = page.locator("[role='dialog'][aria-modal='true']");

@@ -1,7 +1,7 @@
 // scripts/migrate-gallery.ts
 //
-// Migration UNIQUE des médias existants (photos public/images/ + vidéos jsDelivr
-// référencées dans components/sections/GalerieClient.tsx) vers :
+// Migration UNIQUE des médias existants (photos public/images/ + vidéos jsDelivr)
+// vers :
 //   - le bucket Supabase Storage "gallery"
 //   - la table "gallery_items"
 //
