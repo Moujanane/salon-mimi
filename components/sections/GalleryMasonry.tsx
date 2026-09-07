@@ -125,6 +125,16 @@ function PhotoCell({
         sizes="(max-width: 768px) 50vw, 33vw"
         loading="lazy"
       />
+      {/* Description au survol (desktop uniquement — pas de survol au doigt).
+          aria-hidden : le texte est déjà porté par l'aria-label du bouton. */}
+      {item.alt && (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 hidden translate-y-2 bg-gradient-to-t from-black/80 via-black/45 to-transparent p-3 pt-8 text-left text-sm leading-snug text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 md:block"
+        >
+          {item.alt}
+        </span>
+      )}
     </button>
   );
 }
