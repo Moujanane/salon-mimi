@@ -25,7 +25,9 @@ export default async function GalerieAdminPage() {
 
   const { data: items } = await supabase
     .from("gallery_items")
-    .select("id, type, url, poster_url, alt, sort_order, width, height")
+    .select(
+      "id, type, url, poster_url, alt, sort_order, width, height, category",
+    )
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
 
