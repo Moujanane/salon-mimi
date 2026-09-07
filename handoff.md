@@ -6,6 +6,96 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 36. Session 7 sept 2026 — Spec 3 galerie + nettoyage + dette auth (BRANCHE, PAS ENCORE MERGÉE)
+
+Branche `feat/galerie-spec3-nettoyage-dette`, 3 commits au-dessus de `main`
+(`6ee796a` → `5fe2c62`). Commit docs `bf75b88` déjà sur `main` local mais
+**pas encore poussé**.
+
+### Ce qui a été fait
+
+**Lot C — dette auth (`6ee796a`)** : `app/api/reservations/[id]/route.ts`
+importe `getAuthUser` de `lib/adminAuth` au lieu de dupliquer le bloc
+`createServerClient` + `auth.getUser` dans PATCH et DELETE. Comportement
+identique (401 sans session). Cette dette du handoff §35 est soldée.
+
+**Lot B — nettoyage code mort (`6476646`)** :
+
+- supprimé `components/sections/GalerieClient.tsx` (ancien rendu statique)
+- supprimé `scripts/gallery-contact-sheet.ts` + script npm `gallery:sheet`
+- `app/[locale]/galerie/page.tsx` : plus de flag `NEXT_PUBLIC_GALLERY_DYNAMIC`,
+  rend toujours `<GalleryMasonry>`. **Reste à faire : Mouj supprime la
+  variable dans Railway** (inoffensive si elle reste).
+- `.gitignore` : ignore désormais `.next/` imbriqué et `.claude/worktrees/`
+  (un ancien worktree `fix-rate-limiters-upstash` polluait `git status`).
+- `e2e/galerie.spec.ts` : le test « ouvrir un média » ciblait la 1re cellule
+  matchée par `aria-label*='vidéo'` → attrapait la vidéo de test de Mouj (alt
+  « test ajout vidéo ») au lieu d'une photo → `dialog not found`. Corrigé
+  avec `data-testid="gallery-photo"` sur `PhotoCell`.
+
+**Lot A — Spec 3 galerie (`5fe2c62`)** :
+
+- **`lib/gallery-categories.ts`** (nouveau) : liste FIXE de 7 catégories
+  (Tresses africaines, Box braids, Knotless braids, Cornrows, Locks, Tresses
+  rasta, Enfants), source unique + helpers de validation. Pour en ajouter :
+  modifier ce tableau uniquement.
+- **Édition des métadonnées (admin)** : nouveau `PATCH /api/gallery/[id]`
+  (auth, `{ alt?, category? }`, alt ≥ 10 car, category validée contre la
+  liste, `revalidateTag`). `SortableGrid` : sous chaque vignette un
+  `MetaEditor` (textarea description + select catégorie + Enregistrer). Le
+  nœud drag ne couvre plus que la vignette carrée → taper dans les champs ne
+  déclenche jamais un déplacement. `GalleryAdmin.handleEditMeta` optimiste +
+  rollback.
+- **Filtres publics** : `GalleryMasonry` affiche une barre de chips au-dessus
+  de la grille SI au moins un média est classé (sinon rien →
+  rétrocompatible). Filtrage client. Changer de filtre ferme la lightbox
+  (l'index ne pointe plus sur la même photo).
+- **`lib/gallery.ts`** : colonne `category` ajoutée au type et aux selects,
+  avec **relecture défensive sans la colonne** si la migration n'est pas
+  passée (code PostgREST `42703`) → le site ne casse pas si on déploie avant
+  la migration.
+- `AddMediaForm` : select catégorie à l'ajout.
+- `supabase-schema.sql` : colonne `category text` + index.
+
+### ⚠ MIGRATION SQL À APPLIQUER PAR MOUJ avant/après déploiement
+
+Dans le dashboard Supabase (SQL Editor) :
+
+```sql
+alter table gallery_items add column if not exists category text;
+create index if not exists gallery_items_category_idx
+  on gallery_items (category);
+```
+
+Le code marche SANS (filtres juste inactifs, barre masquée). Ordre conseillé :
+migration → merge → Mimi classe ses médias depuis l'admin → les filtres
+apparaissent.
+
+### Vérifs faites
+
+- `npx tsc --noEmit` ✓ · `npm run lint` ✓ (3 warnings `<img>` préexistants,
+  non aggravés) · `npm run build` ✓
+- `npx playwright test` contre build local (`PLAYWRIGHT_BASE_URL=
+http://localhost:3100`, flag ON) : **162 passed / 2 skipped / 0 failed**
+
+### Reste à faire par Mouj
+
+1. Appliquer la migration SQL `category` (ci-dessus).
+2. Merger la branche → déploiement Railway.
+3. Supprimer `NEXT_PUBLIC_GALLERY_DYNAMIC` dans Railway.
+4. **Vérif manuelle du parcours admin authentifié** (pas d'infra login admin
+   Playwright, même limite que `api-reservations-id`) :
+   - ajouter une photo avec une catégorie → elle apparaît, classée
+   - éditer la description + la catégorie d'une vignette → sauvegarde OK
+   - glisser une vignette pour réordonner → l'ordre tient (le panneau
+     d'édition sous la vignette ne doit pas gêner le drag)
+   - sur `/fr/galerie` : les chips de filtres apparaissent, filtrent bien,
+     « Tout » remet tout
+5. Point §35 encore ouvert : supprimer la photo de test `qsQsqSQsqSQ`
+   (`sort_order` 40) + la vidéo de test « test ajout vidéo ».
+
+---
+
 ## 35. Session 6 sept 2026 (suite) — Galerie dynamique + admin galerie (EN PROD)
 
 Trois chantiers enchaînés dans la session, tous déployés sur `main` (Railway
