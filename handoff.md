@@ -9,7 +9,8 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 ## 36. Session 7 sept 2026 — Spec 3 galerie + nettoyage + dette auth (EN PROD)
 
 Mergé et déployé sur `main`. Commits `6ee796a`→`5fe2c62` (rebasés en
-`2a7dbf2`→`8df25cc`), docs `bf75b88`+`63fb0c5`, puis **hotfix `d6c1a0e`**
+`2a7dbf2`→`8df25cc`), docs `bf75b88`+`63fb0c5`, hotfix `d6c1a0e`, puis
+`388edba` (overlay au survol — voir plus bas). **hotfix `d6c1a0e`**
 (voir plus bas). Migration SQL `category` appliquée par Mouj (« Success. No
 rows returned »).
 
@@ -31,6 +32,16 @@ Leçon en mémoire : `salon-mimi-gallery-select-coherence`.
 Vérifs hotfix : `tsc` ✓, `build` ✓, playwright 162/2 skipped/0 failed en
 local. Prod : `/fr|/en|/es/galerie` 200, contrats API 401, pas de 404
 Railway.
+
+### `388edba` — description en overlay au survol (galerie publique)
+
+Demande de Mouj après coup : au survol d'une photo sur `/[locale]/galerie`,
+sa description apparaît dans un bandeau dégradé en bas de la vignette
+(translate + fade 300 ms). **Desktop seulement** (`md:block` — pas de survol
+au doigt), `pointer-events-none` (n'intercepte pas le clic lightbox),
+`aria-hidden` (déjà porté par l'`aria-label` du bouton). Rendu seulement si
+`item.alt` non vide. Vérifié en prod : overlay OK desktop, `display:none`
+sur mobile (34 vignettes), lightbox intacte.
 
 ### Ce qui a été fait
 
