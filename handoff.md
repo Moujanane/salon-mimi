@@ -109,23 +109,41 @@ apparaissent.
 - `npx playwright test` contre build local (`PLAYWRIGHT_BASE_URL=
 http://localhost:3100`, flag ON) : **162 passed / 2 skipped / 0 failed**
 
-### Reste à faire par Mouj
+### État en fin de session (7 sept 2026)
 
-- ✅ Migration SQL `category` appliquée.
-- ✅ Branche mergée + poussée + déployée. Hotfix `d6c1a0e` déployé.
-- ⬜ Supprimer `NEXT_PUBLIC_GALLERY_DYNAMIC` dans Railway (inoffensif si oublié).
-- ⬜ **Vérif manuelle du parcours admin authentifié** (pas d'infra login admin
-  Playwright) :
-  - éditer la catégorie d'une vignette → Enregistrer → **recharger la
-    page** → la catégorie tient (c'est le bug corrigé par `d6c1a0e`, à
-    reconfirmer une fois le déploiement fini)
-  - ajouter une photo avec une catégorie → elle apparaît, classée
-  - glisser une vignette pour réordonner → l'ordre tient (le panneau
-    d'édition sous la vignette ne doit pas gêner le drag)
-  - sur `/fr/galerie` : dès qu'un média est classé, les chips de filtres
-    apparaissent, filtrent bien, « Tout » remet tout
-- ⬜ Point §35 encore ouvert : supprimer la photo de test `qsQsqSQsqSQ`
-  (`sort_order` 40) + la vidéo de test « test ajout vidéo ».
+Tout est **EN PROD** et vérifié :
+
+- Spec 3 (édition alt + catégorie admin, filtres publics), nettoyage code
+  mort, dette auth `reservations/[id]` soldée, hotfix `d6c1a0e` (page admin
+  relit `category`), overlay description au survol `388edba`.
+- Migration SQL `category` appliquée par Mouj.
+- Bug « la catégorie ne se sauvegarde pas » confirmé corrigé par Mouj.
+- Vérif prod : `/fr|/en|/es/galerie` 200, chips de filtres présents (Mouj a
+  déjà classé des médias : Tresses africaines / Tresses rasta / Enfants),
+  overlay au survol OK desktop / masqué mobile, contrats API 401, pas de 404
+  Railway.
+- `git log` : dernier commit `1c3baa2` (handoff). Aucune branche en cours.
+
+### Reste à faire par Mouj (hors de mon accès — Railway + admin authentifié)
+
+- ⬜ **Supprimer `NEXT_PUBLIC_GALLERY_DYNAMIC` dans Railway** (Variables du
+  service web → corbeille). Inoffensif si oublié : le code ne lit plus cette
+  variable depuis `939eaa7`.
+- ⬜ **Supprimer les médias de test** dans `/admin/galerie` (icône corbeille
+  au survol) : photo `qsQsqSQsqSQ` (`sort_order` 40) + vidéo « test ajout
+  vidéo ». Le DELETE nettoie aussi le bucket Storage.
+
+### Pistes pour une prochaine session
+
+- Auth `app/api/reservations/[id]/route.ts` migrée vers `getAuthUser` — il
+  reste éventuellement à faire un tour des autres routes `/api/*` pour
+  vérifier qu'aucune ne duplique encore l'auth inline.
+- Filtres galerie : aujourd'hui purement client (filtrage JS sur la liste
+  complète). Si la galerie grossit beaucoup (>200 médias), envisager une
+  pagination ou un filtrage serveur.
+- Édition de l'ordre + suppression de `data-testid` de debug si un jour on
+  se dote d'une vraie infra de login admin Playwright (couvrirait le
+  parcours admin complet, aujourd'hui vérifié à la main).
 
 ---
 
