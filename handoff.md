@@ -6,20 +6,40 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 36. Session 7 sept 2026 — Spec 3 galerie + nettoyage + dette auth (BRANCHE, PAS ENCORE MERGÉE)
+## 36. Session 7 sept 2026 — Spec 3 galerie + nettoyage + dette auth (EN PROD)
 
-Branche `feat/galerie-spec3-nettoyage-dette`, 3 commits au-dessus de `main`
-(`6ee796a` → `5fe2c62`). Commit docs `bf75b88` déjà sur `main` local mais
-**pas encore poussé**.
+Mergé et déployé sur `main`. Commits `6ee796a`→`5fe2c62` (rebasés en
+`2a7dbf2`→`8df25cc`), docs `bf75b88`+`63fb0c5`, puis **hotfix `d6c1a0e`**
+(voir plus bas). Migration SQL `category` appliquée par Mouj (« Success. No
+rows returned »).
+
+### Hotfix `d6c1a0e` — la page admin ne relisait pas `category`
+
+Symptôme rapporté par Mouj juste après le merge : « je choisis une
+catégorie, je clique Enregistrer, je reviens sur la galerie, la catégorie a
+disparu ».
+
+Cause racine : en ajoutant la colonne `category`, il y a **4** `.select`
+qui alimentent un rendu — j'en avais mis à jour 3 (`lib/gallery.ts`, GET
+`/api/gallery`, retour POST, retour PATCH) et oublié le **server component
+`app/admin/galerie/page.tsx`** qui charge `initialItems`. Le PATCH écrivait
+bien en base et l'affichage optimiste montrait la valeur ; au rechargement,
+la liste relue sans `category` faisait retomber le `<select>` sur « Non
+classé ». Fix = 1 ligne (ajouter `category` au select).
+Leçon en mémoire : `salon-mimi-gallery-select-coherence`.
+
+Vérifs hotfix : `tsc` ✓, `build` ✓, playwright 162/2 skipped/0 failed en
+local. Prod : `/fr|/en|/es/galerie` 200, contrats API 401, pas de 404
+Railway.
 
 ### Ce qui a été fait
 
-**Lot C — dette auth (`6ee796a`)** : `app/api/reservations/[id]/route.ts`
+**Lot C — dette auth (`2a7dbf2`)** : `app/api/reservations/[id]/route.ts`
 importe `getAuthUser` de `lib/adminAuth` au lieu de dupliquer le bloc
 `createServerClient` + `auth.getUser` dans PATCH et DELETE. Comportement
 identique (401 sans session). Cette dette du handoff §35 est soldée.
 
-**Lot B — nettoyage code mort (`6476646`)** :
+**Lot B — nettoyage code mort (`939eaa7`)** :
 
 - supprimé `components/sections/GalerieClient.tsx` (ancien rendu statique)
 - supprimé `scripts/gallery-contact-sheet.ts` + script npm `gallery:sheet`
@@ -33,7 +53,7 @@ identique (401 sans session). Cette dette du handoff §35 est soldée.
   « test ajout vidéo ») au lieu d'une photo → `dialog not found`. Corrigé
   avec `data-testid="gallery-photo"` sur `PhotoCell`.
 
-**Lot A — Spec 3 galerie (`5fe2c62`)** :
+**Lot A — Spec 3 galerie (`8df25cc`)** :
 
 - **`lib/gallery-categories.ts`** (nouveau) : liste FIXE de 7 catégories
   (Tresses africaines, Box braids, Knotless braids, Cornrows, Locks, Tresses
@@ -80,19 +100,21 @@ http://localhost:3100`, flag ON) : **162 passed / 2 skipped / 0 failed**
 
 ### Reste à faire par Mouj
 
-1. Appliquer la migration SQL `category` (ci-dessus).
-2. Merger la branche → déploiement Railway.
-3. Supprimer `NEXT_PUBLIC_GALLERY_DYNAMIC` dans Railway.
-4. **Vérif manuelle du parcours admin authentifié** (pas d'infra login admin
-   Playwright, même limite que `api-reservations-id`) :
-   - ajouter une photo avec une catégorie → elle apparaît, classée
-   - éditer la description + la catégorie d'une vignette → sauvegarde OK
-   - glisser une vignette pour réordonner → l'ordre tient (le panneau
-     d'édition sous la vignette ne doit pas gêner le drag)
-   - sur `/fr/galerie` : les chips de filtres apparaissent, filtrent bien,
-     « Tout » remet tout
-5. Point §35 encore ouvert : supprimer la photo de test `qsQsqSQsqSQ`
-   (`sort_order` 40) + la vidéo de test « test ajout vidéo ».
+- ✅ Migration SQL `category` appliquée.
+- ✅ Branche mergée + poussée + déployée. Hotfix `d6c1a0e` déployé.
+- ⬜ Supprimer `NEXT_PUBLIC_GALLERY_DYNAMIC` dans Railway (inoffensif si oublié).
+- ⬜ **Vérif manuelle du parcours admin authentifié** (pas d'infra login admin
+  Playwright) :
+  - éditer la catégorie d'une vignette → Enregistrer → **recharger la
+    page** → la catégorie tient (c'est le bug corrigé par `d6c1a0e`, à
+    reconfirmer une fois le déploiement fini)
+  - ajouter une photo avec une catégorie → elle apparaît, classée
+  - glisser une vignette pour réordonner → l'ordre tient (le panneau
+    d'édition sous la vignette ne doit pas gêner le drag)
+  - sur `/fr/galerie` : dès qu'un média est classé, les chips de filtres
+    apparaissent, filtrent bien, « Tout » remet tout
+- ⬜ Point §35 encore ouvert : supprimer la photo de test `qsQsqSQsqSQ`
+  (`sort_order` 40) + la vidéo de test « test ajout vidéo ».
 
 ---
 
