@@ -6,6 +6,68 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 37. Rapport SEO quotidien (Google Search Console) — PR EN ATTENTE DE MERGE (8 sept 2026)
+
+**PR : https://github.com/Moujanane/salon-mimi/pull/1** (branche `feat/seo-report` → `main`).
+Portage depuis atlas-swincar (script volontairement dupliqué, fichiers
+identiques). Spec + plan de référence dans le repo atlas-swincar :
+`docs/superpowers/specs/2026-09-08-rapport-seo-quotidien-design.md` et
+`docs/superpowers/plans/2026-09-08-rapport-seo-quotidien.md`.
+
+### Ce que ça fait
+
+Script Node autonome (`scripts/seo-report.mjs` + `scripts/lib/{report,gsc}.mjs`)
+qui interroge l'API Search Console (OAuth utilisateur, lecture seule) et génère
+un rapport Markdown de 8 sections (résumé + deltas 28j vs 28j calés sur J-3,
+top requêtes, opportunités position 8-20, requêtes « marrakech » — pertinent
+pour un salon à Marrakech, pertes de position, pays, top pages, recommandations).
+
+- **Zéro impact site** : jamais importé par Next.js, jamais dans le build.
+- 14 tests `node --test` (`npm run test:seo`). `google-auth-library` ajoutée
+  en devDep (salon-mimi n'a pas Vitest, tests en `node --test` natif).
+- Config via `.env.seo` à la racine (git-ignored, `.env.seo.example` fourni).
+- Vérifié end-to-end : dry-run réel → **108 clics / 2151 impressions /
+  position moy. 5.1** sur 28j. Top requête « salon mimi marrakech » en
+  position 2. Le SEO local de Mimi est en bonne santé, le rapport le confirme.
+
+### Auth Google
+
+OAuth **utilisateur** partagé avec atlas-swincar (même client OAuth
+`seo-report-desktop`, projet Google Cloud `seo-reports`). Seule
+`GSC_SITE_URL` diffère : **`https://mimi-coiffure.com/`** (propriété
+« Préfixe d'URL », slash final obligatoire). Détails complets dans le
+handoff atlas-swincar. **Rotation du client OAuth recommandée** (ID/secret
+échangés dans un chat).
+
+### Lancer un rapport à la main
+
+```bash
+node scripts/seo-report.mjs --dry-run   # affiche, n'écrit rien
+node scripts/seo-report.mjs             # écrit docs/seo/YYYY-MM-DD.md
+```
+
+### Automatisation — PLAN B cron Railway (à faire)
+
+Routines `/schedule` abandonnées (pas d'accès aux secrets en cloud). Plan B =
+service cron Railway `seo-cron` qui lance `scripts/seo-cron.sh` chaque matin et
+pousse sur la branche **`seo-reports`** (isolée de `main`). Spec :
+`atlas-swincar/docs/superpowers/specs/2026-09-08-seo-cron-railway-design.md`.
+Conséquence : section « Recommandations » vide, analyse à la demande via
+« analyse les rapports SEO » dans une session Claude Code.
+
+### Branche `seo-reports`
+
+Créée et poussée. Ne reçoit que `docs/seo/*.md`. Railway déploie `main`.
+
+### Chantier séparé (chip créé) — durcissement JSON-LD
+
+Audit du 8 sept : les 4 blocs JSON-LD de mimi (`app/[locale]/layout.tsx` x2,
+`a-propos`, `services`) sont **propres** (`JSON.stringify(objet natif)`, pas de
+double échappement). Durcissement optionnel : échapper `<` via un helper
+`jsonLdScript()`. Reporté après le merge SEO.
+
+---
+
 ## 36. Session 7 sept 2026 — Spec 3 galerie + nettoyage + dette auth (EN PROD)
 
 Mergé et déployé sur `main`. Commits `6ee796a`→`5fe2c62` (rebasés en
