@@ -16,10 +16,16 @@ set -euo pipefail
 WORKDIR="$(mktemp -d)"
 trap 'rm -rf "$WORKDIR"' EXIT
 
+# Le PAT ne doit JAMAIS transiter dans une URL git (ni argv, ni .git/config,
+# ni les messages d'erreur "fatal: unable to access '<url>'" qui finiraient
+# dans les logs Railway en clair). On l'envoie en en-tête HTTP Authorization,
+# passé en -c à chaque invocation git (clone/fetch/push) — jamais persisté.
+AUTH_HEADER="AUTHORIZATION: basic $(printf '%s' "x-access-token:${GIT_PUSH_TOKEN}" | base64 | tr -d '\n')"
+REPO_URL="https://github.com/${SEO_REPO_SLUG}.git"
+
 echo "==> Clone de seo-reports (${SEO_REPO_SLUG})"
-git clone --branch seo-reports --depth 50 \
-  "https://x-access-token:${GIT_PUSH_TOKEN}@github.com/${SEO_REPO_SLUG}.git" \
-  "$WORKDIR/repo" --quiet
+git -c http.extraHeader="${AUTH_HEADER}" \
+  clone --branch seo-reports --depth 50 "${REPO_URL}" "$WORKDIR/repo" --quiet
 cd "$WORKDIR/repo"
 
 git config user.name  "seo-report-bot"
@@ -30,7 +36,8 @@ echo "==> Récupération du script à jour depuis main"
 # donc un simple "git fetch origin main" n'écrit que FETCH_HEAD et ne crée
 # jamais refs/remotes/origin/main : "git merge origin/main" échouerait avec
 # "not something we can merge". On fetch main dans une ref locale explicite.
-git fetch origin main --depth 50 --quiet -- main:refs/remotes/origin/main
+git -c http.extraHeader="${AUTH_HEADER}" \
+  fetch origin main --depth 50 --quiet -- main:refs/remotes/origin/main
 if ! git merge origin/main --no-edit -m "merge main (script)" --quiet; then
   echo "Conflit de merge inattendu — abandon" >&2
   git merge --abort
@@ -55,5 +62,5 @@ if git diff --cached --quiet; then
   exit 0
 fi
 git commit -m "seo: rapport ${TODAY}" --quiet
-git push origin seo-reports --quiet
+git -c http.extraHeader="${AUTH_HEADER}" push origin seo-reports --quiet
 echo "==> Rapport ${TODAY} poussé sur seo-reports"
