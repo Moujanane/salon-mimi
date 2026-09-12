@@ -6,13 +6,20 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 37. Rapport SEO quotidien (Google Search Console) — PR EN ATTENTE DE MERGE (8 sept 2026)
+## 37. Rapport SEO quotidien (Google Search Console) — SCRIPT MERGÉ, CRON RAILWAY À FAIRE (8-13 sept 2026)
 
-**PR : https://github.com/Moujanane/salon-mimi/pull/1** (branche `feat/seo-report` → `main`).
-Portage depuis atlas-swincar (script volontairement dupliqué, fichiers
-identiques). Spec + plan de référence dans le repo atlas-swincar :
-`docs/superpowers/specs/2026-09-08-rapport-seo-quotidien-design.md` et
-`docs/superpowers/plans/2026-09-08-rapport-seo-quotidien.md`.
+**Les 2 PR mergées** : `Moujanane/salon-mimi#1` (script) + `#2` (script cron
+`seo-cron.sh`, identique à atlas-swincar). Portage depuis atlas-swincar
+(script volontairement dupliqué, fichiers identiques). Spec + plan de
+référence dans le repo atlas-swincar :
+`docs/superpowers/specs/2026-09-08-rapport-seo-quotidien-design.md`,
+`docs/superpowers/plans/2026-09-08-rapport-seo-quotidien.md` et
+`docs/superpowers/specs/2026-09-08-seo-cron-railway-design.md`.
+
+**⚠️ Le service Railway `seo-cron` n'est PAS encore configuré côté Salon
+Mimi.** Il l'est côté atlas-swincar et fonctionne en prod depuis le 12 sept.
+C'est la tâche prioritaire de la prochaine session — procédure complète
+ci-dessous, tirée des obstacles réellement rencontrés sur atlas.
 
 ### Ce que ça fait
 
@@ -29,6 +36,11 @@ pour un salon à Marrakech, pertes de position, pays, top pages, recommandations
 - Vérifié end-to-end : dry-run réel → **108 clics / 2151 impressions /
   position moy. 5.1** sur 28j. Top requête « salon mimi marrakech » en
   position 2. Le SEO local de Mimi est en bonne santé, le rapport le confirme.
+- Rapport du 8 sept analysé et complété à la main sur `seo-reports` : 4
+  requêtes en recul (dont la marque « salon mimi » 2,1→5,9 — à investiguer en
+  priorité), déficit de clic sur « mimi marrakech » (121 impr., 0 clic),
+  opportunités « near me » en position 8-9 à pousser, trafic FR/ES/UK à
+  exploiter, galerie/à-propos à densifier.
 
 ### Auth Google
 
@@ -36,8 +48,8 @@ OAuth **utilisateur** partagé avec atlas-swincar (même client OAuth
 `seo-report-desktop`, projet Google Cloud `seo-reports`). Seule
 `GSC_SITE_URL` diffère : **`https://mimi-coiffure.com/`** (propriété
 « Préfixe d'URL », slash final obligatoire). Détails complets dans le
-handoff atlas-swincar. **Rotation du client OAuth recommandée** (ID/secret
-échangés dans un chat).
+handoff atlas-swincar. **⚠️ Rotation du client OAuth recommandée** (ID/secret
+échangés dans un chat Claude Code le 8 et le 12 sept, à nettoyer un jour).
 
 ### Lancer un rapport à la main
 
@@ -46,25 +58,82 @@ node scripts/seo-report.mjs --dry-run   # affiche, n'écrit rien
 node scripts/seo-report.mjs             # écrit docs/seo/YYYY-MM-DD.md
 ```
 
-### Automatisation — PLAN B cron Railway (à faire)
+### Automatisation — cron Railway : PROCÉDURE À SUIVRE (prochaine session)
 
-Routines `/schedule` abandonnées (pas d'accès aux secrets en cloud). Plan B =
-service cron Railway `seo-cron` qui lance `scripts/seo-cron.sh` chaque matin et
-pousse sur la branche **`seo-reports`** (isolée de `main`). Spec :
-`atlas-swincar/docs/superpowers/specs/2026-09-08-seo-cron-railway-design.md`.
-Conséquence : section « Recommandations » vide, analyse à la demande via
-« analyse les rapports SEO » dans une session Claude Code.
+Routines `/schedule` abandonnées (pas d'accès aux secrets en cloud). À la
+place : un service Railway dédié **`seo-cron`** qui lance
+`scripts/seo-cron.sh` chaque matin et pousse le rapport sur la branche
+**`seo-reports`** (isolée de `main`).
+
+**Étapes exactes** (testées et validées sur atlas-swincar le 12-13 sept,
+3 obstacles déjà identifiés et anticipés ci-dessous — ne pas les redécouvrir) :
+
+1. **PAT GitHub fine-grained** sur https://github.com/settings/tokens?type=beta :
+   nom `seo-cron-salon-mimi`, Resource owner `Moujanane`, Repository access
+   → « Only select repositories » → `salon-mimi` uniquement, expiration
+   90 jours. **Permissions → Add permissions → Contents → Read and write**
+   (ne pas oublier ce clic, sinon le push échoue en `403 Write access not
+granted` comme sur atlas). Copier le token direct dans Railway, jamais
+   dans le chat.
+2. Sur le projet Railway Salon Mimi : **+ New → Empty Service** (ou
+   équivalent), nom `seo-cron`. Fermer le panneau de détail d'un autre
+   service avant si le bouton n'apparaît pas.
+3. **Settings → Source** : repo `Moujanane/salon-mimi`, branche `main`.
+4. **Settings → Build** : **Custom Build Command = `npm ci`** (forcer ce
+   champ explicitement — sinon le builder Nixpacks/Railpack détecte le
+   Next.js et lance `npm run build`, c'est-à-dire le build du SITE entier,
+   comme observé sur atlas au premier essai).
+5. **Settings → Deploy** : Custom Start Command = `bash scripts/seo-cron.sh`,
+   Cron Schedule = **`0 7 * * *`** (7h UTC, décalé d'1h par rapport à atlas
+   à `0 6 * * *`), Restart Policy = `Never`.
+6. **Variables** (7 au total) :
+   - `GSC_OAUTH_CLIENT_ID`, `GSC_OAUTH_CLIENT_SECRET`, `GSC_OAUTH_REFRESH_TOKEN`
+     — mêmes valeurs que dans `.env.seo` local (client OAuth partagé)
+   - `GSC_SITE_URL=https://mimi-coiffure.com/` (différent d'atlas — slash
+     final obligatoire)
+   - `SEO_REPO_SLUG=Moujanane/salon-mimi`
+   - `GIT_PUSH_TOKEN` = le PAT de l'étape 1
+   - `RAILPACK_DEPLOY_APT_PACKAGES=git` — **à poser dès le départ**. Sans
+     cette variable, le script crashe au runtime avec `git: command not
+found` (le builder Railpack n'installe pas `git` par défaut dans
+     l'image de déploiement). Découvert et corrigé sur atlas le 12 sept,
+     inutile de le redécouvrir ici.
+7. Déployer, puis **ne pas attendre le cron** : aller dans l'onglet
+   « Cron Runs » → **Run now** pour tester tout de suite.
+8. Lire les logs du run (cliquer sur le déploiement, pas juste le statut).
+   Une exécution réussie affiche dans l'ordre :
+   ```
+   ==> Clone de seo-reports (Moujanane/salon-mimi)
+   ==> Récupération du script à jour depuis main
+   ==> Installation des dépendances
+   ==> Génération du rapport
+   Écrit : .../docs/seo/YYYY-MM-DD.md
+   ==> Rapport YYYY-MM-DD poussé sur seo-reports
+   ```
+9. Confirmer sur GitHub que `docs/seo/YYYY-MM-DD.md` est bien apparu sur
+   `Moujanane/salon-mimi` branche `seo-reports`.
+
+**Sécurité du script** (déjà en place, rien à refaire) : le PAT passe par
+`-c http.extraHeader` sur `clone`/`fetch`/`push`, jamais dans une URL, jamais
+persisté dans `.git/config`. Le `catch` global sanitise toute trace de token
+avant d'écrire un `-ERREUR.md`.
+
+**Conséquence assumée** : le cron n'a pas d'agent Claude, donc la section
+« Recommandations » du rapport reste vide. L'analyse se fait à la demande :
+lancer « analyse les rapports SEO » dans une session Claude Code, qui lit les
+derniers `docs/seo/*.md` et rédige les recos (déjà fait pour le 8 sept).
 
 ### Branche `seo-reports`
 
 Créée et poussée. Ne reçoit que `docs/seo/*.md`. Railway déploie `main`.
+Contient `2026-09-08.md` (analysé à la main, voir recommandations ci-dessus).
 
 ### Chantier séparé (chip créé) — durcissement JSON-LD
 
 Audit du 8 sept : les 4 blocs JSON-LD de mimi (`app/[locale]/layout.tsx` x2,
 `a-propos`, `services`) sont **propres** (`JSON.stringify(objet natif)`, pas de
 double échappement). Durcissement optionnel : échapper `<` via un helper
-`jsonLdScript()`. Reporté après le merge SEO.
+`jsonLdScript()`. Toujours en attente, non prioritaire.
 
 ---
 
