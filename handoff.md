@@ -6,6 +6,31 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 39. Comment exploiter les rapports SEO quotidiens — à faire en usage régulier
+
+Le cron `seo-cron` étant en prod (§38), reste la question de l'usage. Pas
+un chantier technique, une note de méthode pour les prochaines sessions.
+
+**Rythme recommandé** : hebdomadaire, pas quotidien. Demander « analyse les
+derniers rapports SEO » — lit les fichiers `docs/seo/*.md` récents sur la
+branche `seo-reports`, compare plusieurs jours pour dégager une vraie
+tendance (pas le bruit d'un seul jour), et rédige les 3-5 recommandations
+de la section 8 (laissée vide par le cron, pas d'agent Claude dans le
+service Railway — cf §37 « Conséquence assumée »).
+
+**Lecture du rapport du 13 sept (premier run réussi)** : clics -5.4 %,
+impressions -10.1 % (28j vs 28j précédents). Signal à surveiller en
+priorité : la requête de marque « salon mimi » est en position 6.6, plus
+faible qu'attendu pour une requête de marque pure (à comparer aux
+prochains rapports — si ça continue de reculer, chercher un concurrent
+qui utiliserait le nom, ou un souci d'indexation). « salon mimi
+marrakech » reste solide en position 1.8. La page `/fr` capte l'essentiel
+du trafic, les autres pages restent sous-exploitées — cohérent avec les
+pistes déjà identifiées au §37 (galerie/à-propos à densifier, opportunités
+« near me » position 8-9 à pousser).
+
+---
+
 ## 38. Cron Railway seo-cron — EN PROD + rotation OAuth de sécurité (13-14 sept 2026)
 
 **Le service Railway `seo-cron` est maintenant fonctionnel côté Salon Mimi**,
