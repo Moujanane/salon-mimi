@@ -50,7 +50,7 @@ if [ ! -f scripts/seo-report.mjs ]; then
 fi
 
 echo "==> Installation des dépendances"
-npm ci --no-audit --no-fund
+npm ci --no-audit --no-fund --silent
 
 echo "==> Génération du rapport"
 node scripts/seo-report.mjs
