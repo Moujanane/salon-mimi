@@ -6,6 +6,114 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 39. Comment exploiter les rapports SEO quotidiens — à faire en usage régulier
+
+Le cron `seo-cron` étant en prod (§38), reste la question de l'usage. Pas
+un chantier technique, une note de méthode pour les prochaines sessions.
+
+**Rythme recommandé** : hebdomadaire, pas quotidien. Demander « analyse les
+derniers rapports SEO » — lit les fichiers `docs/seo/*.md` récents sur la
+branche `seo-reports`, compare plusieurs jours pour dégager une vraie
+tendance (pas le bruit d'un seul jour), et rédige les 3-5 recommandations
+de la section 8 (laissée vide par le cron, pas d'agent Claude dans le
+service Railway — cf §37 « Conséquence assumée »).
+
+**Lecture du rapport du 13 sept (premier run réussi)** : clics -5.4 %,
+impressions -10.1 % (28j vs 28j précédents). Signal à surveiller en
+priorité : la requête de marque « salon mimi » est en position 6.6, plus
+faible qu'attendu pour une requête de marque pure (à comparer aux
+prochains rapports — si ça continue de reculer, chercher un concurrent
+qui utiliserait le nom, ou un souci d'indexation). « salon mimi
+marrakech » reste solide en position 1.8. La page `/fr` capte l'essentiel
+du trafic, les autres pages restent sous-exploitées — cohérent avec les
+pistes déjà identifiées au §37 (galerie/à-propos à densifier, opportunités
+« near me » position 8-9 à pousser).
+
+---
+
+## 38. Cron Railway seo-cron — EN PROD + rotation OAuth de sécurité (13-14 sept 2026)
+
+**Le service Railway `seo-cron` est maintenant fonctionnel côté Salon Mimi**,
+premier run réussi le 13 sept 23:20 : `docs/seo/2026-09-13.md` poussé sur la
+branche `seo-reports` (confirmé via l'API GitHub, HTTP 200).
+
+### Ce qui bloquait (3 causes indépendantes, résolues dans l'ordre)
+
+1. **Variables manquantes** : `SEO_REPO_SLUG` et `GSC_SITE_URL` absentes au
+   premier essai, puis `RAILPACK_DEPLOY_APT_PACKAGES` oubliée. Les 3 ont
+   été ajoutées une par une après lecture des erreurs `: "${VAR:?...}"` du
+   script (`scripts/seo-cron.sh`).
+2. **Fausse piste mémoire** : le crash silencieux après "Installation des
+   dépendances" a d'abord fait suspecter un OOM (pic mémoire 1.5 Go / 8 Go
+   alloués observé dans Metrics). En réalité le plan a largement assez de
+   marge (8 Go) — le `npm ci` complet du site (Next.js, Playwright, sharp)
+   dans le clone temporaire de `seo-reports` est normal et fonctionne, il
+   masquait juste le vrai message d'erreur derrière `--silent`.
+3. **Vraie cause : `Error: invalid_grant`** sur le refresh token OAuth
+   Google. Fonctionnait en local (`.env.seo`) mais échouait sur Railway.
+
+### Rotation OAuth complète effectuée
+
+Le handoff notait depuis le 12 sept que le client OAuth `seo-report-desktop`
+avait fui en clair dans un chat Claude Code — jamais nettoyé. Décision prise
+cette session : **recréer entièrement le client** plutôt que juste régénérer
+le refresh token.
+
+- Nouveau client "Application de bureau" `seo-report-desktop-v2` créé dans
+  Google Cloud Console (projet `seo-reports-508020`).
+- **OAuth Playground incompatible** avec un client Desktop app (erreur
+  `redirect_uri_mismatch` — ce type de client n'accepte pas de redirect URI
+  personnalisée déclarée).
+- **Solution retenue** : nouveau script `scripts/get-refresh-token.mjs`
+  (conservé dans le repo, réutilisable pour la prochaine rotation). Utilise
+  le loopback flow RFC 8252 (`http://localhost:51789/callback`, accepté par
+  Google sans déclaration préalable pour ce type de client). Lit les
+  identifiants depuis `.env.seo.tmp` (gitignored, supprimé après usage) ou
+  variables d'env, ouvre le navigateur, capture le code, écrit le refresh
+  token dans `.env.seo.refresh-token.tmp` (jamais affiché dans le chat).
+- **Piège rencontré** : `access_denied` car le compte de connexion n'était
+  pas dans la liste des utilisateurs test de l'écran de consentement OAuth
+  (menu **Audience**, pas "OAuth consent screen" — renommé dans la nouvelle
+  interface Google Auth Platform). Ajouté `moujahid.anane@gmail.com` →
+  résolu.
+- **`.env.seo` mis à jour** (mimi ET atlas-swincar, même client partagé) via
+  `sed` ciblé sur les 3 lignes `GSC_OAUTH_CLIENT_ID/SECRET/REFRESH_TOKEN`,
+  jamais affichées dans le chat. Testé en local sur les deux projets
+  (`--dry-run` OK des deux côtés) avant de toucher Railway.
+- **Variables Railway mises à jour sur les 2 services** `seo-cron` (mimi +
+  atlas).
+
+### Dernier piège avant le succès — copier-coller corrompu dans Railway
+
+Après la rotation, le run échouait encore avec `invalid_grant` alors que
+les 3 valeurs semblaient correctes en local. Diagnostic par comparaison de
+longueur/début/fin de chaîne (jamais la valeur complète) : **le champ
+`GSC_OAUTH_REFRESH_TOKEN` dans Railway contenait le refresh token suivi
+d'un retour à la ligne et de `GSC_SITE_URL=https://mimi-coiffure.com/`
+collés à la suite** — la ligne suivante du fichier `.env.seo` avait été
+copiée avec, corrompant la valeur réellement utilisée au runtime.
+**Leçon** : lors d'un copier-coller de secret depuis un fichier `.env` vers
+Railway, toujours vérifier qu'aucune ligne suivante n'a été incluse par
+erreur — Railway n'affiche pas d'avertissement sur un champ contenant un
+retour à la ligne.
+
+### État en fin de session (13-14 sept 2026)
+
+- `seo-cron` Salon Mimi : **EN PROD**, premier run réussi, cron quotidien
+  `0 7 * * *` actif.
+- `seo-cron` Atlas Swincar : toujours en prod, migré vers le nouveau client
+  OAuth sans interruption (testé `--dry-run` après rotation).
+- Dette de sécurité du 12 sept **soldée** : ancien client `seo-report-desktop`
+  n'est plus utilisé nulle part, peut être supprimé dans Google Cloud
+  Console par Mouj (pas fait cette session, non urgent).
+- Fichiers temporaires (`.env.seo.tmp`, `.env.seo.refresh-token.tmp`)
+  supprimés après usage (`trash`, pas `rm`).
+- `scripts/get-refresh-token.mjs` conservé dans le repo (gitignore couvre
+  les fichiers temporaires qu'il utilise) — réutilisable pour la prochaine
+  rotation OAuth, sur mimi ou atlas.
+
+---
+
 ## 37. Rapport SEO quotidien (Google Search Console) — SCRIPT MERGÉ, CRON RAILWAY À FAIRE (8-13 sept 2026)
 
 **Les 2 PR mergées** : `Moujanane/salon-mimi#1` (script) + `#2` (script cron
