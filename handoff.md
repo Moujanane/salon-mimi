@@ -6,7 +6,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 40. Analyse croisée des rapports SEO — 13/17 sept, 30 sept/1er oct 2026
+## 41. Analyse croisée des rapports SEO — 13/17 sept, 30 sept/1er oct 2026
 
 Suite à la recommandation méthode du §39 (lecture hebdomadaire plutôt que
 quotidienne). Recommandations rédigées directement dans
@@ -43,6 +43,55 @@ quotidienne). Recommandations rédigées directement dans
 
 Prochaine lecture recommandée dans 1-2 semaines pour confirmer si le recul
 du cluster « afro » générique est une tendance ou un artefact d'une semaine.
+
+---
+
+## 40. Session 14-17 sept 2026 — fix meta description + audit SEO complet + suivi en cours
+
+**Fix meta description homepage (commit `249e2e1`, déployé le 14 sept)** :
+la requête `mimi marrakech` avait ~128 impressions/28j en position 3-5 mais
+0 clic. Ajout de "Salon Mimi," en tête de la description fr/en/es (le
+snippet ne mentionnait jamais le nom, seulement le title). Corrigé au
+passage un mélange fr/es sur la version `es` ("Salón de coiffure" → "salón
+de peluquería"). **Résultat pas encore mesurable** — voir tâche en attente
+ci-dessous.
+
+**Piste écartée après vérification jour par jour (API GSC directe)** : la
+baisse apparente de `salon mimi` dans le rapport agrégé 28j (2.4 → 6.6)
+n'est PAS un signal de concurrent/pénalité — requête à très faible volume
+(1-6 impressions/jour), un seul mauvais jour suffit à tirer la moyenne.
+Ne pas ré-investiguer sauf tendance confirmée sur plusieurs jours à volume
+suffisant. Détail dans [[salon-mimi-seo-mimi-marrakech-snippet]].
+
+**Rapport de couverture GSC "pages non indexées" analysé** (3 catégories
+sur 6, exports CSV) : 404/redirections = anciennes URLs pré-i18n sans
+impact, 403 sur `opengraph-image` = transitoire infra (testé en direct,
+HTTP 200 aujourd'hui), doublons `/reservation?service=...` = comportement
+voulu avec canonical déjà correct. **Aucune action de code nécessaire dans
+les 3 cas.** Détail dans [[salon-mimi-gsc-coverage-non-index]]. Catégorie
+"Explorée actuellement non indexée" (2 URLs) jamais reçue en export, pas
+vérifiée.
+
+**Email marketing izyLocal ("gros problème SEO", téléphone sans +212)** :
+vérifié faux et infondé. `+212710388204` présent sur toutes les pages
+(JSON-LD, mentions légales, footer). Audit SEO complet indépendant lancé
+par précaution (skill `audit-site`) : **score 98/100, aucun problème
+critique**. PDF généré et envoyé à Mouj. Aucun concurrent direct n'a de
+site web aussi complet (Marrakech Tresses et M PAT Coiffure n'ont qu'une
+présence Facebook/Instagram).
+
+### ⏳ Tâche en attente — vérifier l'effet du fix au rapport du 20 sept
+
+Le rapport SEO du 20 septembre (généré par le cron à 7h UTC ce jour-là,
+pas avant) dira si `mimi marrakech` convertit enfin en clics après le fix
+du 14 sept. **Ne pas conclure avant cette date** — le rapport du 17 sept
+existe déjà mais ne couvre qu'une fenêtre 28j glissante encore dominée par
+la période pré-fix.
+
+Procédure pour la prochaine session : `cd salon-mimi && git fetch origin
+seo-reports && git show origin/seo-reports:docs/seo/2026-09-20.md`, puis
+comparer le clic/impression de `mimi marrakech` avec l'historique jour par
+jour déjà collecté (voir [[salon-mimi-seo-mimi-marrakech-snippet]]).
 
 ---
 
@@ -154,7 +203,7 @@ retour à la ligne.
 
 ---
 
-## 37. Rapport SEO quotidien (Google Search Console) — SCRIPT MERGÉ, CRON RAILWAY À FAIRE (8-13 sept 2026)
+## 37. Rapport SEO quotidien (Google Search Console) — SCRIPT + CRON RAILWAY EN PROD (8-17 sept 2026)
 
 **Les 2 PR mergées** : `Moujanane/salon-mimi#1` (script) + `#2` (script cron
 `seo-cron.sh`, identique à atlas-swincar). Portage depuis atlas-swincar
@@ -164,10 +213,15 @@ référence dans le repo atlas-swincar :
 `docs/superpowers/plans/2026-09-08-rapport-seo-quotidien.md` et
 `docs/superpowers/specs/2026-09-08-seo-cron-railway-design.md`.
 
-**⚠️ Le service Railway `seo-cron` n'est PAS encore configuré côté Salon
-Mimi.** Il l'est côté atlas-swincar et fonctionne en prod depuis le 12 sept.
-C'est la tâche prioritaire de la prochaine session — procédure complète
-ci-dessous, tirée des obstacles réellement rencontrés sur atlas.
+**✅ Le service Railway `seo-cron` est configuré et opérationnel côté Salon
+Mimi**, confirmé le 17 sept 2026 : rapports générés chaque matin depuis
+le 13 sept sans interruption (`docs/seo/2026-09-13.md` à `2026-09-17.md`
+sur la branche `seo-reports`), 7 variables en place, cron `0 7 * * *`.
+Cette section était restée marquée « à faire » par erreur de mise à jour du
+handoff — le travail avait déjà été fait, ne pas reconfigurer sans vérifier
+d'abord l'état réel (`git fetch origin seo-reports && git log
+origin/seo-reports --oneline` + `git ls-tree -r --name-only
+origin/seo-reports -- docs/seo/`).
 
 ### Ce que ça fait
 
