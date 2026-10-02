@@ -6,6 +6,46 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 40. Analyse croisée des rapports SEO — 13/17 sept, 30 sept/1er oct 2026
+
+Suite à la recommandation méthode du §39 (lecture hebdomadaire plutôt que
+quotidienne). Recommandations rédigées directement dans
+`docs/seo/2026-10-01.md` section 8, sur la branche `seo-reports` (commit
+`fded20d`). Résumé :
+
+- **Pas de dégradation réelle** : la ligne "Clics -13 % / Impressions -33 %"
+  du résumé est un artefact de comparaison 28j vs 28j (haute saison
+  touristique été vs rentrée). CTR (5 %→7 %) et position moyenne
+  (5,06→4,82) progressent sur les 4 derniers rapports — lire ces deux
+  métriques, pas le delta brut de clics/impressions, pour juger la tendance.
+- **Le fix meta description homepage du 14 sept (`249e2e1`) a fonctionné** :
+  la requête de marque « salon mimi » progresse sans interruption, 6,6 → 5,4
+  → 4,4 → 3,8, sur 4 rapports consécutifs. Inquiétude du §39 levée — ne pas
+  retoucher cette page.
+- **⚠ Trou de 9 jours dans les rapports (21-29 sept)**, aucun `*-ERREUR.md`
+  (donc pas un crash du script) → suspicion d'arrêt du service Railway
+  `seo-cron` sur cette fenêtre. **À vérifier par Mouj** : Railway → projet
+  Salon Mimi → service `seo-cron` → Deployments / Cron Runs, dates 21-29 sept.
+- **Nouveau signal à surveiller** : recul récurrent (identique sur 2 rapports
+  de suite) du cluster « afro » générique sans marque ni ville — « african
+  salon », « salon afro », « salon de tresse africaine », « salon de
+  coiffure afro » (-3,5 à -4,5 places). Les requêtes de marque et
+  « marrakech » restent solides ; creuser côté Search Console si un
+  concurrent a gagné du terrain sur ces termes génériques.
+- **Opportunité jamais exploitée** : « salon de coiffure mhamid marrakech »
+  (position ~10, 13-14 impressions) à **0 clic dans les 4 derniers
+  rapports sans exception**. Le quartier Mhamid n'est probablement mentionné
+  nulle part sur le site — piste à faible effort (contenu + `areaServed`
+  dans `lib/salon-info.ts`).
+- **`/fr/reservation`** reproduit l'ancien symptôme de la home avant son
+  fix : bonne position (5,3), CTR quasi nul (0,99 %, 101 impressions pour
+  1 clic). Même traitement à envisager : title/meta plus incitatifs.
+
+Prochaine lecture recommandée dans 1-2 semaines pour confirmer si le recul
+du cluster « afro » générique est une tendance ou un artefact d'une semaine.
+
+---
+
 ## 39. Comment exploiter les rapports SEO quotidiens — à faire en usage régulier
 
 Le cron `seo-cron` étant en prod (§38), reste la question de l'usage. Pas
