@@ -6,6 +6,54 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 0. Index des tâches ouvertes (mis à jour le 10 oct 2026)
+
+Ce fichier grossit vite — avant de re-parcourir tout le handoff en début de
+session, regarder ici d'abord. Mis à jour manuellement, peut dater un peu ;
+si doute, vérifier dans le code/en prod plutôt que de faire confiance
+aveuglément à une ligne vieille de plusieurs mois.
+
+**Côté Mouj, hors code (le plus structurant)**
+
+- Shooting photos (checklist `docs/checklist-shooting-photos-salon-mimi.html`)
+  — bloque galerie GBP, posts Locks/Tissage/rasta, et les photos ongles
+  identifiées §43bis (session GBP du 9-10 oct)
+- Photo HD de la devanture actuelle, pour le montage du panneau façade
+  (§27, PDF imprimeur déjà prêt, en attente depuis le 4 sept)
+- Répondre aux 10 avis Google déjà rédigés + récolter des avis (carte QR
+  prête) — Mimi a 13-20 avis contre 160-813 chez les concurrents directs,
+  c'est la vraie cause du classement faible sur les requêtes génériques
+  (§25)
+- Search Console : cliquer « Valider la correction » sur les motifs 403/404/
+  doublon du rapport de couverture (§43)
+- GBP : catégorie secondaire « Nail salon », services ongles avec prix, post
+  dédié une fois les photos prêtes (§42)
+- Bios Instagram/TikTok : lien réservation (noté « pas fait » en août)
+- TripAdvisor + annuaires Maroc (en attente depuis mai)
+- Confirmer si fait : mot de passe admin Umami changé (`umami` par défaut,
+  noté mai), email de notification `/admin/settings` (noté mai) — anciens,
+  jamais reconfirmés depuis
+
+**Chantiers dev jamais commencés**
+
+- Pages `/fr/tresses-rasta-marrakech` + `/en/rasta-braids-marrakech` (§25) —
+  bloquées par le shooting photos
+- Audit formel des politiques RLS Supabase (mentionné §28, jamais fait)
+
+**À mesurer, pas à coder**
+
+- Rapport du ~17-20 oct : vérifier si le fix title « mimi marrakech » (§42)
+  convertit enfin en clics
+
+**Pour mémoire — déjà réglé, ne pas rouvrir sans nouveau signal**
+
+- Migration Next 14→15 (§32), rate limiters Upstash (§31), fix meta
+  description homepage (§40), fix JSON-LD AggregateRating + anomalie
+  « 5/5 sur Google » (§42), fix title « mimi marrakech » (§42), cron SEO
+  Railway + rotation OAuth (§37-38)
+
+---
+
 ## 43. Nouveau rapport de couverture GSC (58 pages, 6 motifs) — RAS, aucune action de code
 
 Mouj a remonté un nouveau rapport "Pourquoi des pages ne sont pas indexées"
@@ -1297,13 +1345,15 @@ testé. Suggestion spawée en tâche séparée (`task_617d36ae`) : réécrire
    normalement, une réservation test apparaît dans le dashboard, `npx playwright
 test` en full contre la prod réelle après déploiement.
 
-### Hors scope confirmé (gros chantiers, non traités)
+### Hors scope confirmé (gros chantiers, non traités à cette date)
 
-- P6 — pages contenu rasta/EN (`/tresses-rasta-marrakech`)
-- Migration Next 14 → 15 (résoudrait les CVE restantes sur `next`/`postcss`)
-- Migration des rate limiters en mémoire (`/reservations`, `/contact`,
-  `mimiAuth.ts`) vers un store persistant (Upstash/Supabase)
-- Audit formel des politiques RLS Supabase
+- P6 — pages contenu rasta/EN (`/tresses-rasta-marrakech`) — **toujours non
+  traité au 10 oct**, bloqué sur le shooting photos (voir index en tête de
+  fichier)
+- Migration Next 14 → 15 — **✅ fait le lendemain, §32 (5-6 sept), EN PROD**
+- Migration des rate limiters en mémoire vers un store persistant —
+  **✅ fait le lendemain, §31 (5 sept), Upstash Redis EN PROD**
+- Audit formel des politiques RLS Supabase — **toujours non traité au 10 oct**
 
 ---
 
@@ -1949,12 +1999,16 @@ mèches malgré le nom de fichier) : `s-box-braids-longues.jpg`,
 6. Bios Instagram + TikTok : ajouter `https://mimi-coiffure.com/reservation` (toujours pas fait)
 7. Citations locales : TripAdvisor (en attente depuis mai 2026), annuaires Maroc
 
-### Anomalie à corriger (repérée en vérifiant la home en prod)
+### ✅ RÉSOLU (10 oct, §42) — anomalie « 5/5 sur Google »
 
-**Le hero de la home affiche « 5/5 sur Google »** alors que la fiche est à
-**4,2 / 13 avis**. `components/sections/GoogleReviews.tsx` lit l'API Google
-Places en direct — l'API renvoie une note partielle ou un fallback. Déjà noté
-§23, confirmé cette session. À corriger.
+**Le hero de la home affichait « 5/5 sur Google »** alors que la fiche était à
+**4,2 / 13 avis**. Noté ici le 30 août, confirmé §23 (28 août). Cause réelle
+trouvée le 10 oct (§42) : `lib/google-reviews.ts` forçait `rating`/
+`user_ratings_total` à `0` quand l'API Google Places ne répondait pas, au
+lieu du fallback `SALON.ratingFallback`. `GoogleReviews.tsx` partage la même
+fonction `getGoogleReviews()` que le JSON-LD — corrigé pour les deux d'un
+coup. Vérifié en prod le 10 oct : hero affiche `4.4`, cohérent avec le
+JSON-LD.
 
 ---
 
