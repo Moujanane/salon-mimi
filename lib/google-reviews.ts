@@ -1,4 +1,5 @@
 import { cache } from "react";
+import { isValidRating } from "./google-reviews-validation";
 
 export interface GoogleReview {
   author_name: string;
@@ -27,10 +28,13 @@ async function fetchGoogleReviews(): Promise<ReviewsResult | null> {
     if (!res.ok) return null;
     const data = await res.json();
     if (data.status !== "OK" || !data.result) return null;
+    const { rating, user_ratings_total } = data.result;
+    // On laisse layout.tsx retomber sur SALON.ratingFallback si invalide.
+    if (!isValidRating(rating, user_ratings_total)) return null;
     return {
       reviews: data.result.reviews ?? [],
-      rating: data.result.rating ?? 0,
-      user_ratings_total: data.result.user_ratings_total ?? 0,
+      rating,
+      user_ratings_total,
     };
   } catch {
     return null;
