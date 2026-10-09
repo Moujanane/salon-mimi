@@ -6,6 +6,47 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 43. Nouveau rapport de couverture GSC (58 pages, 6 motifs) — RAS, aucune action de code
+
+Mouj a remonté un nouveau rapport "Pourquoi des pages ne sont pas indexées"
+(10 oct) : 31 « Page avec redirection », 17 « Autre page avec balise
+canonique correcte », 4 « Bloquée 403 », 3 « Explorée non indexée », 2
+« Introuvable 404 », 1 « Doublon sans canonical sélectionné ». Chiffres
+proches mais pas identiques à l'analyse du 28 août (§23) et du 14-17 sept
+(§40) — pas un vieux rapport qui traîne, à vérifier au cas par cas plutôt
+que de supposer que c'est déjà traité.
+
+**Méthode** : l'export CSV global de Search Console ne donne que les
+totaux par catégorie, pas les URLs (`Problèmes critiques.csv` contient
+juste `Raison,Source,Validation,Pages`). Il faut cliquer sur chaque ligne
+dans l'UI pour voir les « Exemples » d'URLs, capture d'écran par capture
+d'écran — pas de raccourci trouvé.
+
+**Verdict, catégorie par catégorie (vérifié en direct par `curl`)** :
+
+| Catégorie                                 | Pages | Cause                                                                                                                  | Testé aujourd'hui                                                           |
+| ----------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Page avec redirection                     | 31    | Anciennes URLs pré-i18n (`/reservation`, `/services`, `/galerie`, `/contact`, `/a-propos`, `/`) → 308 vers `/fr/...`   | Voulu, confirmé 200 après redirection                                       |
+| Autre page avec balise canonique correcte | 17    | Variantes `/xx/reservation?service=...` (box-braids, colorations, fulani-braids, locks-dreads, etc.)                   | canonical → `/xx/reservation` sans paramètre, confirmé par curl             |
+| Bloquée 403                               | 4     | Variantes `?service=...` crawlées le **21 août**, pendant l'incident apex Railway 403/404 déjà résolu le 22 août (§23) | 200 aujourd'hui                                                             |
+| Introuvable 404                           | 2     | Même incident du 21-22 août                                                                                            | 200 aujourd'hui                                                             |
+| Doublon sans canonical sélectionné        | 1     | `/en/reservation?service=perruques-tissage`, même famille que les 17 ci-dessus                                         | 200, canonical correct vers `/en/reservation`                               |
+| Explorée, actuellement non indexée        | 3     | `/en/a-propos` (crawlée **24 sept**, donc hors incident) + 2 `opengraph-image?...`                                     | 200 sur les 3 — Google choisit juste de ne pas indexer, pas une erreur HTTP |
+
+**Conclusion : zéro action de code.** Les 58 pages relèvent soit d'un choix
+d'architecture voulu (redirections i18n, canonical sur variantes de
+réservation), soit de traces d'un incident déjà résolu le 22 août que
+Google n'a pas encore re-crawlé. Seul `/en/a-propos` sort du lot (pas lié
+à l'incident, exploré avec succès mais non indexé) — pas un bug, mais un
+candidat à renforcer en contenu si ça persiste sur plusieurs rapports.
+
+**Action restante, côté Mouj dans Search Console (pas du code)** : pour
+les motifs encore « Non commencé »/« Commencé » (403, 404, doublon),
+cliquer **« Valider la correction »** pour forcer un re-crawl — même
+procédure que le 28 août, effet attendu sous 1 à 4 semaines.
+
+---
+
 ## 42. Session 10 oct 2026 — fix JSON-LD AggregateRating + fix title « mimi marrakech »
 
 **Fix JSON-LD AggregateRating invalide (commit `b5ccd25`)** : Search Console
