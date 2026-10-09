@@ -6,6 +6,67 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
+## 42. Session 10 oct 2026 — fix JSON-LD AggregateRating + fix title « mimi marrakech »
+
+**Fix JSON-LD AggregateRating invalide (commit `b5ccd25`)** : Search Console
+signalait 2 problèmes critiques sur les extraits d'avis (`reviewCount` non
+positif, `rating` hors plage). Cause : `lib/google-reviews.ts` forçait
+`rating`/`user_ratings_total` à `0` par défaut (`?? 0`) quand l'API Google
+Places ne renvoyait pas ces champs, au lieu de laisser `layout.tsx`
+retomber sur `SALON.ratingFallback` (4.5/6) comme prévu. Logique de
+validation extraite dans `lib/google-reviews-validation.ts` (module sans
+dépendance React, pour rester testable), couverte par 5 tests
+`node --test` (`lib/google-reviews.test.mjs`). `tsc`/build/lint verts.
+**À vérifier dans quelques jours** : l'alerte Search Console doit
+disparaître d'elle-même une fois Google re-crawlé.
+
+**Fix title homepage « mimi marrakech » (commit `d2faed1`)** : la tâche en
+attente du §40 est tranchée — confirmé sur un mois de rapports (0/32
+impressions encore le 9 oct) que le fix de _description_ du 14 sept
+(§40) n'a pas suffi. Diagnostic : le _title_ séparait "Mimi" de
+"Marrakech" (`Salon Mimi — Tresses Rasta & Africaines Marrakech | ...`),
+empêchant Google de mettre en gras la séquence exacte tapée par
+l'internaute — contrairement à « salon mimi marrakech » qui convertit
+très bien (27.59 % CTR, position 1.3) car les deux mots sont adjacents.
+Réordonné en `Salon Mimi Marrakech — Tresses Rasta & Africaines | ...`
+sur fr/en/es, dans `page.tsx` (titre spécifique homepage) **et**
+`layout.tsx` (fallback générique du layout, qui dupliquait les mêmes
+chaînes) — sans retirer aucun mot-clé. Vérifié : build + rendu réel du
+`<title>` en local.
+
+### ⏳ Tâche en attente — vérifier l'effet du fix title au rapport ~17-20 oct
+
+Même procédure que pour le fix de description de sept : laisser 1-2
+semaines de rapports `docs/seo/*.md` (branche `seo-reports`) s'accumuler,
+puis vérifier si `mimi marrakech` convertit enfin. Ne pas conclure avant
+d'avoir au moins une semaine de données post-fix (déployé le 10 oct).
+
+### Analyse Google Business Profile (fiche Maps/locale, pas Search Console)
+
+Répartition des recherches sur la fiche GBP partagée par Mouj cette
+session : dominée par des requêtes **génériques de catégorie**, pas de
+marque — "rasta" (37), "beauty salons" (32), "nail salon" (27), "hair
+salon" (20), "pedicure" (19), "manicure"/"manucure"/"nails" (cumul
+significatif). 93 % du trafic de la fiche vient de mobile (57 % Maps
+mobile + 36 % Recherche Google mobile) — sur mobile, Maps affiche les
+photos avant tout texte, donc le visuel prime sur le wording ici.
+
+**Confirmé par Mouj : Salon Mimi fait bien des ongles** (manucure/pédicure),
+ce n'est pas un signal de mauvaise catégorisation GBP mais une vraie
+opportunité non exploitée. **Actions recommandées, pas encore faites** :
+
+1. Vérifier/ajouter la catégorie secondaire "Nail salon" sur la fiche GBP.
+2. Shooting photos ongles (le shooting général était déjà priorité depuis
+   août, cf [[salon-mimi-gbp]] — les ongles n'y étaient pas couverts).
+3. Vérifier que "Manucure"/"Pédicure" apparaissent avec prix dans l'onglet
+   Services de la fiche.
+4. Poster un post GBP dédié ongles une fois les photos prêtes.
+
+Ces 4 actions sont hors de mon accès (dashboard Google Business Profile,
+pas du code) — à faire par Mouj.
+
+---
+
 ## 41. Analyse croisée des rapports SEO — 13/17 sept, 30 sept/1er oct 2026
 
 Suite à la recommandation méthode du §39 (lecture hebdomadaire plutôt que
