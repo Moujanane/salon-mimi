@@ -6,9 +6,9 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 const BASE_URL = "https://mimi-coiffure.com";
 
 const titles: Record<string, string> = {
-  fr: "Salon Mimi — Tresses Rasta & Africaines Marrakech | Jamaa El Fna",
-  en: "Salon Mimi — Rasta & African Braids Marrakech | Jamaa El Fna",
-  es: "Salon Mimi — Trenzas Rasta y Africanas Marrakech | Jamaa El Fna",
+  fr: "Salon Mimi Marrakech — Tresses Rasta & Africaines | Jamaa El Fna",
+  en: "Salon Mimi Marrakech — Rasta & African Braids | Jamaa El Fna",
+  es: "Salon Mimi Marrakech — Trenzas Rasta y Africanas | Jamaa El Fna",
 };
 
 const descriptions: Record<string, string> = {

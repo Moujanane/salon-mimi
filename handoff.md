@@ -6,7 +6,157 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 40. Analyse croisée des rapports SEO — 13/17 sept, 30 sept/1er oct 2026
+## 0. Index des tâches ouvertes (mis à jour le 10 oct 2026)
+
+Ce fichier grossit vite — avant de re-parcourir tout le handoff en début de
+session, regarder ici d'abord. Mis à jour manuellement, peut dater un peu ;
+si doute, vérifier dans le code/en prod plutôt que de faire confiance
+aveuglément à une ligne vieille de plusieurs mois.
+
+**Côté Mouj, hors code (le plus structurant)**
+
+- Shooting photos (checklist `docs/checklist-shooting-photos-salon-mimi.html`)
+  — bloque galerie GBP, posts Locks/Tissage/rasta, et les photos ongles
+  identifiées §43bis (session GBP du 9-10 oct)
+- Photo HD de la devanture actuelle, pour le montage du panneau façade
+  (§27, PDF imprimeur déjà prêt, en attente depuis le 4 sept)
+- Répondre aux 10 avis Google déjà rédigés + récolter des avis (carte QR
+  prête) — Mimi a 13-20 avis contre 160-813 chez les concurrents directs,
+  c'est la vraie cause du classement faible sur les requêtes génériques
+  (§25)
+- Search Console : cliquer « Valider la correction » sur les motifs 403/404/
+  doublon du rapport de couverture (§43)
+- GBP : catégorie secondaire « Nail salon », services ongles avec prix, post
+  dédié une fois les photos prêtes (§42)
+- Bios Instagram/TikTok : lien réservation (noté « pas fait » en août)
+- TripAdvisor + annuaires Maroc (en attente depuis mai)
+- Confirmer si fait : mot de passe admin Umami changé (`umami` par défaut,
+  noté mai), email de notification `/admin/settings` (noté mai) — anciens,
+  jamais reconfirmés depuis
+
+**Chantiers dev jamais commencés**
+
+- Pages `/fr/tresses-rasta-marrakech` + `/en/rasta-braids-marrakech` (§25) —
+  bloquées par le shooting photos
+- Audit formel des politiques RLS Supabase (mentionné §28, jamais fait)
+
+**À mesurer, pas à coder**
+
+- Rapport du ~17-20 oct : vérifier si le fix title « mimi marrakech » (§42)
+  convertit enfin en clics
+
+**Pour mémoire — déjà réglé, ne pas rouvrir sans nouveau signal**
+
+- Migration Next 14→15 (§32), rate limiters Upstash (§31), fix meta
+  description homepage (§40), fix JSON-LD AggregateRating + anomalie
+  « 5/5 sur Google » (§42), fix title « mimi marrakech » (§42), cron SEO
+  Railway + rotation OAuth (§37-38)
+
+---
+
+## 43. Nouveau rapport de couverture GSC (58 pages, 6 motifs) — RAS, aucune action de code
+
+Mouj a remonté un nouveau rapport "Pourquoi des pages ne sont pas indexées"
+(10 oct) : 31 « Page avec redirection », 17 « Autre page avec balise
+canonique correcte », 4 « Bloquée 403 », 3 « Explorée non indexée », 2
+« Introuvable 404 », 1 « Doublon sans canonical sélectionné ». Chiffres
+proches mais pas identiques à l'analyse du 28 août (§23) et du 14-17 sept
+(§40) — pas un vieux rapport qui traîne, à vérifier au cas par cas plutôt
+que de supposer que c'est déjà traité.
+
+**Méthode** : l'export CSV global de Search Console ne donne que les
+totaux par catégorie, pas les URLs (`Problèmes critiques.csv` contient
+juste `Raison,Source,Validation,Pages`). Il faut cliquer sur chaque ligne
+dans l'UI pour voir les « Exemples » d'URLs, capture d'écran par capture
+d'écran — pas de raccourci trouvé.
+
+**Verdict, catégorie par catégorie (vérifié en direct par `curl`)** :
+
+| Catégorie                                 | Pages | Cause                                                                                                                  | Testé aujourd'hui                                                           |
+| ----------------------------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Page avec redirection                     | 31    | Anciennes URLs pré-i18n (`/reservation`, `/services`, `/galerie`, `/contact`, `/a-propos`, `/`) → 308 vers `/fr/...`   | Voulu, confirmé 200 après redirection                                       |
+| Autre page avec balise canonique correcte | 17    | Variantes `/xx/reservation?service=...` (box-braids, colorations, fulani-braids, locks-dreads, etc.)                   | canonical → `/xx/reservation` sans paramètre, confirmé par curl             |
+| Bloquée 403                               | 4     | Variantes `?service=...` crawlées le **21 août**, pendant l'incident apex Railway 403/404 déjà résolu le 22 août (§23) | 200 aujourd'hui                                                             |
+| Introuvable 404                           | 2     | Même incident du 21-22 août                                                                                            | 200 aujourd'hui                                                             |
+| Doublon sans canonical sélectionné        | 1     | `/en/reservation?service=perruques-tissage`, même famille que les 17 ci-dessus                                         | 200, canonical correct vers `/en/reservation`                               |
+| Explorée, actuellement non indexée        | 3     | `/en/a-propos` (crawlée **24 sept**, donc hors incident) + 2 `opengraph-image?...`                                     | 200 sur les 3 — Google choisit juste de ne pas indexer, pas une erreur HTTP |
+
+**Conclusion : zéro action de code.** Les 58 pages relèvent soit d'un choix
+d'architecture voulu (redirections i18n, canonical sur variantes de
+réservation), soit de traces d'un incident déjà résolu le 22 août que
+Google n'a pas encore re-crawlé. Seul `/en/a-propos` sort du lot (pas lié
+à l'incident, exploré avec succès mais non indexé) — pas un bug, mais un
+candidat à renforcer en contenu si ça persiste sur plusieurs rapports.
+
+**Action restante, côté Mouj dans Search Console (pas du code)** : pour
+les motifs encore « Non commencé »/« Commencé » (403, 404, doublon),
+cliquer **« Valider la correction »** pour forcer un re-crawl — même
+procédure que le 28 août, effet attendu sous 1 à 4 semaines.
+
+---
+
+## 42. Session 10 oct 2026 — fix JSON-LD AggregateRating + fix title « mimi marrakech »
+
+**Fix JSON-LD AggregateRating invalide (commit `b5ccd25`)** : Search Console
+signalait 2 problèmes critiques sur les extraits d'avis (`reviewCount` non
+positif, `rating` hors plage). Cause : `lib/google-reviews.ts` forçait
+`rating`/`user_ratings_total` à `0` par défaut (`?? 0`) quand l'API Google
+Places ne renvoyait pas ces champs, au lieu de laisser `layout.tsx`
+retomber sur `SALON.ratingFallback` (4.5/6) comme prévu. Logique de
+validation extraite dans `lib/google-reviews-validation.ts` (module sans
+dépendance React, pour rester testable), couverte par 5 tests
+`node --test` (`lib/google-reviews.test.mjs`). `tsc`/build/lint verts.
+**À vérifier dans quelques jours** : l'alerte Search Console doit
+disparaître d'elle-même une fois Google re-crawlé.
+
+**Fix title homepage « mimi marrakech » (commit `d2faed1`)** : la tâche en
+attente du §40 est tranchée — confirmé sur un mois de rapports (0/32
+impressions encore le 9 oct) que le fix de _description_ du 14 sept
+(§40) n'a pas suffi. Diagnostic : le _title_ séparait "Mimi" de
+"Marrakech" (`Salon Mimi — Tresses Rasta & Africaines Marrakech | ...`),
+empêchant Google de mettre en gras la séquence exacte tapée par
+l'internaute — contrairement à « salon mimi marrakech » qui convertit
+très bien (27.59 % CTR, position 1.3) car les deux mots sont adjacents.
+Réordonné en `Salon Mimi Marrakech — Tresses Rasta & Africaines | ...`
+sur fr/en/es, dans `page.tsx` (titre spécifique homepage) **et**
+`layout.tsx` (fallback générique du layout, qui dupliquait les mêmes
+chaînes) — sans retirer aucun mot-clé. Vérifié : build + rendu réel du
+`<title>` en local.
+
+### ⏳ Tâche en attente — vérifier l'effet du fix title au rapport ~17-20 oct
+
+Même procédure que pour le fix de description de sept : laisser 1-2
+semaines de rapports `docs/seo/*.md` (branche `seo-reports`) s'accumuler,
+puis vérifier si `mimi marrakech` convertit enfin. Ne pas conclure avant
+d'avoir au moins une semaine de données post-fix (déployé le 10 oct).
+
+### Analyse Google Business Profile (fiche Maps/locale, pas Search Console)
+
+Répartition des recherches sur la fiche GBP partagée par Mouj cette
+session : dominée par des requêtes **génériques de catégorie**, pas de
+marque — "rasta" (37), "beauty salons" (32), "nail salon" (27), "hair
+salon" (20), "pedicure" (19), "manicure"/"manucure"/"nails" (cumul
+significatif). 93 % du trafic de la fiche vient de mobile (57 % Maps
+mobile + 36 % Recherche Google mobile) — sur mobile, Maps affiche les
+photos avant tout texte, donc le visuel prime sur le wording ici.
+
+**Confirmé par Mouj : Salon Mimi fait bien des ongles** (manucure/pédicure),
+ce n'est pas un signal de mauvaise catégorisation GBP mais une vraie
+opportunité non exploitée. **Actions recommandées, pas encore faites** :
+
+1. Vérifier/ajouter la catégorie secondaire "Nail salon" sur la fiche GBP.
+2. Shooting photos ongles (le shooting général était déjà priorité depuis
+   août, cf [[salon-mimi-gbp]] — les ongles n'y étaient pas couverts).
+3. Vérifier que "Manucure"/"Pédicure" apparaissent avec prix dans l'onglet
+   Services de la fiche.
+4. Poster un post GBP dédié ongles une fois les photos prêtes.
+
+Ces 4 actions sont hors de mon accès (dashboard Google Business Profile,
+pas du code) — à faire par Mouj.
+
+---
+
+## 41. Analyse croisée des rapports SEO — 13/17 sept, 30 sept/1er oct 2026
 
 Suite à la recommandation méthode du §39 (lecture hebdomadaire plutôt que
 quotidienne). Recommandations rédigées directement dans
@@ -43,6 +193,55 @@ quotidienne). Recommandations rédigées directement dans
 
 Prochaine lecture recommandée dans 1-2 semaines pour confirmer si le recul
 du cluster « afro » générique est une tendance ou un artefact d'une semaine.
+
+---
+
+## 40. Session 14-17 sept 2026 — fix meta description + audit SEO complet + suivi en cours
+
+**Fix meta description homepage (commit `249e2e1`, déployé le 14 sept)** :
+la requête `mimi marrakech` avait ~128 impressions/28j en position 3-5 mais
+0 clic. Ajout de "Salon Mimi," en tête de la description fr/en/es (le
+snippet ne mentionnait jamais le nom, seulement le title). Corrigé au
+passage un mélange fr/es sur la version `es` ("Salón de coiffure" → "salón
+de peluquería"). **Résultat pas encore mesurable** — voir tâche en attente
+ci-dessous.
+
+**Piste écartée après vérification jour par jour (API GSC directe)** : la
+baisse apparente de `salon mimi` dans le rapport agrégé 28j (2.4 → 6.6)
+n'est PAS un signal de concurrent/pénalité — requête à très faible volume
+(1-6 impressions/jour), un seul mauvais jour suffit à tirer la moyenne.
+Ne pas ré-investiguer sauf tendance confirmée sur plusieurs jours à volume
+suffisant. Détail dans [[salon-mimi-seo-mimi-marrakech-snippet]].
+
+**Rapport de couverture GSC "pages non indexées" analysé** (3 catégories
+sur 6, exports CSV) : 404/redirections = anciennes URLs pré-i18n sans
+impact, 403 sur `opengraph-image` = transitoire infra (testé en direct,
+HTTP 200 aujourd'hui), doublons `/reservation?service=...` = comportement
+voulu avec canonical déjà correct. **Aucune action de code nécessaire dans
+les 3 cas.** Détail dans [[salon-mimi-gsc-coverage-non-index]]. Catégorie
+"Explorée actuellement non indexée" (2 URLs) jamais reçue en export, pas
+vérifiée.
+
+**Email marketing izyLocal ("gros problème SEO", téléphone sans +212)** :
+vérifié faux et infondé. `+212710388204` présent sur toutes les pages
+(JSON-LD, mentions légales, footer). Audit SEO complet indépendant lancé
+par précaution (skill `audit-site`) : **score 98/100, aucun problème
+critique**. PDF généré et envoyé à Mouj. Aucun concurrent direct n'a de
+site web aussi complet (Marrakech Tresses et M PAT Coiffure n'ont qu'une
+présence Facebook/Instagram).
+
+### ⏳ Tâche en attente — vérifier l'effet du fix au rapport du 20 sept
+
+Le rapport SEO du 20 septembre (généré par le cron à 7h UTC ce jour-là,
+pas avant) dira si `mimi marrakech` convertit enfin en clics après le fix
+du 14 sept. **Ne pas conclure avant cette date** — le rapport du 17 sept
+existe déjà mais ne couvre qu'une fenêtre 28j glissante encore dominée par
+la période pré-fix.
+
+Procédure pour la prochaine session : `cd salon-mimi && git fetch origin
+seo-reports && git show origin/seo-reports:docs/seo/2026-09-20.md`, puis
+comparer le clic/impression de `mimi marrakech` avec l'historique jour par
+jour déjà collecté (voir [[salon-mimi-seo-mimi-marrakech-snippet]]).
 
 ---
 
@@ -154,7 +353,7 @@ retour à la ligne.
 
 ---
 
-## 37. Rapport SEO quotidien (Google Search Console) — SCRIPT MERGÉ, CRON RAILWAY À FAIRE (8-13 sept 2026)
+## 37. Rapport SEO quotidien (Google Search Console) — SCRIPT + CRON RAILWAY EN PROD (8-17 sept 2026)
 
 **Les 2 PR mergées** : `Moujanane/salon-mimi#1` (script) + `#2` (script cron
 `seo-cron.sh`, identique à atlas-swincar). Portage depuis atlas-swincar
@@ -164,10 +363,15 @@ référence dans le repo atlas-swincar :
 `docs/superpowers/plans/2026-09-08-rapport-seo-quotidien.md` et
 `docs/superpowers/specs/2026-09-08-seo-cron-railway-design.md`.
 
-**⚠️ Le service Railway `seo-cron` n'est PAS encore configuré côté Salon
-Mimi.** Il l'est côté atlas-swincar et fonctionne en prod depuis le 12 sept.
-C'est la tâche prioritaire de la prochaine session — procédure complète
-ci-dessous, tirée des obstacles réellement rencontrés sur atlas.
+**✅ Le service Railway `seo-cron` est configuré et opérationnel côté Salon
+Mimi**, confirmé le 17 sept 2026 : rapports générés chaque matin depuis
+le 13 sept sans interruption (`docs/seo/2026-09-13.md` à `2026-09-17.md`
+sur la branche `seo-reports`), 7 variables en place, cron `0 7 * * *`.
+Cette section était restée marquée « à faire » par erreur de mise à jour du
+handoff — le travail avait déjà été fait, ne pas reconfigurer sans vérifier
+d'abord l'état réel (`git fetch origin seo-reports && git log
+origin/seo-reports --oneline` + `git ls-tree -r --name-only
+origin/seo-reports -- docs/seo/`).
 
 ### Ce que ça fait
 
@@ -1141,13 +1345,15 @@ testé. Suggestion spawée en tâche séparée (`task_617d36ae`) : réécrire
    normalement, une réservation test apparaît dans le dashboard, `npx playwright
 test` en full contre la prod réelle après déploiement.
 
-### Hors scope confirmé (gros chantiers, non traités)
+### Hors scope confirmé (gros chantiers, non traités à cette date)
 
-- P6 — pages contenu rasta/EN (`/tresses-rasta-marrakech`)
-- Migration Next 14 → 15 (résoudrait les CVE restantes sur `next`/`postcss`)
-- Migration des rate limiters en mémoire (`/reservations`, `/contact`,
-  `mimiAuth.ts`) vers un store persistant (Upstash/Supabase)
-- Audit formel des politiques RLS Supabase
+- P6 — pages contenu rasta/EN (`/tresses-rasta-marrakech`) — **toujours non
+  traité au 10 oct**, bloqué sur le shooting photos (voir index en tête de
+  fichier)
+- Migration Next 14 → 15 — **✅ fait le lendemain, §32 (5-6 sept), EN PROD**
+- Migration des rate limiters en mémoire vers un store persistant —
+  **✅ fait le lendemain, §31 (5 sept), Upstash Redis EN PROD**
+- Audit formel des politiques RLS Supabase — **toujours non traité au 10 oct**
 
 ---
 
@@ -1793,12 +1999,16 @@ mèches malgré le nom de fichier) : `s-box-braids-longues.jpg`,
 6. Bios Instagram + TikTok : ajouter `https://mimi-coiffure.com/reservation` (toujours pas fait)
 7. Citations locales : TripAdvisor (en attente depuis mai 2026), annuaires Maroc
 
-### Anomalie à corriger (repérée en vérifiant la home en prod)
+### ✅ RÉSOLU (10 oct, §42) — anomalie « 5/5 sur Google »
 
-**Le hero de la home affiche « 5/5 sur Google »** alors que la fiche est à
-**4,2 / 13 avis**. `components/sections/GoogleReviews.tsx` lit l'API Google
-Places en direct — l'API renvoie une note partielle ou un fallback. Déjà noté
-§23, confirmé cette session. À corriger.
+**Le hero de la home affichait « 5/5 sur Google »** alors que la fiche était à
+**4,2 / 13 avis**. Noté ici le 30 août, confirmé §23 (28 août). Cause réelle
+trouvée le 10 oct (§42) : `lib/google-reviews.ts` forçait `rating`/
+`user_ratings_total` à `0` quand l'API Google Places ne répondait pas, au
+lieu du fallback `SALON.ratingFallback`. `GoogleReviews.tsx` partage la même
+fonction `getGoogleReviews()` que le JSON-LD — corrigé pour les deux d'un
+coup. Vérifié en prod le 10 oct : hero affiche `4.4`, cohérent avec le
+JSON-LD.
 
 ---
 
