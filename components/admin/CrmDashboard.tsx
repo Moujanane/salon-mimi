@@ -72,7 +72,7 @@ const DEAL_STAGE_LABELS: Record<string, string> = {
 function formatCurrency(n: number) {
   return new Intl.NumberFormat("fr-FR", {
     style: "currency",
-    currency: "EUR",
+    currency: "MAD",
     maximumFractionDigits: 0,
   }).format(n);
 }
