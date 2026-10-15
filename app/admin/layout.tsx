@@ -34,6 +34,12 @@ export default function AdminLayout({
               Réservations
             </Link>
             <Link
+              href="/admin/crm"
+              className="text-sm text-gray-600 hover:text-brun py-3 border-b-2 border-transparent hover:border-brun transition-colors"
+            >
+              CRM
+            </Link>
+            <Link
               href="/admin/settings"
               className="text-sm text-gray-600 hover:text-brun py-3 border-b-2 border-transparent hover:border-brun transition-colors"
             >
