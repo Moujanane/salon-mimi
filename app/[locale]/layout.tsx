@@ -17,6 +17,7 @@ import {
   offerCatalogLd,
   areaServedLd,
   reserveActionLd,
+  faqTarifsAnswerFr,
 } from "@/lib/salon-info";
 import { getGoogleReviews } from "@/lib/google-reviews";
 import "../globals.css";
@@ -192,7 +193,7 @@ const faqLd = {
       name: "Quels sont les tarifs du salon Mimi Marrakech ?",
       acceptedAnswer: {
         "@type": "Answer",
-        text: "Les tarifs vont de 150 MAD (soin argan, mini braids enfant) à 950 MAD (package Faux Locks avec bijoux). Les box braids medium sont à 550 MAD, les knotless braids à 700 MAD, les cornrows tête entière à 300 MAD, le départ de locks à 900 MAD.",
+        text: faqTarifsAnswerFr(),
       },
     },
   ],

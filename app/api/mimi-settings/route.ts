@@ -14,10 +14,6 @@ const ALLOWED_KEYS = [
   "price_perruques_tissage",
   "price_colorations",
   "price_ongles_soins_epilation",
-  "price_featured_box_braids_medium",
-  "price_featured_knotless_braids",
-  "price_featured_boho_braids",
-  "price_featured_cornrows",
 ];
 
 export async function GET(req: NextRequest) {

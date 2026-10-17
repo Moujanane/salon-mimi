@@ -88,6 +88,26 @@ export function priceRangeLabel(): string {
   return `${min}–${max} ${currency}`;
 }
 
+/**
+ * Réponse FAQ « Quels sont les tarifs ? » (français), calculée depuis le
+ * catalogue pour ne jamais diverger des prix affichés ni du JSON-LD.
+ */
+export function faqTarifsAnswerFr(): string {
+  const all = [...services, ...packages];
+  const cheapest = all.reduce((a, b) => (b.priceMad < a.priceMad ? b : a));
+  const priciest = all.reduce((a, b) => (b.priceMad > a.priceMad ? b : a));
+  const price = (id: string) => {
+    const item = services.find((s) => s.id === id);
+    if (!item) throw new Error(`Service introuvable dans le catalogue : ${id}`);
+    return item.priceMad;
+  };
+  return (
+    `Les tarifs vont de ${cheapest.priceMad} MAD (${cheapest.nameFr}) à ${priciest.priceMad} MAD (${priciest.nameFr}). ` +
+    `Les box braids medium sont à ${price("box-braids-medium")} MAD, les knotless braids à ${price("knotless-braids")} MAD, ` +
+    `les cornrows tête entière à ${price("cornrows")} MAD, le départ de locks à ${price("depart-locks")} MAD.`
+  );
+}
+
 /** Adresse postale schema.org (PostalAddress), sans le repère de quartier. */
 export function postalAddressLd() {
   return {
@@ -111,15 +131,17 @@ const RESERVATION_URL = `${SALON.url}/fr/reservation`;
 /**
  * Catalogue d'offres schema.org (OfferCatalog) : une Offer par prestation, avec
  * un prix numérique exact. Permet à un agent de recherche de citer le prix
- * d'une coiffure précise ("les box braids medium coûtent 550 MAD").
+ * d'une coiffure précise ("les box braids medium coûtent 500 MAD").
  *
  * Source : `lib/services-data.ts` (14 services + 2 packages). Ces mêmes prix
- * alimentent déjà la page d'accueil et les carrousels, donc le catalogue reste
- * cohérent avec ce que le visiteur voit.
+ * alimentent la page d'accueil (cartes « Services vedettes »), les carrousels
+ * et la réponse FAQ « tarifs » (`faqTarifsAnswerFr`), donc tout reste cohérent.
  *
  * ATTENTION : les prix éditables par Mimi dans /admin/settings (clés
  * `settings.price_*`) sont un système SÉPARÉ et approximatif ("dès 150 MAD").
- * Si un prix change ici, le mettre à jour aussi dans `services-data.ts`.
+ * Ils ne pilotent PAS les cartes vedettes de l'accueil. Pour changer un prix
+ * précis, modifier `services-data.ts` (MAD et EUR, taux ~10,6) puis lancer
+ * `npm run test:unit`.
  *
  * Contenu en français uniquement : le reste du JSON-LD de layout.tsx l'est
  * aussi, et schema.org n'a pas de mécanisme i18n propre.
