@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import { SALON } from "@/lib/salon-info";
+import { metaFor } from "@/lib/page-meta";
 
 export async function generateMetadata({
   params,
@@ -12,21 +13,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const titles: Record<string, string> = {
-    fr: "Salon Mimi — Coiffeuse africaine Marrakech Jamaa El Fna",
-    en: "Salon Mimi — African hairstylist Marrakech Jamaa El Fna",
-    es: "Salon Mimi — Peluquera africana Marrakech Jamaa El Fna",
-  };
-
-  const descriptions: Record<string, string> = {
-    fr: "Mimi, coiffeuse ivoirienne à Marrakech, spécialiste des tresses africaines, locks et knotless braids. Produits naturels : huile d'argan, karité, henné. Place Jamaa El Fna.",
-    en: "Mimi, Ivorian hairstylist in Marrakech, specialist in African braids, locks and knotless braids. Natural products: argan oil, shea butter, henna. Jamaa El Fna Square.",
-    es: "Mimi, peluquera marfileña en Marrakech, especialista en trenzas africanas, locks y knotless braids. Productos naturales: aceite de argán, karité, henna. Plaza Jamaa El Fna.",
-  };
-
   return {
-    title: titles[locale] ?? titles.fr,
-    description: descriptions[locale] ?? descriptions.fr,
+    ...metaFor("aPropos", locale),
     alternates: {
       canonical: `https://mimi-coiffure.com/${locale}/a-propos`,
       languages: {

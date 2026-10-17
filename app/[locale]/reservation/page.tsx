@@ -4,6 +4,7 @@ export const revalidate = 3600;
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ReservationLayout from "@/components/sections/ReservationLayout";
 import { getSettings } from "@/lib/settings";
+import { metaFor } from "@/lib/page-meta";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -13,21 +14,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const titles: Record<string, string> = {
-    fr: "Réserver tresses africaines Marrakech — Salon Mimi | Jamaa El Fna",
-    en: "Book African braids Marrakech — Salon Mimi | Jamaa El Fna",
-    es: "Reservar trenzas africanas Marrakech — Salon Mimi | Jamaa El Fna",
-  };
-
-  const descriptions: Record<string, string> = {
-    fr: "Prenez rendez-vous en ligne au Salon Mimi Marrakech. Tresses africaines, knotless braids, box braids, locks. Confirmation par WhatsApp. Place Jamaa El Fna.",
-    en: "Book online at Salon Mimi Marrakech. African braids, knotless braids, box braids, locks. WhatsApp confirmation. Jamaa El Fna Square.",
-    es: "Reserva online en Salon Mimi Marrakech. Trenzas africanas, knotless braids, box braids, locks. Confirmación por WhatsApp. Plaza Jamaa El Fna.",
-  };
-
   return {
-    title: titles[locale] ?? titles.fr,
-    description: descriptions[locale] ?? descriptions.fr,
+    ...metaFor("reservation", locale),
     alternates: {
       canonical: `https://mimi-coiffure.com/${locale}/reservation`,
       languages: {

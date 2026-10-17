@@ -17,7 +17,6 @@ import {
   offerCatalogLd,
   areaServedLd,
   reserveActionLd,
-  faqTarifsAnswerFr,
 } from "@/lib/salon-info";
 import { getGoogleReviews } from "@/lib/google-reviews";
 import "../globals.css";
@@ -160,45 +159,6 @@ const jsonLd = {
   dateModified: SALON.lastReviewed,
 };
 
-const faqLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "Où se trouve le salon Mimi à Marrakech ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Le salon Mimi est situé Place Jamaa El Fna, dans la Médina de Marrakech.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Quels services de tresses propose le salon Mimi ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Le salon Mimi propose des tresses africaines, tresses rasta, box braids, knotless braids, tresses Fulani, tresses Boho, cornrows, locks et dreads, faux locks, Marley twists, cheveux attachés, perruques et tissage. Il coiffe aussi les enfants.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Comment réserver au salon Mimi Marrakech ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "Vous pouvez réserver en ligne directement sur mimi-coiffure.com ou contacter le salon par WhatsApp.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "Quels sont les tarifs du salon Mimi Marrakech ?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: faqTarifsAnswerFr(),
-      },
-    },
-  ],
-};
-
 export default async function LocaleLayout({
   children,
   params,
@@ -230,10 +190,6 @@ export default async function LocaleLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWithRating) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
         />
       </head>
       <body>

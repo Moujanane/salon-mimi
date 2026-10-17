@@ -13,6 +13,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { setRequestLocale } from "next-intl/server";
 import GalleryMasonry from "@/components/sections/GalleryMasonry";
 import { getGalleryItems } from "@/lib/gallery";
+import { metaFor } from "@/lib/page-meta";
 
 export async function generateMetadata({
   params,
@@ -21,21 +22,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const titles: Record<string, string> = {
-    fr: "Galerie — Tresses africaines & Locks Marrakech | Salon Mimi",
-    en: "Gallery — African braids & Locks Marrakech | Salon Mimi",
-    es: "Galería — Trenzas africanas y Locks Marrakech | Salon Mimi",
-  };
-
-  const descriptions: Record<string, string> = {
-    fr: "Découvrez les réalisations du Salon Mimi Marrakech : tresses africaines, knotless braids, box braids, locks, tresses rasta. Photos avant/après — Place Jamaa El Fna.",
-    en: "Explore Salon Mimi Marrakech's work: African braids, knotless braids, box braids, locks, rasta braids. Before/after photos — Jamaa El Fna Square.",
-    es: "Descubre las creaciones del Salon Mimi Marrakech: trenzas africanas, knotless braids, box braids, locks, trenzas rasta. Fotos antes/después — Plaza Jamaa El Fna.",
-  };
-
   return {
-    title: titles[locale] ?? titles.fr,
-    description: descriptions[locale] ?? descriptions.fr,
+    ...metaFor("galerie", locale),
     alternates: {
       canonical: `https://mimi-coiffure.com/${locale}/galerie`,
       languages: {

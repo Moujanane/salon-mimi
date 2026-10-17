@@ -92,7 +92,7 @@ export function priceRangeLabel(): string {
  * Réponse FAQ « Quels sont les tarifs ? » (français), calculée depuis le
  * catalogue pour ne jamais diverger des prix affichés ni du JSON-LD.
  */
-export function faqTarifsAnswerFr(): string {
+export function faqTarifsAnswer(locale: string): string {
   const all = [...services, ...packages];
   const cheapest = all.reduce((a, b) => (b.priceMad < a.priceMad ? b : a));
   const priciest = all.reduce((a, b) => (b.priceMad > a.priceMad ? b : a));
@@ -101,11 +101,33 @@ export function faqTarifsAnswerFr(): string {
     if (!item) throw new Error(`Service introuvable dans le catalogue : ${id}`);
     return item.priceMad;
   };
+  const box = price("box-braids-medium");
+  const knotless = price("knotless-braids");
+  const cornrows = price("cornrows");
+  const locks = price("depart-locks");
+
+  if (locale === "en") {
+    return (
+      `Prices range from ${cheapest.priceMad} MAD (${cheapest.nameEn}) to ${priciest.priceMad} MAD (${priciest.nameEn}). ` +
+      `Medium box braids are ${box} MAD, knotless braids ${knotless} MAD, full-head cornrows ${cornrows} MAD and starter locs ${locks} MAD.`
+    );
+  }
+  if (locale === "es") {
+    return (
+      `Los precios van de ${cheapest.priceMad} MAD (${cheapest.nameEs}) a ${priciest.priceMad} MAD (${priciest.nameEs}). ` +
+      `Las box braids medianas cuestan ${box} MAD, las knotless braids ${knotless} MAD, los cornrows de cabeza completa ${cornrows} MAD y el inicio de rastas ${locks} MAD.`
+    );
+  }
   return (
     `Les tarifs vont de ${cheapest.priceMad} MAD (${cheapest.nameFr}) à ${priciest.priceMad} MAD (${priciest.nameFr}). ` +
-    `Les box braids medium sont à ${price("box-braids-medium")} MAD, les knotless braids à ${price("knotless-braids")} MAD, ` +
-    `les cornrows tête entière à ${price("cornrows")} MAD, le départ de locks à ${price("depart-locks")} MAD.`
+    `Les box braids medium sont à ${box} MAD, les knotless braids à ${knotless} MAD, ` +
+    `les cornrows tête entière à ${cornrows} MAD, le départ de locks à ${locks} MAD.`
   );
+}
+
+/** Version française, conservée pour les tests existants. */
+export function faqTarifsAnswerFr(): string {
+  return faqTarifsAnswer("fr");
 }
 
 /** Adresse postale schema.org (PostalAddress), sans le repère de quartier. */

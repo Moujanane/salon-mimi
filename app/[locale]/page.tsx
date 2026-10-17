@@ -3,19 +3,9 @@ export const revalidate = 3600;
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
+import { metaFor } from "@/lib/page-meta";
+
 const BASE_URL = "https://mimi-coiffure.com";
-
-const titles: Record<string, string> = {
-  fr: "Salon Mimi Marrakech — Tresses Rasta & Africaines | Jamaa El Fna",
-  en: "Salon Mimi Marrakech — Rasta & African Braids | Jamaa El Fna",
-  es: "Salon Mimi Marrakech — Trenzas Rasta y Africanas | Jamaa El Fna",
-};
-
-const descriptions: Record<string, string> = {
-  fr: "Salon Mimi, salon de coiffure Rasta et Africaine à Marrakech, Place Jamaa El Fna. Tresses africaines, box braids, locks, knotless. Réservez en ligne.",
-  en: "Salon Mimi, Rasta and African hair salon in Marrakech, Jamaa El Fna Square. African braids, box braids, locks, knotless. Book online.",
-  es: "Salon Mimi, salón de peluquería Rasta y Africano en Marrakech, Plaza Jamaa El Fna. Trenzas africanas, box braids, locks, knotless. Reserva en línea.",
-};
 
 export async function generateMetadata({
   params,
@@ -24,8 +14,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   return {
-    title: titles[locale] ?? titles.fr,
-    description: descriptions[locale] ?? descriptions.fr,
+    ...metaFor("home", locale),
     alternates: {
       canonical: `${BASE_URL}/${locale}`,
       languages: {
@@ -43,6 +32,8 @@ import GoogleReviews from "@/components/sections/GoogleReviews";
 import ServicesGrid from "@/components/sections/ServicesGrid";
 import CTAFinal from "@/components/sections/CTAFinal";
 import LocationSection from "@/components/sections/LocationSection";
+import FaqSection from "@/components/sections/FaqSection";
+import { faqJsonLd } from "@/lib/faq";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import { services } from "@/lib/services-data";
 import { getSettings } from "@/lib/settings";
@@ -94,6 +85,13 @@ export default async function HomePage({
         showAll={false}
       />
       <LocationSection locale={locale} whatsappNumber={whatsappNumber} />
+      <FaqSection locale={locale} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(faqJsonLd(locale)).replace(/</g, "\\u003c"),
+        }}
+      />
       <CTAFinal
         locale={locale}
         title={ctaTitles[locale] ?? ctaTitles.fr}
