@@ -13,7 +13,9 @@ import { unstable_noStore as noStore } from "next/cache";
 import { setRequestLocale } from "next-intl/server";
 import GalleryMasonry from "@/components/sections/GalleryMasonry";
 import { getGalleryItems } from "@/lib/gallery";
-import { metaFor } from "@/lib/page-meta";
+import { pageMetadata } from "@/lib/page-meta";
+import InfoBlock from "@/components/sections/InfoBlock";
+import { galleryStyles } from "@/lib/page-content";
 
 export async function generateMetadata({
   params,
@@ -23,16 +25,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    ...metaFor("galerie", locale),
-    alternates: {
-      canonical: `https://mimi-coiffure.com/${locale}/galerie`,
-      languages: {
-        fr: "https://mimi-coiffure.com/fr/galerie",
-        en: "https://mimi-coiffure.com/en/galerie",
-        es: "https://mimi-coiffure.com/es/galerie",
-        "x-default": "https://mimi-coiffure.com/fr/galerie",
-      },
-    },
+    ...pageMetadata("galerie", locale, "/galerie"),
   };
 }
 
@@ -65,6 +58,7 @@ export default async function GaleriePage({
   const displayLocale = locale || "fr";
 
   const items = await getGalleryItems();
+  const styles = galleryStyles(displayLocale);
 
   return (
     <div className="bg-fond min-h-screen">
@@ -82,6 +76,13 @@ export default async function GaleriePage({
         </p>
       </div>
       <GalleryMasonry items={items} />
+      <InfoBlock
+        id="gallery-styles"
+        tone="dark"
+        title={styles.title}
+        intro={styles.intro}
+        items={styles.items}
+      />
     </div>
   );
 }

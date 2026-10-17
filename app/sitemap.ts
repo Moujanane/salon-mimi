@@ -1,5 +1,6 @@
 // app/sitemap.ts
 import { MetadataRoute } from "next";
+import { SALON } from "@/lib/salon-info";
 
 export const revalidate = 86400;
 
@@ -24,7 +25,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const localePages = locales.flatMap((locale) =>
     pages.map((page) => ({
       url: `${BASE_URL}/${locale}${page}`,
-      lastModified: new Date(),
+      // Date réelle de dernière révision du contenu (lib/salon-info.ts), pas la
+      // date du build : sinon la lastmod change à chaque déploiement.
+      lastModified: new Date(`${SALON.lastReviewed}T00:00:00Z`),
       changeFrequency: "monthly" as const,
       priority: page === "" ? 1.0 : 0.8,
     })),

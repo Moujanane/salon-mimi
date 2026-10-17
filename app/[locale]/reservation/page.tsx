@@ -4,7 +4,7 @@ export const revalidate = 3600;
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import ReservationLayout from "@/components/sections/ReservationLayout";
 import { getSettings } from "@/lib/settings";
-import { metaFor } from "@/lib/page-meta";
+import { pageMetadata } from "@/lib/page-meta";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -15,16 +15,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    ...metaFor("reservation", locale),
-    alternates: {
-      canonical: `https://mimi-coiffure.com/${locale}/reservation`,
-      languages: {
-        fr: "https://mimi-coiffure.com/fr/reservation",
-        en: "https://mimi-coiffure.com/en/reservation",
-        es: "https://mimi-coiffure.com/es/reservation",
-        "x-default": "https://mimi-coiffure.com/fr/reservation",
-      },
-    },
+    ...pageMetadata("reservation", locale, "/reservation"),
   };
 }
 

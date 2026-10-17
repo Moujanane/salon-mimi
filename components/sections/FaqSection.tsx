@@ -1,10 +1,26 @@
 import { getFaq, FAQ_TITLE, type FaqLocale } from "@/lib/faq";
+import { SALON } from "@/lib/salon-info";
+
+const UPDATED_LABEL: Record<FaqLocale, string> = {
+  fr: "Informations et tarifs mis à jour le",
+  en: "Information and prices last updated on",
+  es: "Información y precios actualizados el",
+};
 
 // Section FAQ visible de l'accueil. Les mêmes textes (lib/faq.ts) alimentent le
-// balisage JSON-LD FAQPage injecté par app/[locale]/page.tsx.
+// balisage JSON-LD FAQPage injecté par app/[locale]/page.tsx. La date affichée
+// est SALON.lastReviewed : la même que dateModified (JSON-LD) et le sitemap.
 export default function FaqSection({ locale }: { locale: string }) {
   const l: FaqLocale = locale === "en" || locale === "es" ? locale : "fr";
   const items = getFaq(l);
+  const updatedOn = new Date(
+    `${SALON.lastReviewed}T00:00:00Z`,
+  ).toLocaleDateString(l, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 
   return (
     <section
@@ -28,6 +44,10 @@ export default function FaqSection({ locale }: { locale: string }) {
             </div>
           ))}
         </dl>
+        <p className="text-white/50 text-sm text-center mt-10">
+          {UPDATED_LABEL[l]}{" "}
+          <time dateTime={SALON.lastReviewed}>{updatedOn}</time>
+        </p>
       </div>
     </section>
   );

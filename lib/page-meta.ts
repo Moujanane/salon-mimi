@@ -10,9 +10,11 @@
 // §42, octobre 2026) est en cours de mesure ; le modifier fausserait la mesure.
 // Seule la fin "| Jamaa El Fna" est tronquée. À revoir après le rapport.
 
+import type { Metadata } from "next";
+
 export type MetaLocale = "fr" | "en" | "es";
 export type PageKey =
-  "home" | "services" | "reservation" | "aPropos" | "galerie";
+  "home" | "services" | "reservation" | "aPropos" | "galerie" | "contact";
 
 type Meta = {
   titles: Record<MetaLocale, string>;
@@ -80,7 +82,73 @@ export const PAGE_META: Record<PageKey, Meta> = {
       es: "Las creaciones del Salon Mimi Marrakech: trenzas africanas, knotless, box braids, locks, trenzas rasta. Fotos antes/después, Plaza Jamaa El Fna.",
     },
   },
+  contact: {
+    titles: {
+      fr: "Contact & Accès — Salon Mimi Marrakech | Place Jamaa El Fna",
+      en: "Contact & Location — Salon Mimi Marrakech | Jamaa El Fna",
+      es: "Contacto y Ubicación — Salon Mimi Marrakech | Jamaa El Fna",
+    },
+    descriptions: {
+      fr: "Contactez le Salon Mimi à Marrakech. Situé Place Jamaa El Fna, Médina. WhatsApp, Instagram, horaires et itinéraire. Réservation en ligne disponible.",
+      en: "Contact Salon Mimi in Marrakech. Located at Jamaa El Fna Square, Medina. WhatsApp, Instagram, opening hours and directions. Online booking available.",
+      es: "Contacta con el Salon Mimi en Marrakech. Ubicado en la Plaza Jamaa El Fna, Medina. WhatsApp, Instagram, horarios e indicaciones. Reserva online disponible.",
+    },
+  },
 };
+
+const SITE_URL = "https://mimi-coiffure.com";
+
+/**
+ * Métadonnées complètes d'une page : title, description, canonical, hreflang,
+ * Open Graph et Twitter propres à la page. Sans cela, les pages héritaient de
+ * l'Open Graph de l'accueil (même titre de partage partout).
+ * `path` : "" pour l'accueil, sinon "/services", "/a-propos", etc.
+ */
+export function pageMetadata(
+  page: PageKey,
+  locale: string,
+  path: string,
+): Metadata {
+  const l: MetaLocale = locale === "en" || locale === "es" ? locale : "fr";
+  const { title, description } = metaFor(page, l);
+  const url = `${SITE_URL}/${l}${path}`;
+  const image = `${SITE_URL}/${l}/opengraph-image`;
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+      languages: {
+        fr: `${SITE_URL}/fr${path}`,
+        en: `${SITE_URL}/en${path}`,
+        es: `${SITE_URL}/es${path}`,
+        "x-default": `${SITE_URL}/fr${path}`,
+      },
+    },
+    openGraph: {
+      title,
+      description,
+      siteName: "Salon Mimi",
+      locale: l,
+      type: "website",
+      url,
+      images: [
+        {
+          url: image,
+          width: 1200,
+          height: 630,
+          alt: "Salon Mimi — Tresses africaines Marrakech",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
 
 /** Title + description d'une page, avec repli sur le français si langue inconnue. */
 export function metaFor(page: PageKey, locale: string) {

@@ -5,7 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import ServicesPageClient from "@/components/sections/ServicesPageClient";
 import { getSettings } from "@/lib/settings";
 import { SALON } from "@/lib/salon-info";
-import { metaFor } from "@/lib/page-meta";
+import { pageMetadata } from "@/lib/page-meta";
 
 export async function generateMetadata({
   params,
@@ -15,16 +15,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    ...metaFor("services", locale),
-    alternates: {
-      canonical: `https://mimi-coiffure.com/${locale}/services`,
-      languages: {
-        fr: "https://mimi-coiffure.com/fr/services",
-        en: "https://mimi-coiffure.com/en/services",
-        es: "https://mimi-coiffure.com/es/services",
-        "x-default": "https://mimi-coiffure.com/fr/services",
-      },
-    },
+    ...pageMetadata("services", locale, "/services"),
   };
 }
 

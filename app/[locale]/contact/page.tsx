@@ -6,6 +6,9 @@ import Image from "next/image";
 import { getSettings } from "@/lib/settings";
 import { GOOGLE_REVIEW_URL } from "@/lib/social";
 import ContactForm from "@/components/sections/ContactForm";
+import { pageMetadata } from "@/lib/page-meta";
+import InfoBlock from "@/components/sections/InfoBlock";
+import { contactFacts } from "@/lib/page-content";
 
 export async function generateMetadata({
   params,
@@ -14,31 +17,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const titles: Record<string, string> = {
-    fr: "Contact & Accès — Salon Mimi Marrakech | Place Jamaa El Fna",
-    en: "Contact & Location — Salon Mimi Marrakech | Jamaa El Fna",
-    es: "Contacto y Ubicación — Salon Mimi Marrakech | Plaza Jamaa El Fna",
-  };
-
-  const descriptions: Record<string, string> = {
-    fr: "Contactez le Salon Mimi à Marrakech. Situé Place Jamaa El Fna, Médina. WhatsApp, Instagram, horaires et itinéraire. Réservation en ligne disponible.",
-    en: "Contact Salon Mimi in Marrakech. Located at Jamaa El Fna Square, Medina. WhatsApp, Instagram, opening hours and directions. Online booking available.",
-    es: "Contacta con el Salon Mimi en Marrakech. Ubicado en la Plaza Jamaa El Fna, Medina. WhatsApp, Instagram, horarios e indicaciones. Reserva online disponible.",
-  };
-
-  return {
-    title: titles[locale] ?? titles.fr,
-    description: descriptions[locale] ?? descriptions.fr,
-    alternates: {
-      canonical: `https://mimi-coiffure.com/${locale}/contact`,
-      languages: {
-        fr: "https://mimi-coiffure.com/fr/contact",
-        en: "https://mimi-coiffure.com/en/contact",
-        es: "https://mimi-coiffure.com/es/contact",
-        "x-default": "https://mimi-coiffure.com/fr/contact",
-      },
-    },
-  };
+  return pageMetadata("contact", locale, "/contact");
 }
 
 const content: Record<
@@ -106,6 +85,7 @@ export default async function ContactPage({
   setRequestLocale(locale);
   const settings = await getSettings();
   const data = content[locale] ?? content.fr;
+  const facts = contactFacts(locale);
 
   return (
     <div className="bg-fond min-h-screen">
@@ -206,6 +186,12 @@ export default async function ContactPage({
           </div>
         </div>
       </div>
+      <InfoBlock
+        id="contact-facts"
+        tone="dark"
+        title={facts.title}
+        items={facts.items}
+      />
     </div>
   );
 }

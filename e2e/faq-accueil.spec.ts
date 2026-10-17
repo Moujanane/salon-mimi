@@ -78,3 +78,26 @@ test.describe("FAQ de l'accueil", () => {
     });
   }
 });
+
+test.describe("Date de mise à jour", () => {
+  for (const locale of ["fr", "en", "es"]) {
+    test(`une date <time> visible = dateModified du balisage (${locale})`, async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}`);
+      const time = page.locator("time[datetime]").first();
+      await expect(time).toBeVisible();
+      const iso = await time.getAttribute("datetime");
+      expect(iso).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      await expect(time).not.toHaveText("");
+
+      const blocs = await page
+        .locator('script[type="application/ld+json"]')
+        .allTextContents();
+      const salon = blocs
+        .map((b) => JSON.parse(b))
+        .find((d) => d["@type"] === "HairSalon");
+      expect(salon.dateModified).toBe(iso);
+    });
+  }
+});

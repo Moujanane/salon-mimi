@@ -3,9 +3,7 @@ export const revalidate = 3600;
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { metaFor } from "@/lib/page-meta";
-
-const BASE_URL = "https://mimi-coiffure.com";
+import { pageMetadata } from "@/lib/page-meta";
 
 export async function generateMetadata({
   params,
@@ -14,16 +12,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   return {
-    ...metaFor("home", locale),
-    alternates: {
-      canonical: `${BASE_URL}/${locale}`,
-      languages: {
-        fr: `${BASE_URL}/fr`,
-        en: `${BASE_URL}/en`,
-        es: `${BASE_URL}/es`,
-        "x-default": `${BASE_URL}/fr`,
-      },
-    },
+    ...pageMetadata("home", locale, ""),
   };
 }
 import HeroHome from "@/components/sections/HeroHome";
@@ -33,6 +22,8 @@ import ServicesGrid from "@/components/sections/ServicesGrid";
 import CTAFinal from "@/components/sections/CTAFinal";
 import LocationSection from "@/components/sections/LocationSection";
 import FaqSection from "@/components/sections/FaqSection";
+import InfoBlock from "@/components/sections/InfoBlock";
+import { homeIntro } from "@/lib/page-content";
 import { faqJsonLd } from "@/lib/faq";
 import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import { services } from "@/lib/services-data";
@@ -56,6 +47,7 @@ export default async function HomePage({
   const settings = await getSettings();
   const whatsappNumber = settings.whatsapp_number;
   const featuredServices = services.filter((s) => s.featured);
+  const intro = homeIntro(locale);
 
   return (
     <>
@@ -75,6 +67,12 @@ export default async function HomePage({
         bodyEm={t("body_em")}
         ctaBookLabel={t("cta_book_label")}
         ctaServicesLabel={t("cta_services_label")}
+      />
+      <InfoBlock
+        id="intro-title"
+        tone="dark"
+        title={intro.title}
+        paragraph={intro.text}
       />
       <TrustBadge locale={locale} />
       <GoogleReviews locale={locale} />

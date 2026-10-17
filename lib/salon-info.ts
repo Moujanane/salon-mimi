@@ -79,7 +79,7 @@ export const SALON = {
    * fraîcheur pour les moteurs génératifs.
    * À bumper à la main quand une de ces infos change. Format YYYY-MM-DD.
    */
-  lastReviewed: "2026-09-06",
+  lastReviewed: "2026-10-17",
 } as const;
 
 /** Fourchette de prix formatée pour le champ `priceRange` de schema.org. */

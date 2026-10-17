@@ -8,14 +8,20 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { PAGE_META, type PageKey, type MetaLocale } from "./page-meta";
+import {
+  PAGE_META,
+  pageMetadata,
+  type PageKey,
+  type MetaLocale,
+} from "./page-meta";
 
 const LOCALES: MetaLocale[] = ["fr", "en", "es"];
 const PAGES = Object.keys(PAGE_META) as PageKey[];
 
-test("les 5 pages principales sont définies dans les 3 langues", () => {
+test("les 6 pages principales sont définies dans les 3 langues", () => {
   assert.deepEqual([...PAGES].sort(), [
     "aPropos",
+    "contact",
     "galerie",
     "home",
     "reservation",
@@ -89,4 +95,39 @@ test("toutes les descriptions citent Marrakech", () => {
       );
     }
   }
+});
+
+const PATHS: Record<PageKey, string> = {
+  home: "",
+  services: "/services",
+  reservation: "/reservation",
+  aPropos: "/a-propos",
+  galerie: "/galerie",
+  contact: "/contact",
+};
+
+test("pageMetadata : titre/description de partage propres à chaque page", () => {
+  for (const page of PAGES) {
+    for (const l of LOCALES) {
+      const m = pageMetadata(page, l, PATHS[page]);
+      const url = `https://mimi-coiffure.com/${l}${PATHS[page]}`;
+      assert.equal(m.title, PAGE_META[page].titles[l], `${page}/${l} title`);
+      assert.equal(m.description, PAGE_META[page].descriptions[l]);
+      assert.equal(m.alternates?.canonical, url, `${page}/${l} canonical`);
+      assert.equal(m.openGraph?.title, m.title, `${page}/${l} og:title`);
+      assert.equal(m.openGraph?.description, m.description);
+      assert.equal(m.openGraph?.url, url, `${page}/${l} og:url`);
+      assert.equal(m.twitter?.title, m.title, `${page}/${l} twitter:title`);
+      const langs = m.alternates?.languages as Record<string, string>;
+      assert.equal(langs["x-default"], `https://mimi-coiffure.com/fr${PATHS[page]}`);
+      assert.equal(Object.keys(langs).length, 4);
+    }
+  }
+});
+
+test("pageMetadata : image de partage présente, langue inconnue -> français", () => {
+  const m = pageMetadata("services", "de", "/services");
+  assert.equal(m.title, PAGE_META.services.titles.fr);
+  const images = m.openGraph?.images as { url: string }[];
+  assert.ok(images[0].url.endsWith("/fr/opengraph-image"));
 });

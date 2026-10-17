@@ -4,7 +4,9 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { setRequestLocale } from "next-intl/server";
 import { SALON } from "@/lib/salon-info";
-import { metaFor } from "@/lib/page-meta";
+import { pageMetadata } from "@/lib/page-meta";
+import InfoBlock from "@/components/sections/InfoBlock";
+import { aboutFacts } from "@/lib/page-content";
 
 export async function generateMetadata({
   params,
@@ -14,16 +16,7 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    ...metaFor("aPropos", locale),
-    alternates: {
-      canonical: `https://mimi-coiffure.com/${locale}/a-propos`,
-      languages: {
-        fr: "https://mimi-coiffure.com/fr/a-propos",
-        en: "https://mimi-coiffure.com/en/a-propos",
-        es: "https://mimi-coiffure.com/es/a-propos",
-        "x-default": "https://mimi-coiffure.com/fr/a-propos",
-      },
-    },
+    ...pageMetadata("aPropos", locale, "/a-propos"),
   };
 }
 
@@ -160,6 +153,7 @@ export default async function AProposPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const data = content[locale] ?? content.fr;
+  const facts = aboutFacts(locale);
 
   const personLd = {
     "@context": "https://schema.org",
@@ -271,6 +265,13 @@ export default async function AProposPage({
               ))}
             </div>
           </div>
+
+          <InfoBlock
+            id="about-facts"
+            tone="light"
+            title={facts.title}
+            items={facts.items}
+          />
         </div>
       </div>
     </>
