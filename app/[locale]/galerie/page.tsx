@@ -13,6 +13,9 @@ import { unstable_noStore as noStore } from "next/cache";
 import { setRequestLocale } from "next-intl/server";
 import GalleryMasonry from "@/components/sections/GalleryMasonry";
 import { getGalleryItems } from "@/lib/gallery";
+import { pageMetadata } from "@/lib/page-meta";
+import InfoBlock from "@/components/sections/InfoBlock";
+import { galleryStyles } from "@/lib/page-content";
 
 export async function generateMetadata({
   params,
@@ -21,30 +24,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const titles: Record<string, string> = {
-    fr: "Galerie — Tresses africaines & Locks Marrakech | Salon Mimi",
-    en: "Gallery — African braids & Locks Marrakech | Salon Mimi",
-    es: "Galería — Trenzas africanas y Locks Marrakech | Salon Mimi",
-  };
-
-  const descriptions: Record<string, string> = {
-    fr: "Découvrez les réalisations du Salon Mimi Marrakech : tresses africaines, knotless braids, box braids, locks, tresses rasta. Photos avant/après — Place Jamaa El Fna.",
-    en: "Explore Salon Mimi Marrakech's work: African braids, knotless braids, box braids, locks, rasta braids. Before/after photos — Jamaa El Fna Square.",
-    es: "Descubre las creaciones del Salon Mimi Marrakech: trenzas africanas, knotless braids, box braids, locks, trenzas rasta. Fotos antes/después — Plaza Jamaa El Fna.",
-  };
-
   return {
-    title: titles[locale] ?? titles.fr,
-    description: descriptions[locale] ?? descriptions.fr,
-    alternates: {
-      canonical: `https://mimi-coiffure.com/${locale}/galerie`,
-      languages: {
-        fr: "https://mimi-coiffure.com/fr/galerie",
-        en: "https://mimi-coiffure.com/en/galerie",
-        es: "https://mimi-coiffure.com/es/galerie",
-        "x-default": "https://mimi-coiffure.com/fr/galerie",
-      },
-    },
+    ...pageMetadata("galerie", locale, "/galerie"),
   };
 }
 
@@ -77,6 +58,7 @@ export default async function GaleriePage({
   const displayLocale = locale || "fr";
 
   const items = await getGalleryItems();
+  const styles = galleryStyles(displayLocale);
 
   return (
     <div className="bg-fond min-h-screen">
@@ -94,6 +76,13 @@ export default async function GaleriePage({
         </p>
       </div>
       <GalleryMasonry items={items} />
+      <InfoBlock
+        id="gallery-styles"
+        tone="dark"
+        title={styles.title}
+        intro={styles.intro}
+        items={styles.items}
+      />
     </div>
   );
 }

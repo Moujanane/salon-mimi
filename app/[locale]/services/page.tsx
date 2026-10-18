@@ -5,6 +5,7 @@ import { setRequestLocale } from "next-intl/server";
 import ServicesPageClient from "@/components/sections/ServicesPageClient";
 import { getSettings } from "@/lib/settings";
 import { SALON } from "@/lib/salon-info";
+import { pageMetadata } from "@/lib/page-meta";
 
 export async function generateMetadata({
   params,
@@ -13,30 +14,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
 
-  const titles: Record<string, string> = {
-    fr: "Tresses africaines Marrakech — Box braids, Knotless, Locks",
-    en: "African Braids Marrakech — Box braids, Knotless, Locks",
-    es: "Trenzas africanas Marrakech — Box braids, Knotless, Locks",
-  };
-
-  const descriptions: Record<string, string> = {
-    fr: "Tous les services du Salon Mimi : tresses africaines, knotless braids, box braids, locks, fulani braids. Tarifs dès 150 MAD. Réservation en ligne — Place Jamaa El Fna, Marrakech.",
-    en: "All Salon Mimi services: African braids, knotless braids, box braids, locks, fulani braids. From 150 MAD. Book online — Jamaa El Fna, Marrakech.",
-    es: "Todos los servicios de Salon Mimi: trenzas africanas, knotless braids, box braids, locks, fulani braids. Desde 150 MAD. Reserva online — Plaza Jamaa El Fna, Marrakech.",
-  };
-
   return {
-    title: titles[locale] ?? titles.fr,
-    description: descriptions[locale] ?? descriptions.fr,
-    alternates: {
-      canonical: `https://mimi-coiffure.com/${locale}/services`,
-      languages: {
-        fr: "https://mimi-coiffure.com/fr/services",
-        en: "https://mimi-coiffure.com/en/services",
-        es: "https://mimi-coiffure.com/es/services",
-        "x-default": "https://mimi-coiffure.com/fr/services",
-      },
-    },
+    ...pageMetadata("services", locale, "/services"),
   };
 }
 

@@ -39,8 +39,8 @@ export const services: Service[] = [
     durationFr: "3–4h",
     durationEn: "3–4h",
     durationEs: "3–4h",
-    priceMad: 550,
-    priceEur: 52,
+    priceMad: 500,
+    priceEur: 47,
     featured: true,
   },
   {

@@ -537,25 +537,6 @@
             <input id="s-whatsapp" type="tel" placeholder="ex: 212600000000" />
           </div>
         </div>
-        <div class="settings-section">
-          <div class="settings-title">💰 Prix vedettes (MAD)</div>
-          <div class="settings-field">
-            <label>Box Braids medium</label>
-            <input id="s-box" type="number" placeholder="ex: 250" />
-          </div>
-          <div class="settings-field">
-            <label>Knotless Braids</label>
-            <input id="s-knotless" type="number" placeholder="ex: 300" />
-          </div>
-          <div class="settings-field">
-            <label>Boho Braids</label>
-            <input id="s-boho" type="number" placeholder="ex: 280" />
-          </div>
-          <div class="settings-field">
-            <label>Cornrows</label>
-            <input id="s-cornrows" type="number" placeholder="ex: 150" />
-          </div>
-        </div>
         <button class="save-btn" id="save-btn" onclick="saveSettings()">
           Enregistrer les paramètres
         </button>
@@ -817,18 +798,6 @@
           .then(function (s) {
             if (s.whatsapp_number)
               document.getElementById("s-whatsapp").value = s.whatsapp_number;
-            if (s.price_featured_box_braids_medium)
-              document.getElementById("s-box").value =
-                s.price_featured_box_braids_medium;
-            if (s.price_featured_knotless_braids)
-              document.getElementById("s-knotless").value =
-                s.price_featured_knotless_braids;
-            if (s.price_featured_boho_braids)
-              document.getElementById("s-boho").value =
-                s.price_featured_boho_braids;
-            if (s.price_featured_cornrows)
-              document.getElementById("s-cornrows").value =
-                s.price_featured_cornrows;
           })
           .catch(function () {});
       }
@@ -845,13 +814,6 @@
           },
           body: JSON.stringify({
             whatsapp_number: document.getElementById("s-whatsapp").value,
-            price_featured_box_braids_medium:
-              document.getElementById("s-box").value,
-            price_featured_knotless_braids:
-              document.getElementById("s-knotless").value,
-            price_featured_boho_braids: document.getElementById("s-boho").value,
-            price_featured_cornrows:
-              document.getElementById("s-cornrows").value,
           }),
         })
           .then(function (res) {

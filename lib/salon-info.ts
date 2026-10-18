@@ -79,13 +79,55 @@ export const SALON = {
    * fraîcheur pour les moteurs génératifs.
    * À bumper à la main quand une de ces infos change. Format YYYY-MM-DD.
    */
-  lastReviewed: "2026-09-06",
+  lastReviewed: "2026-10-17",
 } as const;
 
 /** Fourchette de prix formatée pour le champ `priceRange` de schema.org. */
 export function priceRangeLabel(): string {
   const { min, max, currency } = SALON.priceRange;
   return `${min}–${max} ${currency}`;
+}
+
+/**
+ * Réponse FAQ « Quels sont les tarifs ? » (français), calculée depuis le
+ * catalogue pour ne jamais diverger des prix affichés ni du JSON-LD.
+ */
+export function faqTarifsAnswer(locale: string): string {
+  const all = [...services, ...packages];
+  const cheapest = all.reduce((a, b) => (b.priceMad < a.priceMad ? b : a));
+  const priciest = all.reduce((a, b) => (b.priceMad > a.priceMad ? b : a));
+  const price = (id: string) => {
+    const item = services.find((s) => s.id === id);
+    if (!item) throw new Error(`Service introuvable dans le catalogue : ${id}`);
+    return item.priceMad;
+  };
+  const box = price("box-braids-medium");
+  const knotless = price("knotless-braids");
+  const cornrows = price("cornrows");
+  const locks = price("depart-locks");
+
+  if (locale === "en") {
+    return (
+      `Prices range from ${cheapest.priceMad} MAD (${cheapest.nameEn}) to ${priciest.priceMad} MAD (${priciest.nameEn}). ` +
+      `Medium box braids are ${box} MAD, knotless braids ${knotless} MAD, full-head cornrows ${cornrows} MAD and starter locs ${locks} MAD.`
+    );
+  }
+  if (locale === "es") {
+    return (
+      `Los precios van de ${cheapest.priceMad} MAD (${cheapest.nameEs}) a ${priciest.priceMad} MAD (${priciest.nameEs}). ` +
+      `Las box braids medianas cuestan ${box} MAD, las knotless braids ${knotless} MAD, los cornrows de cabeza completa ${cornrows} MAD y el inicio de rastas ${locks} MAD.`
+    );
+  }
+  return (
+    `Les tarifs vont de ${cheapest.priceMad} MAD (${cheapest.nameFr}) à ${priciest.priceMad} MAD (${priciest.nameFr}). ` +
+    `Les box braids medium sont à ${box} MAD, les knotless braids à ${knotless} MAD, ` +
+    `les cornrows tête entière à ${cornrows} MAD, le départ de locks à ${locks} MAD.`
+  );
+}
+
+/** Version française, conservée pour les tests existants. */
+export function faqTarifsAnswerFr(): string {
+  return faqTarifsAnswer("fr");
 }
 
 /** Adresse postale schema.org (PostalAddress), sans le repère de quartier. */
@@ -111,15 +153,17 @@ const RESERVATION_URL = `${SALON.url}/fr/reservation`;
 /**
  * Catalogue d'offres schema.org (OfferCatalog) : une Offer par prestation, avec
  * un prix numérique exact. Permet à un agent de recherche de citer le prix
- * d'une coiffure précise ("les box braids medium coûtent 550 MAD").
+ * d'une coiffure précise ("les box braids medium coûtent 500 MAD").
  *
  * Source : `lib/services-data.ts` (14 services + 2 packages). Ces mêmes prix
- * alimentent déjà la page d'accueil et les carrousels, donc le catalogue reste
- * cohérent avec ce que le visiteur voit.
+ * alimentent la page d'accueil (cartes « Services vedettes »), les carrousels
+ * et la réponse FAQ « tarifs » (`faqTarifsAnswerFr`), donc tout reste cohérent.
  *
  * ATTENTION : les prix éditables par Mimi dans /admin/settings (clés
  * `settings.price_*`) sont un système SÉPARÉ et approximatif ("dès 150 MAD").
- * Si un prix change ici, le mettre à jour aussi dans `services-data.ts`.
+ * Ils ne pilotent PAS les cartes vedettes de l'accueil. Pour changer un prix
+ * précis, modifier `services-data.ts` (MAD et EUR, taux ~10,6) puis lancer
+ * `npm run test:unit`.
  *
  * Contenu en français uniquement : le reste du JSON-LD de layout.tsx l'est
  * aussi, et schema.org n'a pas de mécanisme i18n propre.
