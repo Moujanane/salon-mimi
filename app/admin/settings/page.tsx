@@ -1,7 +1,6 @@
 // app/admin/settings/page.tsx
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createServerClient } from "@supabase/ssr";
+import { getAuthUser } from "@/lib/adminAuth";
 import { getSettings } from "@/lib/settings";
 import SettingsForm from "@/components/admin/SettingsForm";
 
@@ -12,16 +11,8 @@ export const metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll() } },
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Administrateur uniquement : session valide ET e-mail dans ADMIN_EMAILS.
+  const user = await getAuthUser();
   if (!user) redirect("/admin/login");
 
   const settings = await getSettings();

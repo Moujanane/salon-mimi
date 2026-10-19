@@ -1,7 +1,7 @@
 // app/admin/galerie/page.tsx
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { createServerClient } from "@supabase/ssr";
+import { getAuthUser } from "@/lib/adminAuth";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import GalleryAdmin from "@/components/admin/GalleryAdmin";
 import type { GalleryItem } from "@/lib/gallery";
 
@@ -11,19 +11,11 @@ export const metadata = {
 };
 
 export default async function GalerieAdminPage() {
-  const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { getAll: () => cookieStore.getAll() } },
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Administrateur uniquement : session valide ET e-mail dans ADMIN_EMAILS.
+  const user = await getAuthUser();
   if (!user) redirect("/admin/login");
 
-  const { data: items } = await supabase
+  const { data: items } = await supabaseAdmin
     .from("gallery_items")
     .select(
       "id, type, url, poster_url, alt, sort_order, width, height, category",
