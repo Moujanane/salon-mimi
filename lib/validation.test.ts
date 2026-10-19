@@ -14,6 +14,8 @@ import {
   validateSettingValue,
   validateContactBody,
   validateSettingsUpdates,
+  validatePushSubscription,
+  validatePushEndpoint,
   isValidEmail,
 } from "./validation";
 
@@ -198,6 +200,11 @@ test("isValidEmail : refuse CRLF, espaces et longueur excessive", () => {
   assert.equal(isValidEmail("a@b"), false);
   assert.equal(isValidEmail("a b@c.com"), false);
   assert.equal(isValidEmail("a@c.com\nBcc: x@y.com"), false);
+  // nom d'affichage / guillemets / chevrons (relecture sécurité du 19/10/2026)
+  assert.equal(isValidEmail('"x"<y>@z.fr'), false);
+  assert.equal(isValidEmail("<y@z.fr>"), false);
+  assert.equal(isValidEmail("y@z.fr,other@z.fr"), false);
+  assert.equal(isValidEmail("y@@z.fr"), false);
   assert.equal(isValidEmail(`${"a".repeat(255)}@c.com`), false);
   assert.equal(isValidEmail(undefined), false);
 });
@@ -224,4 +231,72 @@ test("mise à jour de réglages : tout ou rien, clés inconnues ignorées", () =
   assert.equal(validateSettingsUpdates(null, allowed).ok, false);
   assert.equal(validateSettingsUpdates([1, 2], allowed).ok, false);
   assert.equal(validateSettingsUpdates("x", allowed).ok, false);
+});
+
+const CLES = { p256dh: "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM", auth: "tBHItJI5svbpez7KI4CCXg" };
+
+test("abonnement push : services de notification connus acceptés", () => {
+  for (const endpoint of [
+    "https://fcm.googleapis.com/fcm/send/abc123",
+    "https://updates.push.services.mozilla.com/wpush/v2/xyz",
+    "https://web.push.apple.com/QxyZ-123",
+    "https://wns2-par02p.notify.windows.com/w/?token=abc",
+    "https://android.googleapis.com/gcm/send/abc",
+  ]) {
+    assert.deepEqual(
+      validatePushSubscription({ endpoint, keys: CLES }),
+      { ok: true, value: { endpoint, keys: CLES } },
+      endpoint,
+    );
+  }
+});
+
+test("abonnement push : URL de destination dangereuse refusée (pas d'envoi vers n'importe où)", () => {
+  for (const endpoint of [
+    "http://fcm.googleapis.com/fcm/send/abc",
+    "https://evil.com/",
+    "https://fcm.googleapis.com.evil.com/x",
+    "https://evil.com/?https://fcm.googleapis.com/",
+    "https://user:pw@fcm.googleapis.com/x",
+    "https://fcm.googleapis.com:8443/x",
+    "javascript:alert(1)",
+    "https://127.0.0.1/x",
+    "https://169.254.169.254/latest/meta-data/",
+    "https://localhost/x",
+    "https://storage.googleapis.com/bucket/x",
+    "ftp://fcm.googleapis.com/x",
+    "",
+    42,
+    { a: 1 },
+    "https://fcm.googleapis.com/" + "a".repeat(2100),
+  ]) {
+    assert.equal(
+      validatePushEndpoint(endpoint).ok,
+      false,
+      `devrait être refusée : ${String(endpoint).slice(0, 60)}`,
+    );
+  }
+});
+
+test("abonnement push : clés de chiffrement obligatoires et bien formées", () => {
+  const endpoint = "https://fcm.googleapis.com/fcm/send/abc";
+  for (const keys of [
+    undefined,
+    null,
+    {},
+    { p256dh: CLES.p256dh },
+    { auth: CLES.auth },
+    { p256dh: "<script>", auth: CLES.auth },
+    { p256dh: CLES.p256dh, auth: "a b" },
+    { p256dh: "x".repeat(300), auth: CLES.auth },
+    { p256dh: 1, auth: 2 },
+  ]) {
+    assert.equal(
+      validatePushSubscription({ endpoint, keys }).ok,
+      false,
+      JSON.stringify(keys),
+    );
+  }
+  assert.equal(validatePushSubscription(null).ok, false);
+  assert.equal(validatePushSubscription("x").ok, false);
 });

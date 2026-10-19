@@ -16,8 +16,12 @@ export async function PATCH(
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  const body = await request.json();
-  const { statut } = body;
+  // JSON invalide : 400 (et non plus une erreur 500 non gérée).
+  const body = await request.json().catch(() => null);
+  const statut =
+    body && typeof body === "object" && !Array.isArray(body)
+      ? (body as Record<string, unknown>).statut
+      : undefined;
 
   if (typeof statut !== "string" || !VALID_STATUTS.includes(statut as never)) {
     return NextResponse.json({ error: "Statut invalide" }, { status: 400 });

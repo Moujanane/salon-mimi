@@ -12,12 +12,17 @@ type Err = { ok: false; error: string };
 
 const isAbsent = (v: unknown) => v === undefined || v === null || v === "";
 
-/** Adresse e-mail plausible, sans espace ni saut de ligne (pas d'injection d'en-tête). */
+/**
+ * Adresse e-mail plausible. Caractères ASCII courants uniquement : ni espace, ni
+ * saut de ligne (injection d'en-tête), ni guillemets ou chevrons (« "x"<y>@z.fr »
+ * pourrait être lu comme un nom d'affichage par le service d'envoi). Les adresses
+ * à caractères non latins sont refusées : choix assumé pour un salon local.
+ */
 export function isValidEmail(v: unknown): v is string {
   return (
     typeof v === "string" &&
     v.length <= 254 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)
+    /^[A-Za-z0-9._%+-]{1,64}@[A-Za-z0-9.-]{1,253}\.[A-Za-z]{2,}$/.test(v)
   );
 }
 
@@ -191,4 +196,84 @@ export function validateContactBody(body: unknown): Ok<ContactInput> | Err {
   if (!isValidEmail(email)) return { ok: false, error: "E-mail invalide" };
 
   return { ok: true, value: { prenom, nom, telephone, email, demande } };
+}
+
+// ---------- Abonnements aux notifications (Web Push) ----------
+//
+// Le serveur envoie ensuite une requête HTTP vers l'URL `endpoint` fournie. Sans
+// contrôle, quiconque connaît le PIN pourrait faire envoyer des requêtes du
+// serveur vers n'importe quelle adresse (y compris interne : SSRF). On n'accepte
+// donc que les services de notification des navigateurs (HTTPS, port standard).
+const PUSH_HOSTS = new Set([
+  "fcm.googleapis.com", // Chrome, Edge, Android, Samsung
+  "android.googleapis.com", // ancien format Chrome
+  "updates.push.services.mozilla.com", // Firefox
+  "web.push.apple.com", // Safari / iOS
+]);
+const PUSH_HOST_SUFFIXES = [
+  ".push.services.mozilla.com",
+  ".push.apple.com",
+  ".notify.windows.com", // Edge / Windows (WNS)
+];
+
+export function validatePushEndpoint(endpoint: unknown): Ok<string> | Err {
+  const invalid: Err = { ok: false, error: "Abonnement invalide" };
+  if (
+    typeof endpoint !== "string" ||
+    endpoint.length === 0 ||
+    endpoint.length > 2048
+  ) {
+    return invalid;
+  }
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    return invalid;
+  }
+  if (url.protocol !== "https:" || url.username || url.password || url.port) {
+    return invalid;
+  }
+  const host = url.hostname.toLowerCase();
+  const allowed =
+    PUSH_HOSTS.has(host) || PUSH_HOST_SUFFIXES.some((s) => host.endsWith(s));
+  return allowed ? { ok: true, value: endpoint } : invalid;
+}
+
+const PUSH_KEY_RE = /^[A-Za-z0-9_-]{16,200}={0,2}$/;
+
+export type PushSubscriptionInput = {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+};
+
+export function validatePushSubscription(
+  body: unknown,
+): Ok<PushSubscriptionInput> | Err {
+  const invalid: Err = { ok: false, error: "Abonnement invalide" };
+  if (typeof body !== "object" || body === null || Array.isArray(body)) {
+    return invalid;
+  }
+  const b = body as Record<string, unknown>;
+  const endpoint = validatePushEndpoint(b.endpoint);
+  if (!endpoint.ok) return invalid;
+
+  const keys = b.keys as Record<string, unknown> | null | undefined;
+  if (
+    typeof keys !== "object" ||
+    keys === null ||
+    typeof keys.p256dh !== "string" ||
+    typeof keys.auth !== "string" ||
+    !PUSH_KEY_RE.test(keys.p256dh) ||
+    !PUSH_KEY_RE.test(keys.auth)
+  ) {
+    return invalid;
+  }
+  return {
+    ok: true,
+    value: {
+      endpoint: endpoint.value,
+      keys: { p256dh: keys.p256dh, auth: keys.auth },
+    },
+  };
 }

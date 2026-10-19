@@ -89,5 +89,31 @@ commit;
 --   from pg_policies
 --   where schemaname = 'storage' and tablename = 'objects';
 --
--- c) Puis, depuis le dossier du projet :   npm run audit:security
+-- c) Ce script NE TOUCHE PAS aux comptes ni aux données déjà présentes. Pendant
+--    la période où les inscriptions étaient ouvertes, quelqu'un a pu créer un
+--    compte ou modifier des données. À relire À LA MAIN :
+--
+--   -- comptes existants : seuls les tiens doivent apparaître (supprimer les
+--   -- autres dans Authentication > Users)
+--   select id, email, created_at, email_confirmed_at, last_sign_in_at
+--   from auth.users order by created_at;
+--
+--   -- réglages : vérifier surtout whatsapp_number (utilisé dans les liens
+--   -- WhatsApp du site) et notification_email
+--   select key, value, updated_at from public.settings order by key;
+--
+--   -- abonnements aux notifications : seuls tes appareils doivent apparaître
+--   select id, left(endpoint, 60) as endpoint, created_at
+--   from public.push_subscriptions order by created_at;
+--
+--   -- réservations suspectes (texte étrange dans heure / nombre de personnes)
+--   select id, nom, heure_souhaitee, nombre_personnes, created_at
+--   from public.reservations
+--   where heure_souhaitee ~ '[<>"''=]' or nombre_personnes ~ '[<>"''=]';
+--
+-- d) DÉSACTIVER les inscriptions : Supabase > Authentication > Sign In / Providers
+--    (désactiver « Allow new users to sign up »). Le code de l'application ne
+--    peut pas le garantir ; npm run audit:security le vérifie.
+--
+-- e) Puis, depuis le dossier du projet :   npm run audit:security
 --    (sonde la base comme un visiteur anonyme, en lecture seule)

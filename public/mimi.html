@@ -714,7 +714,13 @@
             // filtré avant d'être inséré dans le HTML (id, heure, personnes,
             // statut), sinon un visiteur pourrait exécuter du code ici.
             var id = safeId(r.id);
-            var statut = STATUT_LABELS[r.statut] ? r.statut : "en_attente";
+            // hasOwnProperty : « constructor », « __proto__ »… ne sont pas des statuts.
+            var statut = Object.prototype.hasOwnProperty.call(
+              STATUT_LABELS,
+              r.statut,
+            )
+              ? r.statut
+              : "en_attente";
             return (
               '<div class="card-resa" id="card-' +
               id +

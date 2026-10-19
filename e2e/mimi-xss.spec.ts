@@ -28,6 +28,15 @@ const RESERVATIONS = [
     date_souhaitee: "2026-11-03",
     statut: `x"><img src=x onerror="window.__xss=6">`,
   },
+  {
+    // Noms hérités d'Object : ne doivent pas passer pour des statuts valides
+    id: "def-456",
+    nom: "Bea",
+    telephone: "+212 600 000 002",
+    service: "Cornrows",
+    date_souhaitee: "2026-11-04",
+    statut: "constructor",
+  },
 ];
 
 test.describe("Page de Mimi : données piégées affichées comme du texte", () => {
@@ -60,7 +69,7 @@ test.describe("Page de Mimi : données piégées affichées comme du texte", () 
       renderReservations();
     });
     const cartes = page.locator("#content .card-resa");
-    await expect(cartes).toHaveCount(2);
+    await expect(cartes).toHaveCount(3);
 
     // Laisse le temps à d'éventuels onerror/onload de se déclencher
     await page.waitForTimeout(700);
@@ -73,6 +82,11 @@ test.describe("Page de Mimi : données piégées affichées comme du texte", () 
     expect(texte).toContain('<img src=x onerror="window.__xss=2">');
     expect(texte).toContain('<img src=x onerror="window.__xss=4">');
     expect(texte).toContain('<img src=x onerror="window.__xss=5">');
+
+    // Statut hérité d'Object ("constructor") : affiché comme « En attente »
+    const badge = page.locator("#card-def-456 .badge");
+    await expect(badge).toHaveText("En attente");
+    await expect(badge).toHaveClass(/en_attente/);
 
     // Cliquer un bouton de statut ne doit pas exécuter l'id piégé
     await page.locator(".statut-btn:not([disabled])").first().click();

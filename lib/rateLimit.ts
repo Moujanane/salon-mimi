@@ -12,6 +12,8 @@
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 import type { NextRequest } from "next/server";
+import { incrementWithTtl } from "@/lib/attemptCounter";
+import { rateLimitIp } from "@/lib/clientIp";
 
 const url = process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -39,12 +41,23 @@ const redis = url && token ? new Redis({ url, token }) : null;
  * Fallback sur `x-forwarded-for` (premier segment, sans espace) si
  * `cf-connecting-ip` est absent — utile en dev local ou si le site change
  * un jour de CDN.
+ *
+ * ATTENTION : cet en-tête n'est digne de confiance que si le serveur d'origine
+ * n'est joignable QUE via Cloudflare. Si l'adresse Railway (*.up.railway.app)
+ * répond directement, un attaquant peut écrire lui-même `cf-connecting-ip` et
+ * changer de « visiteur » à chaque requête. Vérifié le 19/10/2026 : l'accès direct
+ * à l'IP d'origine répond 403 ; supprimer dans Railway (Settings > Networking)
+ * tout domaine *.up.railway.app inutilisé.
+ *
+ * Une IPv6 est ramenée à son préfixe /64 (lib/clientIp.ts).
  */
 export function getClientIp(req: NextRequest): string {
   const cfIp = req.headers.get("cf-connecting-ip");
-  if (cfIp) return cfIp;
+  if (cfIp) return rateLimitIp(cfIp.trim());
 
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  return rateLimitIp(
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown",
+  );
 }
 
 /**
@@ -100,8 +113,9 @@ export async function checkWindowLimit(
  * l'authentification ne doit jamais s'ouvrir quand sa protection tombe.
  * Exception : en développement local, sans Upstash, on retourne 0 (pas de limite).
  *
- * `SET NX EX` garantit qu'une expiration est toujours posée (une clé sans TTL
- * ne doit jamais rester en Redis indéfiniment).
+ * L'expiration est toujours posée, même si la clé est supprimée puis recréée par
+ * une requête simultanée (lib/attemptCounter.ts) : une clé sans TTL verrouillerait
+ * le PIN indéfiniment.
  */
 export async function consumeAttempt(
   key: string,
@@ -110,8 +124,7 @@ export async function consumeAttempt(
   if (!redis) return process.env.NODE_ENV === "production" ? null : 0;
 
   try {
-    await redis.set(key, 0, { ex: windowSeconds, nx: true });
-    return await redis.incr(key);
+    return await incrementWithTtl(redis, key, windowSeconds);
   } catch (err) {
     console.error("[rateLimit] consumeAttempt error, fail-closed:", err);
     return null;
