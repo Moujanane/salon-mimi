@@ -13,6 +13,24 @@ session, regarder ici d'abord. Mis à jour manuellement, peut dater un peu ;
 si doute, vérifier dans le code/en prod plutôt que de faire confiance
 aveuglément à une ligne vieille de plusieurs mois.
 
+**SÉCURITÉ — branche `fix/security-hardening` NON FUSIONNÉE, NON DÉPLOYÉE (§45)**
+
+Audit du 19 oct : 2 failles critiques en prod (inscriptions Supabase ouvertes +
+tout compte connecté = admin ; XSS stocké dans `public/mimi.html`). Le code est
+corrigé sur la branche (6 commits, tous tests verts). **Ordre obligatoire** :
+
+1. Railway : définir `ADMIN_EMAILS` (e-mail(s) de connexion admin) AVANT de
+   déployer, sinon l'admin est refusé à tout le monde (refus par défaut).
+2. Railway : vérifier `MIMI_PIN` ≥ 8 caractères (sinon le changer).
+3. Fusionner/pousser la branche, attendre le déploiement.
+4. Supabase SQL Editor : exécuter `supabase/migrations/2026-10-19-security-hardening.sql`
+   (APRÈS le code, sinon le tableau de bord admin casse), puis les requêtes de
+   contrôle en commentaire (comptes inconnus, réglages, abonnements push).
+5. Supabase > Authentication : désactiver les inscriptions.
+6. Railway > Settings > Networking : supprimer tout domaine `*.up.railway.app`
+   inutilisé (sinon `cf-connecting-ip` falsifiable).
+7. `npm run audit:security` doit afficher 10/10.
+
 **Côté Mouj, hors code (le plus structurant)**
 
 - Shooting photos (checklist `docs/checklist-shooting-photos-salon-mimi.html`)
@@ -77,6 +95,107 @@ aveuglément à une ligne vieille de plusieurs mois.
   description homepage (§40), fix JSON-LD AggregateRating + anomalie
   « 5/5 sur Google » (§42), fix title « mimi marrakech » (§42), cron SEO
   Railway + rotation OAuth (§37-38)
+
+---
+
+## 45. Session 19 oct 2026 — audit sécurité (5 points) et corrections, branche `fix/security-hardening`
+
+**État : code corrigé et testé sur la branche (6 commits), PAS fusionné, PAS déployé.**
+Étapes manuelles dans l'ordre : voir l'encadré SÉCURITÉ de l'index §0.
+Demande de Mouj : vérifier 5 oublis classiques des applis faites avec Claude
+(clés secrètes, règles de la base, accès aux données d'un autre compte,
+validation serveur, limite de demandes). Les noms de fichiers cités (`.env`,
+`rule.json`, `routes.py`, `forms.py`, `app.py`) sont ceux d'un exemple Python ;
+équivalents réels ici : `.gitignore`/`.env*`, `supabase-schema.sql`,
+`middleware.ts` + `lib/adminAuth.ts` + `app/admin/*` + `app/api/*`,
+validations dans les routes, `lib/rateLimit.ts` + `lib/mimiAuth.ts`.
+
+### Constats (sondes en lecture seule sur la prod, sans écrire de ligne)
+
+1. **Secrets : OK.** Rien dans le code, l'historique git ni le JS client (18
+   fichiers) ; `.env*` ignorés ; seule la clé `sb_publishable_` (publique) est servie.
+2. **Base : KO.** Inscriptions Supabase ouvertes (`disable_signup: False`) ;
+   `anon` pouvait INSÉRER des réservations (preuve : erreur 23502 = règle
+   passée, contrainte seule bloquante) et LIRE `settings` (dont `notification_email`) ;
+   tout compte « authenticated » lisait/modifiait réservations et réglages.
+   Lecture anonyme des réservations et de `push_subscriptions` déjà bloquée.
+3. **Accès : KO (critique).** `getAuthUser()` acceptait n'importe quel compte
+   connecté comme admin → avec les inscriptions ouvertes, n'importe qui pouvait
+   lire les clients et changer le numéro WhatsApp / e-mail de notification.
+   Routes admin sans session : 401 OK ; faux cookie `sb-…-auth-token` : redirigé OK.
+4. **Validation : KO.** `heure_souhaitee` et `nombre_personnes` jamais vérifiés
+   et insérés SANS échappement dans `public/mimi.html` (XSS stocké → vol du PIN
+   en mémoire). Réglages (WhatsApp, e-mail, prix) vérifiés seulement dans le navigateur.
+5. **Limite : KO.** 15 essais de PIN simultanés passaient TOUS (limite 3) :
+   « vérifier puis enregistrer l'échec » non atomique. Accès direct à l'origine
+   Railway testé : 403 (pas de contournement de Cloudflare par cette voie).
+
+### Corrections (commits `2b6c4a4`, `af984fb`, `610a921`, `173c005`, `cb35c8e`, `8a280c7`)
+
+- `lib/validation.ts` (+ tests) : date réelle AAAA-MM-JJ, heure HH:MM, libellé de
+  personnes sans balises, numéro WhatsApp normalisé, e-mail ASCII sans CRLF ni
+  nom d'affichage, prix entiers, contact, abonnements push (hôtes de services de
+  notification uniquement), réglages « tout ou rien ». Routes : reservations,
+  contact, settings, mimi-settings, push, `PATCH reservations/[id]` (JSON invalide → 400).
+- `public/mimi.html` : tous les champs échappés/filtrés (`escHtml` + `'`, `safeId`,
+  statut par `hasOwnProperty`). Test e2e `e2e/mimi-xss.spec.ts` avec API simulée
+  (rouge avant, vert après).
+- `lib/adminPolicy.ts` + `lib/adminAuth.ts` : admin = e-mail CONFIRMÉ dans
+  `ADMIN_EMAILS` ; variable absente = personne n'est admin. Dashboard et galerie
+  lisent avec la clé serveur après contrôle admin.
+- `lib/pinAuth.ts`, `lib/mimiAuth.ts`, `lib/rateLimit.ts`, `lib/attemptCounter.ts`,
+  `lib/clientIp.ts` : INCR atomique AVANT comparaison du PIN (5 essais / 30 min /
+  IP ; ≥ 6e refusé même avec le bon PIN) ; expiration toujours posée (une clé
+  sans TTL verrouillait Mimi pour toujours) ; compteur indisponible = refus 503
+  (fail-closed) ; IPv6 regroupée par /64.
+- `supabase/migrations/2026-10-19-security-hardening.sql` : supprime toute règle
+  non `service_role` sur reservations/settings/push_subscriptions + REVOKE ;
+  idempotent, sans perte de données. `supabase-schema.sql` mis à jour.
+- `next.config.mjs` : CSP limitée à l'origine Supabase du site (plus `*.supabase.co`),
+  `object-src 'none'`, `base-uri`, `form-action` ; `e2e/csp.spec.ts` (aucune violation).
+- `scripts/security-check.mjs` / `npm run audit:security` : sondes anonymes en
+  lecture seule (état prod avant correction : 7/10).
+- Dépendances : `npm audit fix` → 6 failles (4 high) → 2 ; restent `postcss`
+  imbriqué dans `next` + `next` (exigent Next 16, changement majeur) : risque
+  accepté (traitement de CSS piégé à la construction, pas en ligne).
+
+### Vérifications
+
+59 → 71 tests unitaires, 14 tests SEO, 250 tests Playwright (sans le test de
+réservation), types, lint, build. Test d'intégration local (faux Upstash + FAUSSE
+clé Supabase : aucune écriture possible) : rafale de 15 → 5 examinés / 10
+bloqués ; bon PIN refusé pendant le verrouillage ; 3 requêtes simultanées de la PWA
+non bloquées ; réservation légitime acceptée ; validations 400 ; IPv6 ; TTL rétabli.
+Deux relectures indépendantes (0 critique ; 2 élevés + moyens/faibles corrigés).
+
+### Non corrigé / à décider
+
+- Bouton de statut de `mimi.html` : appelle `PATCH /api/reservations/[id]` SANS
+  PIN alors que la route exige une session admin → échoue en silence (déjà le cas
+  sur `main`, pas une régression). Corriger demande une route protégée par PIN
+  (élargit la surface du PIN) : à décider.
+- `notification_email` (réglage) ne change PAS le destinataire : codé en dur
+  `mouj.business@gmail.com` dans `lib/sendNotificationEmail.ts` ; le réglage ne sert
+  que de condition. Trompeur mais sans risque.
+- E-mails envoyés depuis `noreply@atlas-swincar.com` (domaine de l'autre projet) :
+  réputation partagée ; le champ `nom` libre est repris dans l'e-mail client
+  (spam/hameçonnage limités par 5 requêtes/10 min/IP, fail-open si Upstash tombe).
+- Limite de PIN partagée par IP : un tiers sur la même IP (4G partagée) peut
+  bloquer Mimi 30 min (voulu : pas d'oracle).
+- CSP : `script-src 'unsafe-inline'` conservé (script en ligne de `mimi.html`).
+- Hors périmètre non vérifié : fournisseurs OAuth Supabase, fonctions RPC exposées,
+  règles `storage.objects` (requête de contrôle fournie dans le SQL).
+
+### Pièges rencontrés (leçons)
+
+- **Ne JAMAIS lancer `npm audit fix --omit=dev`** : il retire typescript/tsx de
+  `node_modules` ; la construction suivante (`next build`) réinstalle alors
+  TypeScript ET FIXE des versions exactes dans `package.json`. Restaurer avec
+  `git checkout -- package.json package-lock.json` puis `npm install`.
+- Python (installation python.org) n'a pas les certificats HTTPS sur ce Mac : les
+  scripts réseau utilisent `curl` ou Node (`fetch`).
+- Le garde `GateGuard` exige des « faits » avant chaque première modification d'un
+  fichier (appelants, schémas, consigne) et refuse `rm -rf` (utiliser la corbeille).
 
 ---
 

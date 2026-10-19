@@ -143,8 +143,11 @@ d'exécuter, tu assumes tes limites.
   explicitement (503) plutôt qu'autoriser avec une valeur connue.
 - Un rate limiter en mémoire process (`Map`) est remis à zéro à chaque
   redéploiement et n'est pas partagé entre instances — migrer vers un
-  store partagé si la protection doit être réelle. Concevoir tout rate
-  limiter en **fail-open** (une panne d'infra autorise, ne bloque pas).
+  store partagé si la protection doit être réelle. Un anti-spam de
+  formulaire se conçoit en **fail-open** (une panne d'infra autorise, ne
+  bloque pas) ; en revanche la limite d'essais d'une **authentification**
+  (PIN, mot de passe) se conçoit en **fail-closed** : l'accès ne doit jamais
+  s'ouvrir parce que sa protection est tombée.
 - Derrière un CDN/proxy, `x-forwarded-for` peut varier à chaque requête
   (edge différent) — utiliser le header spécifique au CDN, stable, avec
   `x-forwarded-for` en simple fallback. Prendre le `at(0)` pas `at(-1)`
@@ -163,7 +166,37 @@ d'exécuter, tu assumes tes limites.
   l'occasion ».
 - Suivre `npm audit` / CVE des dépendances ; avant un bump de sécurité,
   valider `tsc --noEmit`, build, tests unitaires et e2e, puis vérifier
-  manuellement en prod les parcours critiques impactés.
+  manuellement en prod les parcours critiques impactés. Ne jamais lancer
+  `npm audit fix --omit=dev` : il retire les outils de dev de `node_modules`
+  et le `next build` suivant réinstalle TypeScript en FIXANT des versions
+  exactes dans `package.json` (annuler avec `git checkout`, puis `npm install`).
+- Supabase (ou tout service avec comptes et règles RLS) : si les inscriptions
+  sont ouvertes et que le code traite « tout compte connecté » comme
+  administrateur, n'importe qui devient admin. Désactiver les inscriptions ET
+  limiter l'admin à une liste d'e-mails confirmés (refus par défaut si la liste
+  est absente). Le test à faire : sonder la VRAIE base comme un visiteur
+  anonyme avec la clé publique (lectures, insertion vide : l'erreur 23502
+  « champ obligatoire » prouve que la règle d'insertion a laissé passer, 42501
+  prouve le refus), sans jamais écrire de ligne.
+- Une règle RLS que le site n'utilise pas (accès uniquement via la clé serveur)
+  est du risque gratuit : la supprimer plutôt que la laisser « large ».
+- Limite d'essais : incrémenter le compteur AVANT de comparer le secret
+  (INCR atomique). « Vérifier puis enregistrer l'échec » laisse passer toute une
+  rafale de requêtes simultanées. Garantir aussi l'expiration (INCR puis
+  EXPIRE si la clé est neuve ou sans TTL), sinon une clé recréée par une course
+  verrouille l'accès pour toujours. Regrouper les IPv6 par /64. Tester la
+  rafale de bout en bout avec un faux Redis local.
+- Tout texte venant d'un visiteur qui finit dans du HTML (innerHTML d'une page
+  statique, e-mail) doit être échappé ; chaque champ, y compris les
+  « techniques » (id dans un onclick, classe CSS, heure). Valider aussi côté
+  serveur : la validation du navigateur se contourne par un appel direct. Une
+  liste blanche par `obj[cle]` laisse passer « constructor » : utiliser
+  `hasOwnProperty`.
+- Une URL fournie par un client et appelée ensuite par le serveur (abonnement
+  push, webhook) est une porte SSRF : n'accepter qu'une liste de domaines connus,
+  en https, sans port ni identifiants.
+- Restreindre la CSP au projet Supabase précis (pas `*.supabase.co`) : sinon un
+  code injecté peut envoyer des données vers le projet d'un attaquant.
 
 ## Process / méthodologie
 
@@ -284,3 +317,8 @@ d'exécuter, tu assumes tes limites.
   FAQPage, lastmod, connecteur GSC) issus de la session salon-mimi.
   Copie mise à jour dans salon-mimi uniquement : à répercuter dans
   atlas-swincar et Distrib-Eau (copies non retrouvées à la racine le 19/10).
+- 2026-10-19 (soir) : section Sécurité enrichie après l'audit sécurité de
+  salon-mimi (inscriptions ouvertes + « tout compte = admin », sonde anonyme de
+  la base, limite d'essais atomique, XSS stocké, SSRF push, CSP, piège
+  `npm audit fix --omit=dev`) ; règle « rate limiter fail-open » nuancée :
+  fail-closed pour une authentification.
