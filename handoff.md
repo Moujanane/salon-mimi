@@ -6,7 +6,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 0. Index des tâches ouvertes (mis à jour le 10 oct 2026)
+## 0. Index des tâches ouvertes (mis à jour le 19 oct 2026)
 
 Ce fichier grossit vite — avant de re-parcourir tout le handoff en début de
 session, regarder ici d'abord. Mis à jour manuellement, peut dater un peu ;
@@ -64,7 +64,12 @@ aveuglément à une ligne vieille de plusieurs mois.
   ex. Box braids dès 200) vs catalogue (Box braids 450-500) — incohérence
   visible ; bloque le tableau de prix HTML
 - Dev, besoin du nom complet de Mimi : `sameAs`/`url` sur le bloc Person
-- Dev, petit : resserrer l'intro de l'accueil (finit au mot 160, cible 150)
+- Dev : **intro de l'accueil resserrée et pages légales sur `pageMetadata()` —
+  FAIT le 19 oct (§44, complément)**
+- Dev, optionnel : phrases de l'intro sans verbe (« 16 prestations et
+  forfaits, de 150 à 950 MAD ») — budget de mots très serré (ES finit au mot
+  149 sur 150) ; toute modif du hero ou de l'intro doit repasser le test e2e
+  « se termine avant le mot 150 »
 
 **Pour mémoire — déjà réglé, ne pas rouvrir sans nouveau signal**
 
@@ -75,7 +80,7 @@ aveuglément à une ligne vieille de plusieurs mois.
 
 ---
 
-## 44. Session 16-19 oct 2026 — prix, audits SEO/GEO, FAQ, Open Graph, llms.txt (3 commits en prod)
+## 44. Session 16-19 oct 2026 — prix, audits SEO/GEO, FAQ, Open Graph, llms.txt (6 commits en prod)
 
 Commits poussés sur `main` et déployés (Railway ~1-2 min) :
 `ff5d054` (prix) → `7de2536` (titles/FAQ) → `086b77d` (OG, date, llms.txt, contenus).
@@ -152,10 +157,52 @@ https://mimi-coiffure.com.
   parallèle : les faire un par un.
 - Le middleware ignore les chemins contenant un point (`/llms.txt`,
   `/robots.txt` ne sont pas redirigés vers une langue).
-- Mentions légales et politique de confidentialité ont leur propre `<title>`
-  mais leur `og:title` hérite encore du layout (titre de l'accueil), car
-  `pageMetadata()` n'est pas appliqué à ces 2 pages (vérifié en prod le 19 oct).
-  Impact faible (aperçu de partage uniquement).
+- Un objet `openGraph`/`twitter`/`alternates` défini dans une page REMPLACE
+  celui du layout (pas de fusion profonde). C'est pourquoi `pageMetadata()`
+  recrée tout l'objet pour chaque page. Les pages légales héritaient encore de
+  l'accueil jusqu'au 19 oct (corrigé, voir complément ci-dessous).
+- Une modif du texte au-dessus de l'intro (hero) décale sa position : le test
+  e2e « se termine avant le mot 150 » le signalerait (marge ES : 1 mot).
+
+### Complément du 19 oct — petits points + clôture (3 commits de plus, en prod)
+
+Commits : `7b7df52` (docs), `8439295`, `4a90724`, poussés sur `main` le 19 oct
+(`086b77d..4a90724`), déployés ~2 min 30.
+
+- **Intro de l'accueil resserrée** (`lib/page-content.ts`, `homeIntro()`) :
+  87 → 68 mots (FR), 79 → 65 (EN), 85 → 69 (ES). Fin de l'intro aux mots
+  146 / 144 / 149 (FR/EN/ES), menu de navigation exclu (convention : contenu
+  principal `<main>`, comme les extracteurs de contenu ; un outil qui compte
+  aussi le menu la verrait quelques dizaines de mots plus tard). Mêmes faits
+  qu'avant. Le qualificatif « tête entière » / « full-head » / « cabeza
+  completa » est conservé : 300 MAD est le prix de « Cornrows full head »,
+  pas de tous les cornrows (remarque de relecture, test ajouté).
+- **Pages légales** (`mentions-legales`, `politique-de-confidentialite`) :
+  clés `mentionsLegales` / `confidentialite` dans `lib/page-meta.ts` (textes
+  strictement inchangés), `pageMetadata()` appliqué → hreflang 0 → 4 et
+  Open Graph/Twitter propres. Title, description, canonical, robots, nombre
+  de H1 identiques à la prod sur les 24 URLs avant déploiement.
+- Tests : intro 45-70 mots, qualificatif cornrows, test e2e de position
+  (≤ mot 150, `e2e/contenu-seo.spec.ts`), 31 tests unitaires, 196 tests
+  Playwright (sans le test de réservation) — tous verts en local ET contre
+  la prod après déploiement.
+- Relectures indépendantes (agent code-reviewer) faites sur chaque lot : 0
+  bloquant ; remarques traitées (qualificatif cornrows, convention de
+  comptage) ou notées ici (phrases de l'intro sans verbe, marge ES de 1 mot).
+- Données GSC arrêtées au 16 oct : **aucun effet des déploiements des 17-18
+  et 19 oct n'est encore mesurable**. Refaire le point des positions ~4-6
+  semaines après, en comparant au tableau du 16 oct (« salon mimi marrakech »
+  pos 1,8 ; « tresse marrakech » 3,0 ; « tresse africaine marrakech » 3,3 ;
+  « salon afro marrakech » 4,3 ; « coiffeur afro marrakech » 6,0).
+- Audit GEO refait le 19 oct (skill geo-optimizer) : 48 → 58/100, plafonné à
+  60 par 2 vetos encore ouverts (horaires contradictoires, robots IA bloqués
+  par Cloudflare). Détail du score : densité de preuves 17/35, structure
+  16/25, autorité 13/25, accès robots IA 12/15.
+- **Mémoire du projet** : leçons transférables ajoutées à
+  `MEMOIRE-GLOBALE.md` (copie salon-mimi uniquement ; à répercuter dans
+  atlas-swincar et Distrib-Eau, dont les copies n'ont pas été retrouvées à la
+  racine le 19 oct). Fiche mémoire utilisateur créée :
+  `~/.claude/projects/-Users-Mouj/memory/project_salon_mimi.md`.
 
 ---
 

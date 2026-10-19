@@ -229,6 +229,30 @@ d'exécuter, tu assumes tes limites.
 - Une dépendance montée en version majeure peut imposer des changements
   collatéraux non anticipés — vérifier réellement le build après la
   montée de version, pas seulement se fier au guide de migration.
+- Des tests de bout en bout lancés sur un serveur local avec le `.env`
+  réel écrivent dans la VRAIE base (et déclenchent emails/push). Exclure
+  les tests qui écrivent, ou utiliser une base de test. Le baseURL par
+  défaut pointant sur la prod a le même risque.
+- Une même donnée (ex. un prix) éditable en base ET écrite dans le code
+  finit par diverger, surtout si le balisage SEO et le texte visible
+  n'ont pas la même source. Une seule source de vérité + un test de
+  cohérence qui compare balisage, texte visible et catalogue.
+- Avant de supprimer un champ éditable par le client, chercher TOUS les
+  points d'édition : page admin, routes API, et pages HTML statiques
+  (`public/*.html`, souvent oubliées par un grep limité à `.ts/.tsx`).
+- Next.js `generateMetadata` : un objet `openGraph`, `twitter` ou
+  `alternates` défini dans une page REMPLACE celui du layout (pas de
+  fusion profonde). Sinon les pages héritent de celui de l'accueil. Le
+  générer par page depuis une fonction unique, et comparer canonical,
+  hreflang et robots avant/après sur chaque URL.
+- Un balisage JSON-LD `FAQPage` doit correspondre à du texte VISIBLE sur
+  la même page : ne l'injecter que là où la FAQ est affichée, et générer
+  balisage et texte depuis la même source.
+- `lastmod` du sitemap et `dateModified` = date réelle de révision du
+  contenu (une constante qu'on met à jour), jamais `new Date()` (date du
+  build), qui perd toute valeur de signal.
+- Le connecteur MCP Search Console échoue (SSL/timeout) quand plusieurs
+  appels sont lancés en parallèle — les enchaîner un par un.
 
 ## Documentation / handoff
 
@@ -255,3 +279,8 @@ d'exécuter, tu assumes tes limites.
 - 2026-10-01 : création, consolidation des bonnes pratiques issues des
   handoffs `atlas-swincar` et `salon-mimi`. Dupliqué dans les 3 projets
   actifs (atlas-swincar, salon-mimi, Distrib-Eau).
+- 2026-10-19 : ajout de 7 pièges transférables (tests e2e et vraie base,
+  source de vérité unique, champs éditables à supprimer, métadonnées Next.js,
+  FAQPage, lastmod, connecteur GSC) issus de la session salon-mimi.
+  Copie mise à jour dans salon-mimi uniquement : à répercuter dans
+  atlas-swincar et Distrib-Eau (copies non retrouvées à la racine le 19/10).
