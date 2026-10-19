@@ -1,6 +1,6 @@
 // app/admin/galerie/page.tsx
 import { redirect } from "next/navigation";
-import { getAuthUser } from "@/lib/adminAuth";
+import { getAdminStatus } from "@/lib/adminAuth";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import GalleryAdmin from "@/components/admin/GalleryAdmin";
 import type { GalleryItem } from "@/lib/gallery";
@@ -12,8 +12,8 @@ export const metadata = {
 
 export default async function GalerieAdminPage() {
   // Administrateur uniquement : session valide ET e-mail dans ADMIN_EMAILS.
-  const user = await getAuthUser();
-  if (!user) redirect("/admin/login");
+  const { user, decision } = await getAdminStatus();
+  if (!decision.admin) redirect(user ? "/admin/acces-refuse" : "/admin/login");
 
   const { data: items } = await supabaseAdmin
     .from("gallery_items")

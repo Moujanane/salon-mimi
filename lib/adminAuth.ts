@@ -14,9 +14,15 @@
 
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
-import { isAdminUser } from "@/lib/adminPolicy";
+import { adminDecision, maskEmail } from "@/lib/adminPolicy";
 
-export async function getAuthUser() {
+/**
+ * Session Supabase de la requête + décision d'accès administrateur avec la
+ * raison précise d'un refus (pour afficher une page d'explication à un compte
+ * connecté mais non autorisé). Journalise la raison côté serveur, avec l'adresse
+ * masquée et sans jamais écrire la liste des administrateurs.
+ */
+export async function getAdminStatus() {
   const cookieStore = await cookies();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,13 +32,18 @@ export async function getAuthUser() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return null;
 
-  if (!process.env.ADMIN_EMAILS) {
+  const decision = adminDecision(user, process.env.ADMIN_EMAILS);
+  if (user && !decision.admin) {
     console.error(
-      "[adminAuth] ADMIN_EMAILS n'est pas défini : aucun administrateur reconnu.",
+      `[adminAuth] accès admin refusé (${decision.reason}) : compte ${maskEmail(user.email)}, ${decision.configured} adresse(s) configurée(s) dans ADMIN_EMAILS.`,
     );
-    return null;
   }
-  return isAdminUser(user, process.env.ADMIN_EMAILS) ? user : null;
+  return { user, decision };
+}
+
+/** Utilisateur administrateur de la requête, ou null (jamais d'exception). */
+export async function getAuthUser() {
+  const { user, decision } = await getAdminStatus();
+  return decision.admin ? user : null;
 }

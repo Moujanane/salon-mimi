@@ -1,6 +1,6 @@
 // app/admin/dashboard/page.tsx
 import { redirect } from "next/navigation";
-import { getAuthUser } from "@/lib/adminAuth";
+import { getAdminStatus } from "@/lib/adminAuth";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import ReservationsTable from "@/components/admin/ReservationsTable";
 
@@ -10,9 +10,11 @@ export const metadata = {
 
 export default async function DashboardPage() {
   // Administrateur uniquement : session valide ET e-mail dans ADMIN_EMAILS.
-  const user = await getAuthUser();
-  if (!user) {
-    redirect("/admin/login");
+  const { user, decision } = await getAdminStatus();
+  if (!decision.admin) {
+    // Connecté mais non autorisé : page qui explique pourquoi (et non plus une
+    // redirection muette vers la connexion).
+    redirect(user ? "/admin/acces-refuse" : "/admin/login");
   }
 
   // Lecture avec la clé serveur, APRÈS la vérification administrateur. Elle ne

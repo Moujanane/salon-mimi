@@ -1,6 +1,6 @@
 // app/admin/settings/page.tsx
 import { redirect } from "next/navigation";
-import { getAuthUser } from "@/lib/adminAuth";
+import { getAdminStatus } from "@/lib/adminAuth";
 import { getSettings } from "@/lib/settings";
 import SettingsForm from "@/components/admin/SettingsForm";
 
@@ -12,8 +12,8 @@ export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   // Administrateur uniquement : session valide ET e-mail dans ADMIN_EMAILS.
-  const user = await getAuthUser();
-  if (!user) redirect("/admin/login");
+  const { user, decision } = await getAdminStatus();
+  if (!decision.admin) redirect(user ? "/admin/acces-refuse" : "/admin/login");
 
   const settings = await getSettings();
 

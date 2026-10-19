@@ -9,7 +9,12 @@
 
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseAdminEmails, isAdminUser } from "./adminPolicy";
+import {
+  parseAdminEmails,
+  isAdminUser,
+  adminDecision,
+  maskEmail,
+} from "./adminPolicy";
 
 const confirme = "2026-10-19T10:00:00Z";
 
@@ -104,4 +109,54 @@ test("isAdminUser : pas d'utilisateur ou pas d'e-mail refusé", () => {
     ),
     false,
   );
+});
+
+test("parseAdminEmails : tolère guillemets, point-virgule et espaces entre adresses", () => {
+  assert.deepEqual(parseAdminEmails('"a@x.com"'), ["a@x.com"]);
+  assert.deepEqual(parseAdminEmails("'a@x.com', 'b@y.com'"), ["a@x.com", "b@y.com"]);
+  assert.deepEqual(parseAdminEmails("a@x.com; b@y.com"), ["a@x.com", "b@y.com"]);
+  assert.deepEqual(parseAdminEmails("a@x.com b@y.com\nc@z.com"), [
+    "a@x.com",
+    "b@y.com",
+    "c@z.com",
+  ]);
+});
+
+test("une adresse entre guillemets dans la variable est reconnue (erreur courante dans Railway)", () => {
+  assert.equal(
+    isAdminUser({ email: "mimi@exemple.com", email_confirmed_at: confirme }, '"mimi@exemple.com"'),
+    true,
+  );
+});
+
+test("adminDecision : raison précise du refus", () => {
+  const u = { email: "mimi@exemple.com", email_confirmed_at: confirme };
+  assert.deepEqual(adminDecision(null, "mimi@exemple.com"), {
+    admin: false,
+    reason: "no-user",
+    configured: 1,
+  });
+  assert.deepEqual(adminDecision(u, undefined), {
+    admin: false,
+    reason: "no-list",
+    configured: 0,
+  });
+  assert.deepEqual(adminDecision({ ...u, email_confirmed_at: null }, "mimi@exemple.com"), {
+    admin: false,
+    reason: "not-confirmed",
+    configured: 1,
+  });
+  assert.deepEqual(adminDecision(u, "autre@exemple.com, encore@exemple.com"), {
+    admin: false,
+    reason: "not-in-list",
+    configured: 2,
+  });
+  assert.deepEqual(adminDecision(u, "MIMI@exemple.com"), { admin: true });
+});
+
+test("maskEmail : n'expose jamais l'adresse complète dans les journaux", () => {
+  assert.equal(maskEmail("mimi@exemple.com"), "mi***@exemple.com");
+  assert.equal(maskEmail("a@x.com"), "a***@x.com");
+  assert.equal(maskEmail(null), "(aucun e-mail)");
+  assert.equal(maskEmail("pas-un-email"), "***");
 });
