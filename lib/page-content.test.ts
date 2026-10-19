@@ -43,7 +43,9 @@ test("introduction de l'accueil : réponse directe avec prix du catalogue (3 lan
     );
     assert.doesNotMatch(text, /\b550\b/, l);
     const words = text.split(/\s+/).length;
-    assert.ok(words >= 60 && words <= 130, `${l} : ${words} mots`);
+    // ~80 mots de hero précèdent l'intro : <= 70 mots pour que la réponse
+    // directe se termine avant le mot 150 de la page (critère GEO).
+    assert.ok(words >= 45 && words <= 70, `${l} : ${words} mots`);
   }
 });
 

@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
+import { pageMetadata } from "@/lib/page-meta";
 
 export const revalidate = 86400;
-
-const BASE_URL = "https://mimi-coiffure.com";
 
 export async function generateMetadata({
   params,
@@ -11,23 +10,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const titles: Record<string, string> = {
-    fr: "Politique de confidentialité — Salon Mimi Marrakech",
-    en: "Privacy Policy — Salon Mimi Marrakech",
-    es: "Política de privacidad — Salon Mimi Marrakech",
-  };
-  const descriptions: Record<string, string> = {
-    fr: "Politique de confidentialité du Salon Mimi Marrakech. Données collectées, finalité, durée de conservation, vos droits selon la loi marocaine 09-08.",
-    en: "Privacy policy for Salon Mimi Marrakech. Data collected, purpose, retention period and your rights under Moroccan law 09-08.",
-    es: "Política de privacidad del Salon Mimi Marrakech. Datos recopilados, finalidad, conservación y sus derechos según la ley marroquí 09-08.",
-  };
-  return {
-    title: titles[locale] ?? titles.fr,
-    description: descriptions[locale] ?? descriptions.fr,
-    alternates: {
-      canonical: `${BASE_URL}/${locale}/politique-de-confidentialite`,
-    },
-  };
+  return pageMetadata(
+    "confidentialite",
+    locale,
+    "/politique-de-confidentialite",
+  );
 }
 
 export default async function PolitiqueConfidentialitePage({

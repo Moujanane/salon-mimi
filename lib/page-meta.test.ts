@@ -18,12 +18,14 @@ import {
 const LOCALES: MetaLocale[] = ["fr", "en", "es"];
 const PAGES = Object.keys(PAGE_META) as PageKey[];
 
-test("les 6 pages principales sont définies dans les 3 langues", () => {
+test("les 8 pages (6 principales + 2 légales) sont définies dans les 3 langues", () => {
   assert.deepEqual([...PAGES].sort(), [
     "aPropos",
+    "confidentialite",
     "contact",
     "galerie",
     "home",
+    "mentionsLegales",
     "reservation",
     "services",
   ]);
@@ -104,6 +106,8 @@ const PATHS: Record<PageKey, string> = {
   aPropos: "/a-propos",
   galerie: "/galerie",
   contact: "/contact",
+  mentionsLegales: "/mentions-legales",
+  confidentialite: "/politique-de-confidentialite",
 };
 
 test("pageMetadata : titre/description de partage propres à chaque page", () => {
@@ -119,7 +123,10 @@ test("pageMetadata : titre/description de partage propres à chaque page", () =>
       assert.equal(m.openGraph?.url, url, `${page}/${l} og:url`);
       assert.equal(m.twitter?.title, m.title, `${page}/${l} twitter:title`);
       const langs = m.alternates?.languages as Record<string, string>;
-      assert.equal(langs["x-default"], `https://mimi-coiffure.com/fr${PATHS[page]}`);
+      assert.equal(
+        langs["x-default"],
+        `https://mimi-coiffure.com/fr${PATHS[page]}`,
+      );
       assert.equal(Object.keys(langs).length, 4);
     }
   }

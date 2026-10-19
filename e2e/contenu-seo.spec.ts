@@ -78,3 +78,28 @@ test.describe("Structure : un seul H1 par page", () => {
     });
   }
 });
+
+test.describe("Réponse directe dans les 150 premiers mots (critère GEO)", () => {
+  for (const locale of ["fr", "en", "es"]) {
+    test(`l'introduction de l'accueil se termine avant le mot 150 (${locale})`, async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}`);
+      const intro = page.locator("section", {
+        has: page.locator("#intro-title"),
+      });
+      const paragraphe = (await intro.locator("p").first().innerText())
+        .replace(/\s+/g, " ")
+        .trim();
+      const principal = (await page.locator("main").innerText())
+        .replace(/\s+/g, " ")
+        .trim();
+      const debut = principal.indexOf(paragraphe);
+      expect(debut).toBeGreaterThan(-1);
+      const motsJusqueFin = principal
+        .slice(0, debut + paragraphe.length)
+        .split(" ").length;
+      expect(motsJusqueFin).toBeLessThanOrEqual(150);
+    });
+  }
+});
