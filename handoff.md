@@ -42,8 +42,29 @@ aveuglément à une ligne vieille de plusieurs mois.
 
 **À mesurer, pas à coder**
 
-- Rapport du ~17-20 oct : vérifier si le fix title « mimi marrakech » (§42)
-  convertit enfin en clics
+- Rapport du ~17-20 oct (fix title « mimi marrakech » §42) : **mesuré le
+  19 oct, non concluant** — la requête n'a plus que 1-3 impressions/semaine
+  et 0 clic depuis fin juillet (§44). Ne pas raccourcir le title de l'accueil
+  tant que ce n'est pas tranché ; refaire le point ~4-6 sem. après le
+  déploiement du 18 oct (données GSC arrêtées au 16 oct).
+
+**Ouvert après la session du 17-18 oct (§44)**
+
+- Mouj : confirmer les VRAIS horaires (JSON-LD Lun-Sam 9h-19h vs texte
+  visible « tous les jours 9h-23h »), puis corriger le côté faux
+- Mouj : Cloudflare renvoie 403 à ClaudeBot / anthropic-ai / Bytespider /
+  cohere-ai / Amazonbot alors que robots.txt les autorise
+- Mouj : GBP produits (ajoutés en juin) avec d'anciens prix (Cornrows 370,
+  Boho 420, Knotless 360, Box braids 550) → aligner sur 500/700/650/300
+- Mouj : vérifier s'il reste 2 fausses réservations « Test Playwright API »
+  (+212600000001) dans l'admin, créées par un test e2e lancé en local
+- Search Console : demander l'indexation de /fr, /fr/services, /fr/a-propos
+  et renvoyer le sitemap
+- Décision : prix « dès » de la page Services (système `settings.price_*`,
+  ex. Box braids dès 200) vs catalogue (Box braids 450-500) — incohérence
+  visible ; bloque le tableau de prix HTML
+- Dev, besoin du nom complet de Mimi : `sameAs`/`url` sur le bloc Person
+- Dev, petit : resserrer l'intro de l'accueil (finit au mot 160, cible 150)
 
 **Pour mémoire — déjà réglé, ne pas rouvrir sans nouveau signal**
 
@@ -51,6 +72,90 @@ aveuglément à une ligne vieille de plusieurs mois.
   description homepage (§40), fix JSON-LD AggregateRating + anomalie
   « 5/5 sur Google » (§42), fix title « mimi marrakech » (§42), cron SEO
   Railway + rotation OAuth (§37-38)
+
+---
+
+## 44. Session 16-19 oct 2026 — prix, audits SEO/GEO, FAQ, Open Graph, llms.txt (3 commits en prod)
+
+Commits poussés sur `main` et déployés (Railway ~1-2 min) :
+`ff5d054` (prix) → `7de2536` (titles/FAQ) → `086b77d` (OG, date, llms.txt, contenus).
+Vérifié en prod après chaque déploiement : 190 tests Playwright passent contre
+https://mimi-coiffure.com.
+
+### Prix — une seule source de vérité (`lib/services-data.ts`)
+
+- Bug : l'accueil affichait 150/150/180/180 MAD (valeurs saisies en base via
+  `public/mimi.html` « Prix vedettes » et `/admin/settings`, exemples
+  « ex: 150 » trompeurs) alors que JSON-LD/FAQ annonçaient 550/700/650/300 et
+  les euros correspondaient à 550 → incohérence 2 sources.
+- Prix confirmés par Mouj le 17 oct : **box braids medium 500 MAD (47 €)**,
+  knotless 700, boho 650, cornrows 300. (Le 550 d'avant était faux.)
+- L'accueil lit maintenant `services-data.ts` ; les 4 clés `price_featured_*`
+  sont supprimées (type/défauts `lib/settings.ts`, `SettingsForm`, routes
+  `api/settings` et `api/mimi-settings`, section de `public/mimi.html`).
+  **Conséquence : Mimi ne peut plus changer ces 4 prix seule** (il faut
+  modifier le code, MAD ET EUR au taux ~10,6, puis `npm run test:unit`).
+  Les lignes `price_featured_*` restent orphelines en base (sans effet).
+- Erreur FAQ corrigée : « mini braids enfant à 150 » (c'est 200).
+- Les prix « dès » (`settings.price_*`, pages Services/Réservation) sont un
+  système SÉPARÉ, non touché. Incohérence visible (Box braids dès 200 vs
+  catalogue 450-500) → à trancher avant d'ajouter un tableau de prix.
+
+### SEO on-page
+
+- `lib/page-meta.ts` : source unique titles/descriptions des 6 pages
+  (home, services, reservation, aPropos, galerie, contact) + `pageMetadata()`
+  (canonical, hreflang, Open Graph, Twitter propres à chaque page ; avant,
+  tout héritait de l'OG de l'accueil). Tests : title ≤ 60, description ≤ 160.
+  **Exception volontaire : title de l'accueil inchangé (64 car.)**, fix §42 en
+  cours de mesure. Title ES de Contact raccourci (64→58).
+- FAQ : `lib/faq.ts` (FR/EN/ES) → section visible `FaqSection` + JSON-LD
+  FAQPage **injecté uniquement sur l'accueil** (avant : sur toutes les pages
+  via le layout, sans FAQ visible). Réponse tarifs calculée depuis le catalogue
+  (`faqTarifsAnswer(locale)` dans `salon-info.ts`).
+- `SALON.lastReviewed` = 2026-10-17 : alimente `dateModified` (JSON-LD), la
+  `lastmod` du sitemap (avant : date du build) et la balise `<time>` visible
+  sous la FAQ. **À bumper à la main quand prix/infos changent.**
+- `/llms.txt` généré (`lib/llms.ts` + `app/llms.txt/route.ts`), sans horaires.
+- Contenus calculés depuis le catalogue (`lib/page-content.ts`, composant
+  `InfoBlock`) : intro accueil, « L'essentiel » (à propos), « Informations
+  pratiques » (contact), styles + liens de réservation (galerie).
+
+### Audits (PDF audit-site : scratchpad de session, non conservé)
+
+- Audit-site : 80/100 (technique 36/40, contenu 17/25, mots-clés 14/20,
+  présence 8/10, UX 5/5). Concurrents (Mouna 813 avis, Mpat 160, Hair Mermaid 24) : fiches Google Maps sans site retrouvé, comparaison de sites impossible
+  (WebSearch limité aux résultats US).
+- Audit GEO (skill geo-optimizer, installé globalement) : 48 → 58/100. Plafond
+  60 tant que 2 vetos : horaires contradictoires + robots IA bloqués (403
+  Cloudflare sur ClaudeBot, anthropic-ai, Bytespider, cohere-ai, Amazonbot ;
+  test par user-agent, règle exacte à confirmer dans le tableau Cloudflare).
+
+### Mesure GSC du 19 oct (données jusqu'au 16 oct, avant les déploiements)
+
+- « mimi marrakech » : 230 impressions/90 j mais seulement 1-3/semaine depuis
+  mi-sept, 0 clic depuis fin juillet → fix title du 10 oct non évaluable.
+- Génériques (sans « mimi ») : ~100 impr./semaine en août → ~64 en octobre,
+  position 5-7 stable ; marque : ~12-20/semaine, bien classée (pos 2-4).
+- Cause n°1 du classement faible inchangée : avis (13-22 vs 160-813).
+
+### Pièges rencontrés
+
+- **Les tests Playwright lancés avec `PLAYWRIGHT_BASE_URL=http://localhost`
+  utilisent `.env.local` (vraie base Supabase)** : le test « enregistre la
+  réservation via l'API » crée une vraie réservation (+ push/email à Mimi).
+  Toujours lancer avec `--grep-invert "enregistre la réservation"`. Par défaut
+  le baseURL est la prod : même risque.
+- `npm run test:unit` = `node --import tsx --test "lib/*.test.ts"` (tests de
+  cohérence prix/méta/FAQ/sitemap/llms/contenus).
+- Le connecteur GSC (MCP) échoue (SSL/timeout) si on lance plusieurs appels en
+  parallèle : les faire un par un.
+- Le middleware ignore les chemins contenant un point (`/llms.txt`,
+  `/robots.txt` ne sont pas redirigés vers une langue).
+- Mentions légales et politique de confidentialité ont leur propre `<title>`
+  mais leur `og:title` hérite encore du layout (titre de l'accueil), car
+  `pageMetadata()` n'est pas appliqué à ces 2 pages (vérifié en prod le 19 oct).
+  Impact faible (aperçu de partage uniquement).
 
 ---
 
@@ -3018,10 +3123,12 @@ app/[locale]/contact/page.tsx        — import + intégration ContactForm
 - Cause : `globals.css` applique `text-white` sur le `body`, les inputs héritaient cette couleur
 - Fix : `bg-white` + `ring-offset-white` ajoutés sur les 3 inputs (WhatsApp, email, prix) dans `SettingsForm.tsx`
 
-### SEO — canonicals avec slash final
+### SEO — canonicals avec slash final (OBSOLÈTE, voir §23 et commit `263dd8d`)
+
+> ⚠️ Cette section est OBSOLÈTE. Le slash final a ensuite été retiré (`263dd8d`) : Next.js a `trailingSlash: false` et redirige `/.../` vers `/...` en 308. Canonicals, hreflang et sitemap sont SANS slash final. Ne pas réintroduire de slash final. Vérifié le 16 oct 2026 : le code et le site en ligne sont cohérents.
 
 - Problème : Google signalait `mimi-coiffure.com/fr` comme doublon car le canonical déclarait `/fr` sans slash mais Next.js sert `/fr/` avec slash
-- Fix : slash final ajouté sur tous les canonicals de toutes les pages publiques (8 fichiers)
+- ~~Fix : slash final ajouté sur tous les canonicals de toutes les pages publiques (8 fichiers)~~ OBSOLÈTE, annulé par `263dd8d`
 - Fix appliqué aussi sur les hreflang dans `app/[locale]/layout.tsx`
 - **Action Search Console** : cliquer "Valider la correction" sur les 2 lignes d'erreur (redirection + doublon canonique)
 
