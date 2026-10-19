@@ -17,12 +17,12 @@ aveuglément à une ligne vieille de plusieurs mois.
 
 Historique de l'audit ci-dessous (état AVANT les étapes manuelles) :
 
-Audit du 19 oct : 2 failles critiques en prod (inscriptions Supabase ouvertes +
+Audit du 19 oct (état AVANT les étapes manuelles) : 2 failles critiques en prod (inscriptions Supabase ouvertes +
 tout compte connecté = admin ; XSS stocké dans `public/mimi.html`). Le code corrigé
 est en production (250 tests Playwright verts contre la prod après déploiement).
 Mais la BASE n'est pas encore durcie : `npm run audit:security` affiche encore
 **7/10** (3 échecs = inscriptions ouvertes, `settings` lisible, insertion anonyme)
-tant que les étapes 4 et 5 ne sont pas faites. Étapes :
+tant que les étapes 4 et 5 ne sont pas faites. (Étapes 1 à 5 et 7 faites depuis, voir ci-dessus ; seule la 6 reste.) Étapes :
 
 1. ~~Railway : définir `ADMIN_EMAILS`~~ FAIT (confirmé par Mouj le 19 oct ; non
    vérifiable depuis le code : si l'admin est refusé après connexion, contrôler
@@ -106,8 +106,9 @@ tant que les étapes 4 et 5 ne sont pas faites. Étapes :
 
 ## 45. Session 19 oct 2026 — audit sécurité (5 points) et corrections, branche `fix/security-hardening`
 
-**État : code fusionné dans `main` et DÉPLOYÉ le 19 oct (`fa6870e`, 7 commits). Base de données PAS encore durcie (SQL à exécuter) et inscriptions Supabase encore ouvertes : `npm run audit:security` = 7/10 en prod.**
-Étapes manuelles dans l'ordre : voir l'encadré SÉCURITÉ de l'index §0.
+**État : TERMINÉ le 19 oct. Code déployé (`fa6870e`, puis correctif admin `4492d33`), SQL exécuté, inscriptions fermées, `ADMIN_EMAILS` créé dans Railway, connexion admin testée OK, `MIMI_PIN` ≥ 8 : `npm run audit:security` = 10/10 en prod. Seule étape 6 (domaine `*.up.railway.app`) à vérifier par Mouj.**
+
+Correctif admin (`4492d33`) : après le déploiement, Mouj ne pouvait plus se connecter (retour muet sur /login) car `ADMIN_EMAILS` n'existait pas encore sur Railway. Ajouts : `lib/adminPolicy.ts` (`parseAdminEmails` tolérant : espaces, virgules, point-virgules, guillemets ; `adminDecision` avec raison du refus ; `maskEmail`), `getAdminStatus()` dans `lib/adminAuth.ts` (journalise la raison, e-mail masqué, jamais la liste), page `/admin/acces-refuse` qui explique le refus à un compte connecté mais non autorisé, test `e2e/acces-admin.spec.ts`. Leçon : une variable absente doit produire un message clair, pas une redirection silencieuse. Vérification prod après déploiement : 25 tests ciblés verts à froid ; une grosse série de 270 tests d'affilée contre la prod fait expirer quelques pages (charge, pas régression) : relancer par petits lots.
 Demande de Mouj : vérifier 5 oublis classiques des applis faites avec Claude
 (clés secrètes, règles de la base, accès aux données d'un autre compte,
 validation serveur, limite de demandes). Les noms de fichiers cités (`.env`,
@@ -160,7 +161,7 @@ validations dans les routes, `lib/rateLimit.ts` + `lib/mimiAuth.ts`.
 - `next.config.mjs` : CSP limitée à l'origine Supabase du site (plus `*.supabase.co`),
   `object-src 'none'`, `base-uri`, `form-action` ; `e2e/csp.spec.ts` (aucune violation).
 - `scripts/security-check.mjs` / `npm run audit:security` : sondes anonymes en
-  lecture seule (état prod avant correction : 7/10).
+  lecture seule (état prod avant correction : 7/10 ; après : 10/10).
 - Dépendances : `npm audit fix` → 6 failles (4 high) → 2 ; restent `postcss`
   imbriqué dans `next` + `next` (exigent Next 16, changement majeur) : risque
   accepté (traitement de CSS piégé à la construction, pas en ligne).
