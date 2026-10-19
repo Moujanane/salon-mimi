@@ -89,47 +89,32 @@ export async function checkWindowLimit(
 }
 
 /**
- * Compteur d'échecs réinitialisable sur succès : "au plus `max` échecs
- * consécutifs par `windowSeconds` secondes, remis à zéro dès qu'un essai
- * réussit". Utilisé pour le PIN de la PWA Mimi (lib/mimiAuth.ts).
+ * Consomme UN essai de la fenêtre `windowSeconds` pour `key`, de façon
+ * ATOMIQUE (INCR Redis), et retourne le nombre d'essais consommés (>= 1).
+ * Utilisé pour le PIN de la PWA Mimi (lib/mimiAuth.ts), AVANT de comparer le
+ * PIN : c'est ce qui empêche une rafale de requêtes simultanées de dépasser la
+ * limite (l'ancien « vérifier puis enregistrer l'échec » ne le garantissait pas).
  *
- * Retourne `false` si la limite est dépassée (appel bloqué), `true` sinon.
- * N'incrémente PAS automatiquement — appeler `recordFailure` séparément
- * après un échec constaté par l'appelant.
+ * Retourne `null` si le compteur est indisponible : l'appelant doit alors
+ * REFUSER (fail-closed). Contrairement à l'anti-spam des formulaires (fail-open),
+ * l'authentification ne doit jamais s'ouvrir quand sa protection tombe.
+ * Exception : en développement local, sans Upstash, on retourne 0 (pas de limite).
+ *
+ * `SET NX EX` garantit qu'une expiration est toujours posée (une clé sans TTL
+ * ne doit jamais rester en Redis indéfiniment).
  */
-export async function isFailureLimitExceeded(
-  key: string,
-  max: number,
-): Promise<boolean> {
-  if (!redis) return false;
-
-  try {
-    const current = await redis.get<number>(key);
-    return (current ?? 0) >= max;
-  } catch (err) {
-    console.error("[rateLimit] isFailureLimitExceeded error, fail-open:", err);
-    return false;
-  }
-}
-
-/**
- * Enregistre un échec : incrémente le compteur, pose une expiration de
- * `windowSeconds` uniquement si c'est le premier échec de la fenêtre (une
- * clé sans TTL ne doit jamais rester en Redis indéfiniment).
- */
-export async function recordFailure(
+export async function consumeAttempt(
   key: string,
   windowSeconds: number,
-): Promise<void> {
-  if (!redis) return;
+): Promise<number | null> {
+  if (!redis) return process.env.NODE_ENV === "production" ? null : 0;
 
   try {
-    const count = await redis.incr(key);
-    if (count === 1) {
-      await redis.expire(key, windowSeconds);
-    }
+    await redis.set(key, 0, { ex: windowSeconds, nx: true });
+    return await redis.incr(key);
   } catch (err) {
-    console.error("[rateLimit] recordFailure error (ignoré, fail-open):", err);
+    console.error("[rateLimit] consumeAttempt error, fail-closed:", err);
+    return null;
   }
 }
 
