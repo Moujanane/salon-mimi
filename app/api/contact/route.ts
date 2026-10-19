@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { checkWindowLimit, getClientIp } from "@/lib/rateLimit";
+import { validateContactBody } from "@/lib/validation";
 
 function esc(str: string | undefined): string {
   if (!str) return "";
@@ -20,13 +21,13 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => null);
-  if (!body)
-    return NextResponse.json({ error: "Données invalides" }, { status: 400 });
-
-  const { prenom, nom, telephone, email, demande } = body;
-  if (!prenom || !nom || !telephone || !email || !demande) {
-    return NextResponse.json({ error: "Champs manquants" }, { status: 400 });
+  // Types, longueurs et formats vérifiés côté serveur (lib/validation.ts) :
+  // le navigateur peut être contourné par un appel direct à l'API.
+  const parsed = validateContactBody(body);
+  if (!parsed.ok) {
+    return NextResponse.json({ error: parsed.error }, { status: 400 });
   }
+  const { prenom, nom, telephone, email, demande } = parsed.value;
 
   if (!process.env.RESEND_API_KEY) {
     return NextResponse.json(

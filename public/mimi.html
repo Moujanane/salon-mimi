@@ -709,22 +709,27 @@
         }
         content.innerHTML = filtered
           .map(function (r) {
-            var tel = r.telephone.replace(/[^0-9]/g, "");
+            var tel = String(r.telephone || "").replace(/[^0-9]/g, "");
+            // Ces données sont saisies par des visiteurs : tout est échappé ou
+            // filtré avant d'être inséré dans le HTML (id, heure, personnes,
+            // statut), sinon un visiteur pourrait exécuter du code ici.
+            var id = safeId(r.id);
+            var statut = STATUT_LABELS[r.statut] ? r.statut : "en_attente";
             return (
               '<div class="card-resa" id="card-' +
-              r.id +
+              id +
               '">' +
               '<div class="card-date"><span class="card-date-text">' +
               formatDate(r.date_souhaitee) +
               (r.heure_souhaitee
                 ? '<span class="card-date-heure"> à ' +
-                  r.heure_souhaitee +
+                  escHtml(r.heure_souhaitee) +
                   "</span>"
                 : "") +
               '</span><span class="badge ' +
-              r.statut +
+              statut +
               '">' +
-              STATUT_LABELS[r.statut] +
+              STATUT_LABELS[statut] +
               "</span></div>" +
               '<div class="card-body"><div class="card-row"><div class="card-info">' +
               '<div class="card-nom">' +
@@ -735,7 +740,7 @@
               "</div>" +
               (r.nombre_personnes
                 ? '<div class="card-personnes">' +
-                  r.nombre_personnes +
+                  escHtml(r.nombre_personnes) +
                   " personne(s)</div>"
                 : "") +
               (r.message
@@ -754,15 +759,11 @@
                 .map(function (s) {
                   return (
                     '<button class="statut-btn' +
-                    (r.statut === s ? " active" : "") +
+                    (statut === s ? " active" : "") +
                     '"' +
-                    (r.statut === s
+                    (statut === s
                       ? " disabled"
-                      : " onclick=\"updateStatut('" +
-                        r.id +
-                        "','" +
-                        s +
-                        "')\"") +
+                      : " onclick=\"updateStatut('" + id + "','" + s + "')\"") +
                     ">" +
                     STATUT_LABELS[s] +
                     "</button>"
@@ -938,7 +939,14 @@
           .replace(/&/g, "&amp;")
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      // Identifiant utilisé dans un attribut id et dans un onclick : seuls les
+      // caractères d'un UUID sont conservés (aucune apostrophe ni parenthèse).
+      function safeId(v) {
+        return String(v == null ? "" : v).replace(/[^0-9a-zA-Z-]/g, "");
       }
     </script>
   </body>

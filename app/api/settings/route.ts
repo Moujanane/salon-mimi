@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { getAuthUser } from "@/lib/adminAuth";
+import { validateSettingsUpdates } from "@/lib/validation";
 
 // Clés accessibles sans authentification (affichage public : prix, WhatsApp)
 const PUBLIC_KEYS = [
@@ -38,7 +39,7 @@ export async function PATCH(request: NextRequest) {
   if (!user)
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
-  const body = await request.json();
+  const body = await request.json().catch(() => null);
   const allowedKeys = [
     "whatsapp_number",
     "notification_email",
@@ -54,17 +55,17 @@ export async function PATCH(request: NextRequest) {
     "price_ongles_soins_epilation",
   ];
 
-  const updates = Object.entries(body).filter(([key]) =>
-    allowedKeys.includes(key),
-  );
-  if (updates.length === 0) {
-    return NextResponse.json({ error: "Aucune clé valide" }, { status: 400 });
+  // Valeurs vérifiées côté serveur (le formulaire ne les vérifie que dans le
+  // navigateur) : numéro WhatsApp, e-mail de notification, prix. Tout ou rien.
+  const parsed = validateSettingsUpdates(body, allowedKeys);
+  if (!parsed.ok) {
+    return NextResponse.json({ error: parsed.error }, { status: 400 });
   }
 
-  for (const [key, value] of updates) {
+  for (const [key, value] of parsed.value) {
     const { error } = await supabaseAdmin
       .from("settings")
-      .upsert({ key, value: String(value) }, { onConflict: "key" });
+      .upsert({ key, value }, { onConflict: "key" });
     if (error)
       return NextResponse.json({ error: error.message }, { status: 500 });
   }
