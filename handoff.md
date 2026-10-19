@@ -13,16 +13,20 @@ session, regarder ici d'abord. Mis à jour manuellement, peut dater un peu ;
 si doute, vérifier dans le code/en prod plutôt que de faire confiance
 aveuglément à une ligne vieille de plusieurs mois.
 
-**SÉCURITÉ — branche `fix/security-hardening` NON FUSIONNÉE, NON DÉPLOYÉE (§45)**
+**SÉCURITÉ — CODE FUSIONNÉ ET DÉPLOYÉ le 19 oct (`fa6870e`) ; ÉTAPES 4 à 7 RESTENT À FAIRE (§45)**
 
 Audit du 19 oct : 2 failles critiques en prod (inscriptions Supabase ouvertes +
-tout compte connecté = admin ; XSS stocké dans `public/mimi.html`). Le code est
-corrigé sur la branche (6 commits, tous tests verts). **Ordre obligatoire** :
+tout compte connecté = admin ; XSS stocké dans `public/mimi.html`). Le code corrigé
+est en production (250 tests Playwright verts contre la prod après déploiement).
+Mais la BASE n'est pas encore durcie : `npm run audit:security` affiche encore
+**7/10** (3 échecs = inscriptions ouvertes, `settings` lisible, insertion anonyme)
+tant que les étapes 4 et 5 ne sont pas faites. Étapes :
 
-1. Railway : définir `ADMIN_EMAILS` (e-mail(s) de connexion admin) AVANT de
-   déployer, sinon l'admin est refusé à tout le monde (refus par défaut).
-2. Railway : vérifier `MIMI_PIN` ≥ 8 caractères (sinon le changer).
-3. Fusionner/pousser la branche, attendre le déploiement.
+1. ~~Railway : définir `ADMIN_EMAILS`~~ FAIT (confirmé par Mouj le 19 oct ; non
+   vérifiable depuis le code : si l'admin est refusé après connexion, contrôler
+   l'orthographe de l'e-mail et qu'il est confirmé dans Supabase).
+2. Railway : vérifier `MIMI_PIN` ≥ 8 caractères (sinon le changer) — non confirmé.
+3. ~~Fusionner/pousser~~ FAIT (fast-forward, déployé en ~3 min).
 4. Supabase SQL Editor : exécuter `supabase/migrations/2026-10-19-security-hardening.sql`
    (APRÈS le code, sinon le tableau de bord admin casse), puis les requêtes de
    contrôle en commentaire (comptes inconnus, réglages, abonnements push).
@@ -100,7 +104,7 @@ corrigé sur la branche (6 commits, tous tests verts). **Ordre obligatoire** :
 
 ## 45. Session 19 oct 2026 — audit sécurité (5 points) et corrections, branche `fix/security-hardening`
 
-**État : code corrigé et testé sur la branche (6 commits), PAS fusionné, PAS déployé.**
+**État : code fusionné dans `main` et DÉPLOYÉ le 19 oct (`fa6870e`, 7 commits). Base de données PAS encore durcie (SQL à exécuter) et inscriptions Supabase encore ouvertes : `npm run audit:security` = 7/10 en prod.**
 Étapes manuelles dans l'ordre : voir l'encadré SÉCURITÉ de l'index §0.
 Demande de Mouj : vérifier 5 oublis classiques des applis faites avec Claude
 (clés secrètes, règles de la base, accès aux données d'un autre compte,
