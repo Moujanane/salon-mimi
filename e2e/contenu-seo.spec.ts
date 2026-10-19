@@ -80,6 +80,10 @@ test.describe("Structure : un seul H1 par page", () => {
 });
 
 test.describe("Réponse directe dans les 150 premiers mots (critère GEO)", () => {
+  // Convention de comptage : contenu principal (<main>), sans le menu de
+  // navigation du header ni le footer, comme le font les extracteurs de
+  // contenu. Un outil qui compterait aussi le menu verrait l'introduction
+  // quelques dizaines de mots plus tard.
   for (const locale of ["fr", "en", "es"]) {
     test(`l'introduction de l'accueil se termine avant le mot 150 (${locale})`, async ({
       page,

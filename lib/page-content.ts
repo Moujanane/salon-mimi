@@ -57,18 +57,18 @@ export function homeIntro(locale: string): { title: string; text: string } {
   if (l === "en") {
     return {
       title: "African braiding salon in Marrakech",
-      text: `Salon Mimi is an Afro hair salon on Jamaa El Fna Square, in the Medina of Marrakech. Mimi, an Ivorian hairstylist in Marrakech for over 10 years, does African braids, rasta braids, box braids, knotless braids, locs and cornrows. ${N} services and packages, from ${MIN} to ${MAX} MAD: medium box braids ${box} MAD, knotless ${knotless} MAD, cornrows ${cornrows} MAD. Book online, confirmation by WhatsApp.`,
+      text: `Salon Mimi is an Afro hair salon on Jamaa El Fna Square, in the Medina of Marrakech. Mimi, an Ivorian hairstylist in Marrakech for over 10 years, does African braids, rasta braids, box braids, knotless braids, locs and cornrows. ${N} services and packages, from ${MIN} to ${MAX} MAD: medium box braids ${box} MAD, knotless ${knotless} MAD, full-head cornrows ${cornrows} MAD. Book online, confirmation by WhatsApp.`,
     };
   }
   if (l === "es") {
     return {
       title: "Salón de trenzas africanas en Marrakech",
-      text: `Salon Mimi es un salón de peluquería afro en la plaza Jamaa El Fna, en la Medina de Marrakech. Mimi, peluquera marfileña en Marrakech desde hace más de 10 años, hace trenzas africanas, rasta, box braids, knotless braids, rastas y cornrows. ${N} servicios y paquetes, de ${MIN} a ${MAX} MAD: box braids medianas ${box} MAD, knotless ${knotless} MAD, cornrows ${cornrows} MAD. Reserva en línea, confirmación por WhatsApp.`,
+      text: `Salon Mimi es un salón de peluquería afro en la plaza Jamaa El Fna, en la Medina de Marrakech. Mimi, peluquera marfileña en Marrakech desde hace más de 10 años, hace trenzas africanas, rasta, box braids, knotless braids, rastas y cornrows. ${N} servicios y paquetes, de ${MIN} a ${MAX} MAD: box braids medianas ${box} MAD, knotless ${knotless} MAD, cornrows cabeza completa ${cornrows} MAD. Reserva en línea, confirmación por WhatsApp.`,
     };
   }
   return {
     title: "Salon de tresses africaines à Marrakech",
-    text: `Salon Mimi est un salon de coiffure afro Place Jamaa El Fna, dans la Médina de Marrakech. Mimi, coiffeuse ivoirienne à Marrakech depuis plus de 10 ans, réalise tresses africaines, tresses rasta, box braids, knotless braids, locks et cornrows. ${N} prestations et forfaits, de ${MIN} à ${MAX} MAD : box braids medium ${box} MAD, knotless ${knotless} MAD, cornrows ${cornrows} MAD. Réservation en ligne, confirmation par WhatsApp.`,
+    text: `Salon Mimi est un salon de coiffure afro Place Jamaa El Fna, dans la Médina de Marrakech. Mimi, coiffeuse ivoirienne à Marrakech depuis plus de 10 ans, réalise tresses africaines, tresses rasta, box braids, knotless braids, locks et cornrows. ${N} prestations et forfaits, de ${MIN} à ${MAX} MAD : box braids medium ${box} MAD, knotless ${knotless} MAD, cornrows tête entière ${cornrows} MAD. Réservation en ligne, confirmation par WhatsApp.`,
   };
 }
 
