@@ -6,6 +6,13 @@
 -- Policies). Toute modification RLS doit être appliquée dans le dashboard ET
 -- reflétée ici, puis vérifiée manuellement sur /admin/dashboard (voir mémoire
 -- projet, leçon RLS).
+--
+-- 19/10/2026 : durcissement sécurité. reservations, settings et
+-- push_subscriptions n'ont plus AUCUNE règle pour anon / authenticated (tout
+-- passe par le serveur, clé service_role). À appliquer avec
+-- supabase/migrations/2026-10-19-security-hardening.sql. Le tableau de bord
+-- admin ne dépend plus d'une règle « authenticated » (il lit avec service_role
+-- après vérification ADMIN_EMAILS).
 
 -- ============================================================
 -- Table: reservations
@@ -24,28 +31,20 @@ create table if not exists reservations (
 
 alter table reservations enable row level security;
 
--- anon peut insérer (formulaire public /reservation)
-create policy "anon_insert_reservations"
-  on reservations for insert
-  to anon
-  with check (true);
-
--- authenticated peut lire et modifier (dashboard admin /admin/dashboard)
--- CRITIQUE : cette policy SELECT est celle qui a déjà sauté silencieusement
--- lors d'un audit sécurité passé et cassé le dashboard admin. Ne jamais la
--- supprimer sans vérifier /admin/dashboard immédiatement après.
-create policy "authenticated_select_reservations"
-  on reservations for select
-  to authenticated
-  using (true);
-
-create policy "authenticated_update_reservations"
-  on reservations for update
-  to authenticated
-  using (true);
-
--- Pas de policy DELETE pour anon/authenticated — seul service_role (qui
--- bypass RLS) peut supprimer, via les routes API server-side.
+-- AUCUNE règle pour anon / authenticated (état voulu depuis le 19/10/2026,
+-- audit sécurité : supabase/migrations/2026-10-19-security-hardening.sql).
+-- Avant, trois règles existaient :
+--   - anon INSERT (with check true) : n'importe qui pouvait écrire des
+--     réservations directement via la clé publique, sans validation serveur ni
+--     limite de demandes ;
+--   - authenticated SELECT / UPDATE (using true) : tout compte connecté lisait
+--     et modifiait les données clients, or les inscriptions Supabase étaient
+--     ouvertes.
+-- Désormais TOUT passe par les routes serveur avec la clé service_role (qui
+-- ignore RLS) : formulaire public (app/api/reservations), tableau de bord admin
+-- (app/admin/dashboard, après vérification ADMIN_EMAILS) et page de Mimi
+-- (app/api/mimi). Si un composant navigateur doit un jour lire cette table, ne
+-- PAS rouvrir une règle large : passer par une route serveur.
 
 -- ============================================================
 -- Table: settings
@@ -60,22 +59,14 @@ create table if not exists settings (
 
 alter table settings enable row level security;
 
--- anon peut lire (prix affichés sur le site public, sans authentification)
-create policy "anon_select_settings"
-  on settings for select
-  to anon
-  using (true);
-
--- authenticated peut tout faire (large — non exploitée aujourd'hui : le
--- code applicatif (app/api/settings, app/api/mimi-settings) passe toujours
--- par service_role, jamais par une requête authenticated directe. Cette
--- policy reste large ; à resserrer si un jour un composant navigateur
--- authentifié écrit directement dans cette table sans passer par une API).
-create policy "authenticated_all_settings"
-  on settings for all
-  to authenticated
-  using (true)
-  with check (true);
+-- AUCUNE règle pour anon / authenticated (état voulu depuis le 19/10/2026,
+-- supabase/migrations/2026-10-19-security-hardening.sql). Avant :
+--   - anon SELECT (using true) : n'importe qui lisait tous les réglages, dont
+--     l'e-mail de notification (notification_email) ;
+--   - authenticated ALL (using true) : tout compte connecté écrivait les
+--     réglages (numéro WhatsApp, e-mail de notification).
+-- Le site lit les réglages côté serveur avec service_role (lib/settings.ts), et
+-- les modifie via app/api/settings (admin vérifié) et app/api/mimi-settings (PIN).
 
 create policy "service_role_all_settings"
   on settings for all
