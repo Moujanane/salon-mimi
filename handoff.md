@@ -13,7 +13,9 @@ session, regarder ici d'abord. Mis à jour manuellement, peut dater un peu ;
 si doute, vérifier dans le code/en prod plutôt que de faire confiance
 aveuglément à une ligne vieille de plusieurs mois.
 
-**SÉCURITÉ — CODE FUSIONNÉ ET DÉPLOYÉ le 19 oct (`fa6870e`) ; ÉTAPES 4 à 7 RESTENT À FAIRE (§45)**
+**SÉCURITÉ — TERMINÉE le 19 oct : `npm run audit:security` = 10/10 en prod (code `4492d33`, SQL exécuté, inscriptions fermées, ADMIN_EMAILS créé dans Railway, connexion admin testée OK par Mouj, MIMI_PIN ≥ 8 confirmé). Reste : retirer tout domaine `*.up.railway.app` inutilisé (§45)**
+
+Historique de l'audit ci-dessous (état AVANT les étapes manuelles) :
 
 Audit du 19 oct : 2 failles critiques en prod (inscriptions Supabase ouvertes +
 tout compte connecté = admin ; XSS stocké dans `public/mimi.html`). Le code corrigé
