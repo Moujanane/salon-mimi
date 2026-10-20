@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { checkMimiPin } from "@/lib/mimiAuth";
+import { validatePushSubscription } from "@/lib/validation";
 
 // Retourne la clé publique VAPID pour le client (non sensible : elle est
 // destinée à être exposée au navigateur).
@@ -16,11 +17,13 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => null);
-  const { endpoint, keys } = body ?? {};
-
-  if (!endpoint || !keys?.p256dh || !keys?.auth) {
-    return NextResponse.json({ error: "Abonnement invalide" }, { status: 400 });
+  // Le serveur enverra des requêtes vers `endpoint` : seules les URL des services
+  // de notification des navigateurs sont acceptées (lib/validation.ts).
+  const parsed = validatePushSubscription(body);
+  if (!parsed.ok) {
+    return NextResponse.json({ error: parsed.error }, { status: 400 });
   }
+  const { endpoint, keys } = parsed.value;
 
   const { error } = await supabaseAdmin
     .from("push_subscriptions")
@@ -42,7 +45,7 @@ export async function DELETE(req: NextRequest) {
 
   const body = await req.json().catch(() => null);
   const endpoint = body?.endpoint;
-  if (!endpoint) {
+  if (typeof endpoint !== "string" || !endpoint || endpoint.length > 2048) {
     return NextResponse.json({ error: "Endpoint manquant" }, { status: 400 });
   }
 

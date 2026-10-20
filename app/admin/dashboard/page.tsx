@@ -1,38 +1,26 @@
 // app/admin/dashboard/page.tsx
-import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { getAdminStatus } from "@/lib/adminAuth";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import ReservationsTable from "@/components/admin/ReservationsTable";
 
 export const metadata = {
   robots: { index: false, follow: false },
 };
-import { redirect } from "next/navigation";
-import { createServerClient } from "@supabase/ssr";
-import ReservationsTable from "@/components/admin/ReservationsTable";
 
 export default async function DashboardPage() {
-  const cookieStore = await cookies();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-      },
-    },
-  );
-
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (!user || authError) {
-    redirect("/admin/login");
+  // Administrateur uniquement : session valide ET e-mail dans ADMIN_EMAILS.
+  const { user, decision } = await getAdminStatus();
+  if (!decision.admin) {
+    // Connecté mais non autorisé : page qui explique pourquoi (et non plus une
+    // redirection muette vers la connexion).
+    redirect(user ? "/admin/acces-refuse" : "/admin/login");
   }
 
-  const { data: reservations, error } = await supabase
+  // Lecture avec la clé serveur, APRÈS la vérification administrateur. Elle ne
+  // dépend plus des règles de la base pour les comptes connectés (supprimées :
+  // supabase/migrations/2026-10-19-security-hardening.sql).
+  const { data: reservations, error } = await supabaseAdmin
     .from("reservations")
     .select("*")
     .order("created_at", { ascending: false });

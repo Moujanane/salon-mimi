@@ -6,12 +6,36 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 0. Index des tâches ouvertes (mis à jour le 10 oct 2026)
+## 0. Index des tâches ouvertes (mis à jour le 19 oct 2026)
 
 Ce fichier grossit vite — avant de re-parcourir tout le handoff en début de
 session, regarder ici d'abord. Mis à jour manuellement, peut dater un peu ;
 si doute, vérifier dans le code/en prod plutôt que de faire confiance
 aveuglément à une ligne vieille de plusieurs mois.
+
+**SÉCURITÉ — TERMINÉE le 19 oct : `npm run audit:security` = 10/10 en prod (code `4492d33`, SQL exécuté, inscriptions fermées, ADMIN_EMAILS créé dans Railway, connexion admin testée OK par Mouj, MIMI_PIN ≥ 8 confirmé). Reste : retirer tout domaine `*.up.railway.app` inutilisé (§45)**
+
+Historique de l'audit ci-dessous (état AVANT les étapes manuelles) :
+
+Audit du 19 oct (état AVANT les étapes manuelles) : 2 failles critiques en prod (inscriptions Supabase ouvertes +
+tout compte connecté = admin ; XSS stocké dans `public/mimi.html`). Le code corrigé
+est en production (250 tests Playwright verts contre la prod après déploiement).
+Mais la BASE n'est pas encore durcie : `npm run audit:security` affiche encore
+**7/10** (3 échecs = inscriptions ouvertes, `settings` lisible, insertion anonyme)
+tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites depuis, voir ci-dessus.) Étapes :
+
+1. ~~Railway : définir `ADMIN_EMAILS`~~ FAIT (confirmé par Mouj le 19 oct ; non
+   vérifiable depuis le code : si l'admin est refusé après connexion, contrôler
+   l'orthographe de l'e-mail et qu'il est confirmé dans Supabase).
+2. Railway : vérifier `MIMI_PIN` ≥ 8 caractères (sinon le changer) — non confirmé.
+3. ~~Fusionner/pousser~~ FAIT (fast-forward, déployé en ~3 min).
+4. Supabase SQL Editor : exécuter `supabase/migrations/2026-10-19-security-hardening.sql`
+   (APRÈS le code, sinon le tableau de bord admin casse), puis les requêtes de
+   contrôle en commentaire (comptes inconnus, réglages, abonnements push).
+5. Supabase > Authentication : désactiver les inscriptions.
+6. Railway > Settings > Networking : supprimer tout domaine `*.up.railway.app`
+   inutilisé (sinon `cf-connecting-ip` falsifiable).
+7. `npm run audit:security` doit afficher 10/10.
 
 **Côté Mouj, hors code (le plus structurant)**
 
@@ -42,8 +66,34 @@ aveuglément à une ligne vieille de plusieurs mois.
 
 **À mesurer, pas à coder**
 
-- Rapport du ~17-20 oct : vérifier si le fix title « mimi marrakech » (§42)
-  convertit enfin en clics
+- Rapport du ~17-20 oct (fix title « mimi marrakech » §42) : **mesuré le
+  19 oct, non concluant** — la requête n'a plus que 1-3 impressions/semaine
+  et 0 clic depuis fin juillet (§44). Ne pas raccourcir le title de l'accueil
+  tant que ce n'est pas tranché ; refaire le point ~4-6 sem. après le
+  déploiement du 18 oct (données GSC arrêtées au 16 oct).
+
+**Ouvert après la session du 17-18 oct (§44)**
+
+- Mouj : confirmer les VRAIS horaires (JSON-LD Lun-Sam 9h-19h vs texte
+  visible « tous les jours 9h-23h »), puis corriger le côté faux
+- Mouj : Cloudflare renvoie 403 à ClaudeBot / anthropic-ai / Bytespider /
+  cohere-ai / Amazonbot alors que robots.txt les autorise
+- Mouj : GBP produits (ajoutés en juin) avec d'anciens prix (Cornrows 370,
+  Boho 420, Knotless 360, Box braids 550) → aligner sur 500/700/650/300
+- Mouj : vérifier s'il reste 2 fausses réservations « Test Playwright API »
+  (+212600000001) dans l'admin, créées par un test e2e lancé en local
+- Search Console : demander l'indexation de /fr, /fr/services, /fr/a-propos
+  et renvoyer le sitemap
+- Décision : prix « dès » de la page Services (système `settings.price_*`,
+  ex. Box braids dès 200) vs catalogue (Box braids 450-500) — incohérence
+  visible ; bloque le tableau de prix HTML
+- Dev, besoin du nom complet de Mimi : `sameAs`/`url` sur le bloc Person
+- Dev : **intro de l'accueil resserrée et pages légales sur `pageMetadata()` —
+  FAIT le 19 oct (§44, complément)**
+- Dev, optionnel : phrases de l'intro sans verbe (« 16 prestations et
+  forfaits, de 150 à 950 MAD ») — budget de mots très serré (ES finit au mot
+  149 sur 150) ; toute modif du hero ou de l'intro doit repasser le test e2e
+  « se termine avant le mot 150 »
 
 **Pour mémoire — déjà réglé, ne pas rouvrir sans nouveau signal**
 
@@ -51,6 +101,234 @@ aveuglément à une ligne vieille de plusieurs mois.
   description homepage (§40), fix JSON-LD AggregateRating + anomalie
   « 5/5 sur Google » (§42), fix title « mimi marrakech » (§42), cron SEO
   Railway + rotation OAuth (§37-38)
+
+---
+
+## 45. Session 19 oct 2026 — audit sécurité (5 points) et corrections, branche `fix/security-hardening`
+
+**État : TERMINÉ le 19 oct. Code déployé (`fa6870e`, puis correctif admin `4492d33`), SQL exécuté, inscriptions fermées, `ADMIN_EMAILS` créé dans Railway, connexion admin testée OK, `MIMI_PIN` ≥ 8 : `npm run audit:security` = 10/10 en prod. Domaine `*.up.railway.app` supprimé par Mouj dans Railway. Plus aucune étape manuelle de sécurité en attente.**
+
+Correctif admin (`4492d33`) : après le déploiement, Mouj ne pouvait plus se connecter (retour muet sur /login) car `ADMIN_EMAILS` n'existait pas encore sur Railway. Ajouts : `lib/adminPolicy.ts` (`parseAdminEmails` tolérant : espaces, virgules, point-virgules, guillemets ; `adminDecision` avec raison du refus ; `maskEmail`), `getAdminStatus()` dans `lib/adminAuth.ts` (journalise la raison, e-mail masqué, jamais la liste), page `/admin/acces-refuse` qui explique le refus à un compte connecté mais non autorisé, test `e2e/acces-admin.spec.ts`. Leçon : une variable absente doit produire un message clair, pas une redirection silencieuse. Vérification prod après déploiement : 25 tests ciblés verts à froid ; une grosse série de 270 tests d'affilée contre la prod fait expirer quelques pages (charge, pas régression) : relancer par petits lots.
+Demande de Mouj : vérifier 5 oublis classiques des applis faites avec Claude
+(clés secrètes, règles de la base, accès aux données d'un autre compte,
+validation serveur, limite de demandes). Les noms de fichiers cités (`.env`,
+`rule.json`, `routes.py`, `forms.py`, `app.py`) sont ceux d'un exemple Python ;
+équivalents réels ici : `.gitignore`/`.env*`, `supabase-schema.sql`,
+`middleware.ts` + `lib/adminAuth.ts` + `app/admin/*` + `app/api/*`,
+validations dans les routes, `lib/rateLimit.ts` + `lib/mimiAuth.ts`.
+
+### Constats (sondes en lecture seule sur la prod, sans écrire de ligne)
+
+1. **Secrets : OK.** Rien dans le code, l'historique git ni le JS client (18
+   fichiers) ; `.env*` ignorés ; seule la clé `sb_publishable_` (publique) est servie.
+2. **Base : KO.** Inscriptions Supabase ouvertes (`disable_signup: False`) ;
+   `anon` pouvait INSÉRER des réservations (preuve : erreur 23502 = règle
+   passée, contrainte seule bloquante) et LIRE `settings` (dont `notification_email`) ;
+   tout compte « authenticated » lisait/modifiait réservations et réglages.
+   Lecture anonyme des réservations et de `push_subscriptions` déjà bloquée.
+3. **Accès : KO (critique).** `getAuthUser()` acceptait n'importe quel compte
+   connecté comme admin → avec les inscriptions ouvertes, n'importe qui pouvait
+   lire les clients et changer le numéro WhatsApp / e-mail de notification.
+   Routes admin sans session : 401 OK ; faux cookie `sb-…-auth-token` : redirigé OK.
+4. **Validation : KO.** `heure_souhaitee` et `nombre_personnes` jamais vérifiés
+   et insérés SANS échappement dans `public/mimi.html` (XSS stocké → vol du PIN
+   en mémoire). Réglages (WhatsApp, e-mail, prix) vérifiés seulement dans le navigateur.
+5. **Limite : KO.** 15 essais de PIN simultanés passaient TOUS (limite 3) :
+   « vérifier puis enregistrer l'échec » non atomique. Accès direct à l'origine
+   Railway testé : 403 (pas de contournement de Cloudflare par cette voie).
+
+### Corrections (commits `2b6c4a4`, `af984fb`, `610a921`, `173c005`, `cb35c8e`, `8a280c7`)
+
+- `lib/validation.ts` (+ tests) : date réelle AAAA-MM-JJ, heure HH:MM, libellé de
+  personnes sans balises, numéro WhatsApp normalisé, e-mail ASCII sans CRLF ni
+  nom d'affichage, prix entiers, contact, abonnements push (hôtes de services de
+  notification uniquement), réglages « tout ou rien ». Routes : reservations,
+  contact, settings, mimi-settings, push, `PATCH reservations/[id]` (JSON invalide → 400).
+- `public/mimi.html` : tous les champs échappés/filtrés (`escHtml` + `'`, `safeId`,
+  statut par `hasOwnProperty`). Test e2e `e2e/mimi-xss.spec.ts` avec API simulée
+  (rouge avant, vert après).
+- `lib/adminPolicy.ts` + `lib/adminAuth.ts` : admin = e-mail CONFIRMÉ dans
+  `ADMIN_EMAILS` ; variable absente = personne n'est admin. Dashboard et galerie
+  lisent avec la clé serveur après contrôle admin.
+- `lib/pinAuth.ts`, `lib/mimiAuth.ts`, `lib/rateLimit.ts`, `lib/attemptCounter.ts`,
+  `lib/clientIp.ts` : INCR atomique AVANT comparaison du PIN (5 essais / 30 min /
+  IP ; ≥ 6e refusé même avec le bon PIN) ; expiration toujours posée (une clé
+  sans TTL verrouillait Mimi pour toujours) ; compteur indisponible = refus 503
+  (fail-closed) ; IPv6 regroupée par /64.
+- `supabase/migrations/2026-10-19-security-hardening.sql` : supprime toute règle
+  non `service_role` sur reservations/settings/push_subscriptions + REVOKE ;
+  idempotent, sans perte de données. `supabase-schema.sql` mis à jour.
+- `next.config.mjs` : CSP limitée à l'origine Supabase du site (plus `*.supabase.co`),
+  `object-src 'none'`, `base-uri`, `form-action` ; `e2e/csp.spec.ts` (aucune violation).
+- `scripts/security-check.mjs` / `npm run audit:security` : sondes anonymes en
+  lecture seule (état prod avant correction : 7/10 ; après : 10/10).
+- Dépendances : `npm audit fix` → 6 failles (4 high) → 2 ; restent `postcss`
+  imbriqué dans `next` + `next` (exigent Next 16, changement majeur) : risque
+  accepté (traitement de CSS piégé à la construction, pas en ligne).
+
+### Vérifications
+
+59 → 71 tests unitaires, 14 tests SEO, 250 tests Playwright (sans le test de
+réservation), types, lint, build. Test d'intégration local (faux Upstash + FAUSSE
+clé Supabase : aucune écriture possible) : rafale de 15 → 5 examinés / 10
+bloqués ; bon PIN refusé pendant le verrouillage ; 3 requêtes simultanées de la PWA
+non bloquées ; réservation légitime acceptée ; validations 400 ; IPv6 ; TTL rétabli.
+Deux relectures indépendantes (0 critique ; 2 élevés + moyens/faibles corrigés).
+
+### Non corrigé / à décider
+
+- Bouton de statut de `mimi.html` : appelle `PATCH /api/reservations/[id]` SANS
+  PIN alors que la route exige une session admin → échoue en silence (déjà le cas
+  sur `main`, pas une régression). Corriger demande une route protégée par PIN
+  (élargit la surface du PIN) : à décider.
+- `notification_email` (réglage) ne change PAS le destinataire : codé en dur
+  `mouj.business@gmail.com` dans `lib/sendNotificationEmail.ts` ; le réglage ne sert
+  que de condition. Trompeur mais sans risque.
+- E-mails envoyés depuis `noreply@atlas-swincar.com` (domaine de l'autre projet) :
+  réputation partagée ; le champ `nom` libre est repris dans l'e-mail client
+  (spam/hameçonnage limités par 5 requêtes/10 min/IP, fail-open si Upstash tombe).
+- Limite de PIN partagée par IP : un tiers sur la même IP (4G partagée) peut
+  bloquer Mimi 30 min (voulu : pas d'oracle).
+- CSP : `script-src 'unsafe-inline'` conservé (script en ligne de `mimi.html`).
+- Hors périmètre non vérifié : fournisseurs OAuth Supabase, fonctions RPC exposées,
+  règles `storage.objects` (requête de contrôle fournie dans le SQL).
+
+### Pièges rencontrés (leçons)
+
+- **Ne JAMAIS lancer `npm audit fix --omit=dev`** : il retire typescript/tsx de
+  `node_modules` ; la construction suivante (`next build`) réinstalle alors
+  TypeScript ET FIXE des versions exactes dans `package.json`. Restaurer avec
+  `git checkout -- package.json package-lock.json` puis `npm install`.
+- Python (installation python.org) n'a pas les certificats HTTPS sur ce Mac : les
+  scripts réseau utilisent `curl` ou Node (`fetch`).
+- Le garde `GateGuard` exige des « faits » avant chaque première modification d'un
+  fichier (appelants, schémas, consigne) et refuse `rm -rf` (utiliser la corbeille).
+
+---
+
+## 44. Session 16-19 oct 2026 — prix, audits SEO/GEO, FAQ, Open Graph, llms.txt (6 commits en prod)
+
+Commits poussés sur `main` et déployés (Railway ~1-2 min) :
+`ff5d054` (prix) → `7de2536` (titles/FAQ) → `086b77d` (OG, date, llms.txt, contenus).
+Vérifié en prod après chaque déploiement : 190 tests Playwright passent contre
+https://mimi-coiffure.com.
+
+### Prix — une seule source de vérité (`lib/services-data.ts`)
+
+- Bug : l'accueil affichait 150/150/180/180 MAD (valeurs saisies en base via
+  `public/mimi.html` « Prix vedettes » et `/admin/settings`, exemples
+  « ex: 150 » trompeurs) alors que JSON-LD/FAQ annonçaient 550/700/650/300 et
+  les euros correspondaient à 550 → incohérence 2 sources.
+- Prix confirmés par Mouj le 17 oct : **box braids medium 500 MAD (47 €)**,
+  knotless 700, boho 650, cornrows 300. (Le 550 d'avant était faux.)
+- L'accueil lit maintenant `services-data.ts` ; les 4 clés `price_featured_*`
+  sont supprimées (type/défauts `lib/settings.ts`, `SettingsForm`, routes
+  `api/settings` et `api/mimi-settings`, section de `public/mimi.html`).
+  **Conséquence : Mimi ne peut plus changer ces 4 prix seule** (il faut
+  modifier le code, MAD ET EUR au taux ~10,6, puis `npm run test:unit`).
+  Les lignes `price_featured_*` restent orphelines en base (sans effet).
+- Erreur FAQ corrigée : « mini braids enfant à 150 » (c'est 200).
+- Les prix « dès » (`settings.price_*`, pages Services/Réservation) sont un
+  système SÉPARÉ, non touché. Incohérence visible (Box braids dès 200 vs
+  catalogue 450-500) → à trancher avant d'ajouter un tableau de prix.
+
+### SEO on-page
+
+- `lib/page-meta.ts` : source unique titles/descriptions des 6 pages
+  (home, services, reservation, aPropos, galerie, contact) + `pageMetadata()`
+  (canonical, hreflang, Open Graph, Twitter propres à chaque page ; avant,
+  tout héritait de l'OG de l'accueil). Tests : title ≤ 60, description ≤ 160.
+  **Exception volontaire : title de l'accueil inchangé (64 car.)**, fix §42 en
+  cours de mesure. Title ES de Contact raccourci (64→58).
+- FAQ : `lib/faq.ts` (FR/EN/ES) → section visible `FaqSection` + JSON-LD
+  FAQPage **injecté uniquement sur l'accueil** (avant : sur toutes les pages
+  via le layout, sans FAQ visible). Réponse tarifs calculée depuis le catalogue
+  (`faqTarifsAnswer(locale)` dans `salon-info.ts`).
+- `SALON.lastReviewed` = 2026-10-17 : alimente `dateModified` (JSON-LD), la
+  `lastmod` du sitemap (avant : date du build) et la balise `<time>` visible
+  sous la FAQ. **À bumper à la main quand prix/infos changent.**
+- `/llms.txt` généré (`lib/llms.ts` + `app/llms.txt/route.ts`), sans horaires.
+- Contenus calculés depuis le catalogue (`lib/page-content.ts`, composant
+  `InfoBlock`) : intro accueil, « L'essentiel » (à propos), « Informations
+  pratiques » (contact), styles + liens de réservation (galerie).
+
+### Audits (PDF audit-site : scratchpad de session, non conservé)
+
+- Audit-site : 80/100 (technique 36/40, contenu 17/25, mots-clés 14/20,
+  présence 8/10, UX 5/5). Concurrents (Mouna 813 avis, Mpat 160, Hair Mermaid 24) : fiches Google Maps sans site retrouvé, comparaison de sites impossible
+  (WebSearch limité aux résultats US).
+- Audit GEO (skill geo-optimizer, installé globalement) : 48 → 58/100. Plafond
+  60 tant que 2 vetos : horaires contradictoires + robots IA bloqués (403
+  Cloudflare sur ClaudeBot, anthropic-ai, Bytespider, cohere-ai, Amazonbot ;
+  test par user-agent, règle exacte à confirmer dans le tableau Cloudflare).
+
+### Mesure GSC du 19 oct (données jusqu'au 16 oct, avant les déploiements)
+
+- « mimi marrakech » : 230 impressions/90 j mais seulement 1-3/semaine depuis
+  mi-sept, 0 clic depuis fin juillet → fix title du 10 oct non évaluable.
+- Génériques (sans « mimi ») : ~100 impr./semaine en août → ~64 en octobre,
+  position 5-7 stable ; marque : ~12-20/semaine, bien classée (pos 2-4).
+- Cause n°1 du classement faible inchangée : avis (13-22 vs 160-813).
+
+### Pièges rencontrés
+
+- **Les tests Playwright lancés avec `PLAYWRIGHT_BASE_URL=http://localhost`
+  utilisent `.env.local` (vraie base Supabase)** : le test « enregistre la
+  réservation via l'API » crée une vraie réservation (+ push/email à Mimi).
+  Toujours lancer avec `--grep-invert "enregistre la réservation"`. Par défaut
+  le baseURL est la prod : même risque.
+- `npm run test:unit` = `node --import tsx --test "lib/*.test.ts"` (tests de
+  cohérence prix/méta/FAQ/sitemap/llms/contenus).
+- Le connecteur GSC (MCP) échoue (SSL/timeout) si on lance plusieurs appels en
+  parallèle : les faire un par un.
+- Le middleware ignore les chemins contenant un point (`/llms.txt`,
+  `/robots.txt` ne sont pas redirigés vers une langue).
+- Un objet `openGraph`/`twitter`/`alternates` défini dans une page REMPLACE
+  celui du layout (pas de fusion profonde). C'est pourquoi `pageMetadata()`
+  recrée tout l'objet pour chaque page. Les pages légales héritaient encore de
+  l'accueil jusqu'au 19 oct (corrigé, voir complément ci-dessous).
+- Une modif du texte au-dessus de l'intro (hero) décale sa position : le test
+  e2e « se termine avant le mot 150 » le signalerait (marge ES : 1 mot).
+
+### Complément du 19 oct — petits points + clôture (3 commits de plus, en prod)
+
+Commits : `7b7df52` (docs), `8439295`, `4a90724`, poussés sur `main` le 19 oct
+(`086b77d..4a90724`), déployés ~2 min 30.
+
+- **Intro de l'accueil resserrée** (`lib/page-content.ts`, `homeIntro()`) :
+  87 → 68 mots (FR), 79 → 65 (EN), 85 → 69 (ES). Fin de l'intro aux mots
+  146 / 144 / 149 (FR/EN/ES), menu de navigation exclu (convention : contenu
+  principal `<main>`, comme les extracteurs de contenu ; un outil qui compte
+  aussi le menu la verrait quelques dizaines de mots plus tard). Mêmes faits
+  qu'avant. Le qualificatif « tête entière » / « full-head » / « cabeza
+  completa » est conservé : 300 MAD est le prix de « Cornrows full head »,
+  pas de tous les cornrows (remarque de relecture, test ajouté).
+- **Pages légales** (`mentions-legales`, `politique-de-confidentialite`) :
+  clés `mentionsLegales` / `confidentialite` dans `lib/page-meta.ts` (textes
+  strictement inchangés), `pageMetadata()` appliqué → hreflang 0 → 4 et
+  Open Graph/Twitter propres. Title, description, canonical, robots, nombre
+  de H1 identiques à la prod sur les 24 URLs avant déploiement.
+- Tests : intro 45-70 mots, qualificatif cornrows, test e2e de position
+  (≤ mot 150, `e2e/contenu-seo.spec.ts`), 31 tests unitaires, 196 tests
+  Playwright (sans le test de réservation) — tous verts en local ET contre
+  la prod après déploiement.
+- Relectures indépendantes (agent code-reviewer) faites sur chaque lot : 0
+  bloquant ; remarques traitées (qualificatif cornrows, convention de
+  comptage) ou notées ici (phrases de l'intro sans verbe, marge ES de 1 mot).
+- Données GSC arrêtées au 16 oct : **aucun effet des déploiements des 17-18
+  et 19 oct n'est encore mesurable**. Refaire le point des positions ~4-6
+  semaines après, en comparant au tableau du 16 oct (« salon mimi marrakech »
+  pos 1,8 ; « tresse marrakech » 3,0 ; « tresse africaine marrakech » 3,3 ;
+  « salon afro marrakech » 4,3 ; « coiffeur afro marrakech » 6,0).
+- Audit GEO refait le 19 oct (skill geo-optimizer) : 48 → 58/100, plafonné à
+  60 par 2 vetos encore ouverts (horaires contradictoires, robots IA bloqués
+  par Cloudflare). Détail du score : densité de preuves 17/35, structure
+  16/25, autorité 13/25, accès robots IA 12/15.
+- **Mémoire du projet** : leçons transférables ajoutées à
+  `MEMOIRE-GLOBALE.md` (copie salon-mimi uniquement ; à répercuter dans
+  atlas-swincar et Distrib-Eau, dont les copies n'ont pas été retrouvées à la
+  racine le 19 oct). Fiche mémoire utilisateur créée :
+  `~/.claude/projects/-Users-Mouj/memory/project_salon_mimi.md`.
 
 ---
 
@@ -3018,10 +3296,12 @@ app/[locale]/contact/page.tsx        — import + intégration ContactForm
 - Cause : `globals.css` applique `text-white` sur le `body`, les inputs héritaient cette couleur
 - Fix : `bg-white` + `ring-offset-white` ajoutés sur les 3 inputs (WhatsApp, email, prix) dans `SettingsForm.tsx`
 
-### SEO — canonicals avec slash final
+### SEO — canonicals avec slash final (OBSOLÈTE, voir §23 et commit `263dd8d`)
+
+> ⚠️ Cette section est OBSOLÈTE. Le slash final a ensuite été retiré (`263dd8d`) : Next.js a `trailingSlash: false` et redirige `/.../` vers `/...` en 308. Canonicals, hreflang et sitemap sont SANS slash final. Ne pas réintroduire de slash final. Vérifié le 16 oct 2026 : le code et le site en ligne sont cohérents.
 
 - Problème : Google signalait `mimi-coiffure.com/fr` comme doublon car le canonical déclarait `/fr` sans slash mais Next.js sert `/fr/` avec slash
-- Fix : slash final ajouté sur tous les canonicals de toutes les pages publiques (8 fichiers)
+- ~~Fix : slash final ajouté sur tous les canonicals de toutes les pages publiques (8 fichiers)~~ OBSOLÈTE, annulé par `263dd8d`
 - Fix appliqué aussi sur les hreflang dans `app/[locale]/layout.tsx`
 - **Action Search Console** : cliquer "Valider la correction" sur les 2 lignes d'erreur (redirection + doublon canonique)
 

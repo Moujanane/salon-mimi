@@ -2,6 +2,19 @@ import createNextIntlPlugin from "next-intl/plugin";
 
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
+// Origine du projet Supabase du site (ex. https://abcd1234.supabase.co). Les
+// connexions, images et médias sont limités à CE projet : avec le joker
+// *.supabase.co, un code injecté dans une page pourrait envoyer des données
+// (ex. le PIN de Mimi) vers le projet Supabase d'un attaquant. Repli sur le joker
+// si l'URL n'est pas définie au build (le site continue alors de fonctionner).
+const supabaseOrigin = (() => {
+  try {
+    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").origin;
+  } catch {
+    return "https://*.supabase.co";
+  }
+})();
+
 const securityHeaders = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -23,13 +36,19 @@ const securityHeaders = [
       "font-src 'self' https://fonts.gstatic.com",
       // Restreint aux sources réellement utilisées (images locales + tuiles de
       // la carte Google Maps embarquée). Plus de `https:` générique.
-      "img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://*.googleusercontent.com https://*.supabase.co https://cdn.jsdelivr.net",
-      "connect-src 'self' https://*.supabase.co https://api.resend.com",
+      `img-src 'self' data: blob: https://maps.gstatic.com https://maps.googleapis.com https://*.googleusercontent.com ${supabaseOrigin} https://cdn.jsdelivr.net`,
+      `connect-src 'self' ${supabaseOrigin} https://api.resend.com`,
       // blob: nécessaire pour l'extraction du poster vidéo côté admin
       // (URL.createObjectURL sur le fichier choisi avant upload).
-      "media-src 'self' blob: https://*.supabase.co https://cdn.jsdelivr.net",
+      `media-src 'self' blob: ${supabaseOrigin} https://cdn.jsdelivr.net`,
       "frame-src https://www.google.com https://maps.google.com",
       "frame-ancestors 'none'",
+      // Pas de <object>/<embed> ; <base> et envois de formulaires limités au site
+      // (un <base> ou un formulaire injecté ne peut plus détourner les liens ni
+      // envoyer des données vers un autre domaine).
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
     ].join("; "),
   },
 ];

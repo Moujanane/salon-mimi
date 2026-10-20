@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
+import { pageMetadata } from "@/lib/page-meta";
 
 export const revalidate = 86400;
-
-const BASE_URL = "https://mimi-coiffure.com";
 
 export async function generateMetadata({
   params,
@@ -11,23 +10,7 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const titles: Record<string, string> = {
-    fr: "Mentions légales — Salon Mimi Marrakech",
-    en: "Legal Notice — Salon Mimi Marrakech",
-    es: "Aviso legal — Salon Mimi Marrakech",
-  };
-  const descriptions: Record<string, string> = {
-    fr: "Mentions légales du Salon Mimi, salon de coiffure afro à Marrakech. Éditeur, hébergeur, propriété intellectuelle et droit applicable.",
-    en: "Legal notice for Salon Mimi, afro hair salon in Marrakech. Publisher, hosting, intellectual property and applicable law.",
-    es: "Aviso legal del Salon Mimi, salón de peluquería afro en Marrakech. Editor, alojamiento, propiedad intelectual y legislación aplicable.",
-  };
-  return {
-    title: titles[locale] ?? titles.fr,
-    description: descriptions[locale] ?? descriptions.fr,
-    alternates: {
-      canonical: `${BASE_URL}/${locale}/mentions-legales`,
-    },
-  };
+  return pageMetadata("mentionsLegales", locale, "/mentions-legales");
 }
 
 export default async function MentionsLegalesPage({

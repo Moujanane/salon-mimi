@@ -7,6 +7,7 @@ import { sendNotificationEmail } from "@/lib/sendNotificationEmail";
 import { sendClientConfirmationEmail } from "@/lib/sendClientConfirmationEmail";
 import { sendPushToMimi } from "@/lib/sendPushToMimi";
 import { checkWindowLimit, getClientIp } from "@/lib/rateLimit";
+import { validateReservationExtras, isValidEmail } from "@/lib/validation";
 
 const VALID_SERVICES = [
   "Tresses africaines",
@@ -31,7 +32,10 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const body = await request.json();
+  const body = await request.json().catch(() => null);
+  if (!body || typeof body !== "object" || Array.isArray(body)) {
+    return NextResponse.json({ error: "Données invalides" }, { status: 400 });
+  }
   const {
     nom,
     telephone,
@@ -71,10 +75,7 @@ export async function POST(request: NextRequest) {
   ) {
     return NextResponse.json({ error: "Téléphone invalide" }, { status: 400 });
   }
-  if (
-    email &&
-    (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-  ) {
+  if (email && !isValidEmail(email)) {
     return NextResponse.json({ error: "Email invalide" }, { status: 400 });
   }
   if (!service || !VALID_SERVICES.includes(service)) {
@@ -82,6 +83,23 @@ export async function POST(request: NextRequest) {
   }
   if (message && typeof message === "string" && message.length > 1000) {
     return NextResponse.json({ error: "Message trop long" }, { status: 400 });
+  }
+  if (
+    message !== undefined &&
+    message !== null &&
+    typeof message !== "string"
+  ) {
+    return NextResponse.json({ error: "Message invalide" }, { status: 400 });
+  }
+  // Champs facultatifs (date, heure, nombre de personnes) : vérifiés ici, car
+  // la page de Mimi les affiche et le navigateur peut être contourné.
+  const extrasError = validateReservationExtras({
+    date_souhaitee,
+    heure_souhaitee,
+    nombre_personnes,
+  });
+  if (extrasError) {
+    return NextResponse.json({ error: extrasError }, { status: 400 });
   }
 
   const { error } = await supabaseAdmin.from("reservations").insert({

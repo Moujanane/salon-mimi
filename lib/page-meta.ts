@@ -14,7 +14,14 @@ import type { Metadata } from "next";
 
 export type MetaLocale = "fr" | "en" | "es";
 export type PageKey =
-  "home" | "services" | "reservation" | "aPropos" | "galerie" | "contact";
+  | "home"
+  | "services"
+  | "reservation"
+  | "aPropos"
+  | "galerie"
+  | "contact"
+  | "mentionsLegales"
+  | "confidentialite";
 
 type Meta = {
   titles: Record<MetaLocale, string>;
@@ -92,6 +99,30 @@ export const PAGE_META: Record<PageKey, Meta> = {
       fr: "Contactez le Salon Mimi à Marrakech. Situé Place Jamaa El Fna, Médina. WhatsApp, Instagram, horaires et itinéraire. Réservation en ligne disponible.",
       en: "Contact Salon Mimi in Marrakech. Located at Jamaa El Fna Square, Medina. WhatsApp, Instagram, opening hours and directions. Online booking available.",
       es: "Contacta con el Salon Mimi en Marrakech. Ubicado en la Plaza Jamaa El Fna, Medina. WhatsApp, Instagram, horarios e indicaciones. Reserva online disponible.",
+    },
+  },
+  mentionsLegales: {
+    titles: {
+      fr: "Mentions légales — Salon Mimi Marrakech",
+      en: "Legal Notice — Salon Mimi Marrakech",
+      es: "Aviso legal — Salon Mimi Marrakech",
+    },
+    descriptions: {
+      fr: "Mentions légales du Salon Mimi, salon de coiffure afro à Marrakech. Éditeur, hébergeur, propriété intellectuelle et droit applicable.",
+      en: "Legal notice for Salon Mimi, afro hair salon in Marrakech. Publisher, hosting, intellectual property and applicable law.",
+      es: "Aviso legal del Salon Mimi, salón de peluquería afro en Marrakech. Editor, alojamiento, propiedad intelectual y legislación aplicable.",
+    },
+  },
+  confidentialite: {
+    titles: {
+      fr: "Politique de confidentialité — Salon Mimi Marrakech",
+      en: "Privacy Policy — Salon Mimi Marrakech",
+      es: "Política de privacidad — Salon Mimi Marrakech",
+    },
+    descriptions: {
+      fr: "Politique de confidentialité du Salon Mimi Marrakech. Données collectées, finalité, durée de conservation, vos droits selon la loi marocaine 09-08.",
+      en: "Privacy policy for Salon Mimi Marrakech. Data collected, purpose, retention period and your rights under Moroccan law 09-08.",
+      es: "Política de privacidad del Salon Mimi Marrakech. Datos recopilados, finalidad, conservación y sus derechos según la ley marroquí 09-08.",
     },
   },
 };
