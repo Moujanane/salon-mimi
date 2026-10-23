@@ -322,3 +322,6 @@ d'exécuter, tu assumes tes limites.
   la base, limite d'essais atomique, XSS stocké, SSRF push, CSP, piège
   `npm audit fix --omit=dev`) ; règle « rate limiter fail-open » nuancée :
   fail-closed pour une authentification.
+- 2026-10-23 : synchronisation — copie répercutée dans atlas-swincar et
+  Distrib-Eau (en retard depuis le 19/10), suite à l'incident sécurité
+  Railway (rotation de secrets sur les 3 projets).
