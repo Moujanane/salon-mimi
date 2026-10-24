@@ -104,6 +104,45 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
 
 ---
 
+## 46. Incident sécurité Railway — `MIMI_PIN` toujours `1993` malgré le §45 (23 oct 2026)
+
+**Contexte** : Railway a notifié qu'un tiers non autorisé a pu accéder à des
+variables d'environnement déchiffrées sur sa plateforme — incident touchant
+les 3 projets du compte (atlas-swincar, salon-mimi, Distrib-Eau), pas
+spécifique à ce repo. Rotation complète des secrets en cours sur les 3
+projets (voir `handoff.md` d'atlas-swincar pour le détail de l'incident).
+
+**Trouvaille propre à salon-mimi** : un audit de sécurité fait dans ce
+cadre (agent dédié, lecture seule) a confirmé que les 6 points de l'audit
+du 19 oct (§45 ci-dessous) sont bien corrigés dans le code — **mais** a
+trouvé que `MIMI_PIN` était resté en clair à 3 endroits de ce fichier
+(`1993`), et que **cette valeur de 4 caractères était toujours active en
+prod** au 23 oct, malgré la ligne du §45 qui affirmait *« MIMI_PIN ≥ 8
+confirmé »* et *« 10/10 en prod »*. La rotation annoncée en mai (§39, voir
+plus bas) n'avait donc jamais été suivie d'un vrai changement de valeur, et
+personne ne l'avait revérifié depuis.
+
+**Risque** : avec `1993` connu, quiconque a accès en lecture à ce repo
+GitHub pouvait appeler `GET /api/mimi` avec `x-mimi-pin: 1993` et lire
+toutes les réservations clientes (noms, téléphones, messages), ou modifier
+les réglages via `/api/mimi-settings` — sans passer par le rate limiter
+(un PIN correct au premier essai n'est jamais compté comme un échec).
+
+**Corrigé** : confirmé par Mouj que `1993` était bien la valeur active →
+roté vers une nouvelle valeur de 20 caractères alphanumériques (générée
+hors chat, jamais écrite ici ni dans aucun fichier versionné). Les 3
+mentions en clair dans ce fichier remplacées par des références génériques
+à la variable Railway, sans valeur.
+
+**Leçon à retenir** : une ligne de handoff qui affirme « corrigé en prod »
+n'est pas une garantie si la valeur elle-même reste visible en clair plus
+bas dans le même document — la revoir implique de corriger TOUTES les
+occurrences, pas seulement la ligne de statut. Vérifier périodiquement
+qu'une rotation annoncée a réellement eu lieu (ex. en reconsultant la
+variable Railway), pas seulement qu'elle a été documentée comme faite.
+
+---
+
 ## 45. Session 19 oct 2026 — audit sécurité (5 points) et corrections, branche `fix/security-hardening`
 
 **État : TERMINÉ le 19 oct. Code déployé (`fa6870e`, puis correctif admin `4492d33`), SQL exécuté, inscriptions fermées, `ADMIN_EMAILS` créé dans Railway, connexion admin testée OK, `MIMI_PIN` ≥ 8 : `npm run audit:security` = 10/10 en prod. Domaine `*.up.railway.app` supprimé par Mouj dans Railway. Plus aucune étape manuelle de sécurité en attente.**
@@ -1792,11 +1831,19 @@ et `push`.
   `push` ont maintenant un rate limit.
 - `public/mimi.html` : les 6 `fetch` envoient `x-mimi-pin` en header.
 
-`MIMI_PIN=1993` confirmé présent dans Railway, **gardé tel quel** (recommandation
-non urgente : passer à 8+ caractères alphanumériques + prévenir Mimi).
+`MIMI_PIN` confirmé présent dans Railway.
 
-Vérifié prod : sans header → 401, mauvais PIN → 401, `?pin=1993` query → **401
-(ne marche plus)**, `x-mimi-pin: 1993` header → **200 + réservations**.
+Vérifié prod : sans header → 401, mauvais PIN → 401, `?pin=<valeur>` query → **401
+(ne marche plus)**, `x-mimi-pin: <valeur>` header → **200 + réservations**.
+
+**[23 oct 2026] Correctif sécurité** : la valeur alors en place (`1993`,
+4 caractères) avait été laissée en clair dans ce fichier aux 3 endroits
+ci-dessus et plus bas — trouvé par l'audit sécurité du 23 oct 2026 (incident
+Railway), confirmé encore actif en prod par Mouj. Roté vers une nouvelle
+valeur de 20 caractères alphanumériques, jamais écrite dans ce chat ni dans
+un fichier versionné. Voir §46 (« Incident sécurité Railway — `MIMI_PIN`
+toujours `1993` malgré le §45 ») plus haut dans ce fichier pour le détail
+complet.
 
 **NOTE PWA** : Mimi devra peut-être vider le cache de sa PWA installée (ou
 désinstaller/réinstaller) pour récupérer le nouveau `mimi.html` — le Service
@@ -2974,7 +3021,7 @@ next.config.mjs                                 — media-src jsDelivr dans CSP
 
 - Fichier : `public/mimi.html` — page HTML vanilla complète, hors React/Next.js
 - API : `app/api/mimi/route.ts` — vérifie le PIN (`MIMI_PIN` env var) et retourne les réservations
-- PIN actuel : `1993` (variable Railway `MIMI_PIN`)
+- PIN actuel : variable Railway `MIMI_PIN` (voir journal 23 oct 2026 pour l'historique de rotation)
 - URL d'accès : `https://mimi-coiffure.com/mimi.html`
 - Installation Android : Chrome > 3 points > "Ajouter à l'écran d'accueil"
 - Le middleware exclut `/mimi*` de l'i18n (ligne `if (pathname.startsWith("/mimi"))`)
@@ -3347,7 +3394,7 @@ app/sitemap.ts                                           — ajout mentions-lega
 | Variable                        | Rôle                                                    |
 | ------------------------------- | ------------------------------------------------------- |
 | `RESEND_API_KEY`                | Envoi emails via Resend API (clé commence par `re_`)    |
-| `MIMI_PIN`                      | PIN d'accès à la PWA `/mimi.html` (actuellement `1993`) |
+| `MIMI_PIN`                      | PIN d'accès à la PWA `/mimi.html` (valeur définie dans Railway, jamais versionnée) |
 | `SUPABASE_URL`                  | URL du projet Supabase                                  |
 | `SUPABASE_SERVICE_ROLE_KEY`     | Clé service Supabase (accès total)                      |
 | `NEXT_PUBLIC_SUPABASE_URL`      | URL Supabase côté client                                |
