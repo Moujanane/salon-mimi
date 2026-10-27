@@ -39,9 +39,19 @@ export async function POST(request: NextRequest) {
   if (!user)
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
-  // NB : request.formData() bufferise tout le corps avant les contrôles de
-  // taille ci-dessous. Le vrai plafond de taille de requête doit être imposé
+  // request.formData() bufferise tout le corps en mémoire : un Content-Length
+  // annoncé au-delà du plafond est rejeté AVANT ce buffering. Défense en
+  // profondeur seulement — un client peut omettre Content-Length ou envoyer
+  // en chunked, donc le vrai plafond de taille de requête doit rester imposé
   // au niveau de Railway / du proxy (client_max_body_size).
+  const announcedSize = Number(request.headers.get("content-length") ?? 0);
+  if (announcedSize > MAX_ANY) {
+    return NextResponse.json(
+      { error: "Fichier trop volumineux" },
+      { status: 413 },
+    );
+  }
+
   const form = await request.formData();
   const file = form.get("file");
   const alt = String(form.get("alt") ?? "").trim();
