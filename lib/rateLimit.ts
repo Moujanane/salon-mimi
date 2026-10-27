@@ -8,12 +8,17 @@
 // autorise la requête plutôt que de bloquer un utilisateur légitime. Une
 // panne Upstash dégrade la protection anti-spam, jamais la disponibilité
 // du site.
+//
+// Toute panne Upstash (ici ou dans consumeAttempt, fail-closed pour le PIN
+// de Mimi) déclenche une alerte par e-mail best-effort — lib/redisAlert.ts —
+// pour qu'elle soit vue vite plutôt que découverte dans les logs Railway.
 
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 import type { NextRequest } from "next/server";
 import { incrementWithTtl } from "@/lib/attemptCounter";
 import { rateLimitIp } from "@/lib/clientIp";
+import { alertRedisFailure } from "@/lib/redisAlert";
 
 const url = process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -108,7 +113,7 @@ export async function checkWindowLimit(
     const { success } = await limiter.limit(key);
     return success;
   } catch (err) {
-    console.error("[rateLimit] checkWindowLimit error, fail-open:", err);
+    alertRedisFailure("anti-spam", err);
     return true;
   }
 }
@@ -138,7 +143,7 @@ export async function consumeAttempt(
   try {
     return await incrementWithTtl(redis, key, windowSeconds);
   } catch (err) {
-    console.error("[rateLimit] consumeAttempt error, fail-closed:", err);
+    alertRedisFailure("pin-mimi", err);
     return null;
   }
 }
