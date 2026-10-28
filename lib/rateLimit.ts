@@ -8,12 +8,17 @@
 // autorise la requête plutôt que de bloquer un utilisateur légitime. Une
 // panne Upstash dégrade la protection anti-spam, jamais la disponibilité
 // du site.
+//
+// Toute panne Upstash (ici ou dans consumeAttempt, fail-closed pour le PIN
+// de Mimi) déclenche une alerte par e-mail best-effort — lib/redisAlert.ts —
+// pour qu'elle soit vue vite plutôt que découverte dans les logs Railway.
 
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 import type { NextRequest } from "next/server";
 import { incrementWithTtl } from "@/lib/attemptCounter";
 import { rateLimitIp } from "@/lib/clientIp";
+import { alertRedisFailure } from "@/lib/redisAlert";
 
 const url = process.env.UPSTASH_REDIS_REST_URL;
 const token = process.env.UPSTASH_REDIS_REST_TOKEN;
@@ -38,22 +43,34 @@ const redis = url && token ? new Redis({ url, token }) : null;
  * consécutives du même testeur ont produit 3 x-forwarded-for différents,
  * empêchant tout rate limit par IP de fonctionner).
  *
- * Fallback sur `x-forwarded-for` (premier segment, sans espace) si
- * `cf-connecting-ip` est absent — utile en dev local ou si le site change
- * un jour de CDN.
- *
  * ATTENTION : cet en-tête n'est digne de confiance que si le serveur d'origine
  * n'est joignable QUE via Cloudflare. Si l'adresse Railway (*.up.railway.app)
  * répond directement, un attaquant peut écrire lui-même `cf-connecting-ip` et
  * changer de « visiteur » à chaque requête. Vérifié le 19/10/2026 : l'accès direct
- * à l'IP d'origine répond 403 ; supprimer dans Railway (Settings > Networking)
- * tout domaine *.up.railway.app inutilisé.
+ * à l'IP d'origine répond 403 ; vérifier régulièrement dans Railway
+ * (Settings > Networking) qu'aucun domaine *.up.railway.app inutilisé ne
+ * répond en direct — ce point reste une vérification d'infrastructure que le
+ * code ne peut pas garantir lui-même.
+ *
+ * En production, `x-forwarded-for` n'est PAS utilisé en repli : cet en-tête
+ * est réécrit librement par n'importe quel client, donc l'accepter sans
+ * passerelle de confiance connue reviendrait à laisser un attaquant choisir
+ * lui-même sa clé de limitation (et donc la contourner en la changeant à
+ * chaque requête). Une requête sans `cf-connecting-ip` en production est
+ * anormale (Cloudflare le pose toujours) : elle est regroupée sous une seule
+ * clé partagée, plus restrictive qu'un `x-forwarded-for` choisi par
+ * l'attaquant. Le repli sur `x-forwarded-for` reste actif hors production,
+ * uniquement pour le confort du développement local.
  *
  * Une IPv6 est ramenée à son préfixe /64 (lib/clientIp.ts).
  */
 export function getClientIp(req: NextRequest): string {
   const cfIp = req.headers.get("cf-connecting-ip");
   if (cfIp) return rateLimitIp(cfIp.trim());
+
+  if (process.env.NODE_ENV === "production") {
+    return "no-cf-connecting-ip";
+  }
 
   return rateLimitIp(
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown",
@@ -96,7 +113,7 @@ export async function checkWindowLimit(
     const { success } = await limiter.limit(key);
     return success;
   } catch (err) {
-    console.error("[rateLimit] checkWindowLimit error, fail-open:", err);
+    alertRedisFailure("anti-spam", err);
     return true;
   }
 }
@@ -126,7 +143,7 @@ export async function consumeAttempt(
   try {
     return await incrementWithTtl(redis, key, windowSeconds);
   } catch (err) {
-    console.error("[rateLimit] consumeAttempt error, fail-closed:", err);
+    alertRedisFailure("pin-mimi", err);
     return null;
   }
 }

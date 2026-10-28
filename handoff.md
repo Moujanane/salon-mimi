@@ -72,6 +72,20 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
   tant que ce n'est pas tranché ; refaire le point ~4-6 sem. après le
   déploiement du 18 oct (données GSC arrêtées au 16 oct).
 
+**Ouvert après la session du 27 oct (§47)**
+
+- Vérifier manuellement en prod après déploiement de la PR #5 (mergée,
+  commit `b4f4005`) : formulaire de réservation, formulaire de contact, PIN
+  de la PWA Mimi, upload d'un média dans `/admin/galerie` — pas encore fait,
+  session agent sans accès réseau sortant vers `mimi-coiffure.com`
+- Si on veut que l'agent fasse cette vérification lui-même la prochaine
+  fois : ajouter `mimi-coiffure.com` aux domaines autorisés de
+  l'environnement cloud (barre de titre de la session → *Edit* → *Network
+  access*)
+- Logs Railway : confirmer qu'aucun `[ALERTE REDIS]` n'apparaît en
+  fonctionnement normal (sinon Upstash a un problème indépendant de cette
+  session)
+
 **Ouvert après la session du 17-18 oct (§44)**
 
 - Mouj : confirmer les VRAIS horaires (JSON-LD Lun-Sam 9h-19h vs texte
@@ -140,6 +154,79 @@ bas dans le même document — la revoir implique de corriger TOUTES les
 occurrences, pas seulement la ligne de statut. Vérifier périodiquement
 qu'une rotation annoncée a réellement eu lieu (ex. en reconsultant la
 variable Railway), pas seulement qu'elle a été documentée comme faite.
+
+---
+
+## 47. Session 27 oct 2026 — revue d'architecture + durcissement de 4 points fragiles (PR #5, MERGÉE)
+
+**Contexte** : revue d'architecture demandée depuis une session agent sans
+accès au repo local de Mouj (clone en lecture seule puis attaché en
+écriture via `add_repo`). Un diagramme de l'architecture a été produit
+(acteurs → middleware → routes API → Redis/Supabase → services externes)
+et publié en Artifact Claude (lien privé, propriété du compte
+`moujahid.anane@gmail.com` — non reproduit ici, redemander à l'agent si
+besoin). 6 points fragiles identifiés ; 4 ont été corrigés sur demande, 2
+écartés sciemment.
+
+**Corrigé (branche `claude/fix-fragile-points`, PR #5 mergée dans `main`,
+commit de merge `b4f4005`)** :
+
+1. **Confiance dans `cf-connecting-ip`** (`lib/rateLimit.ts`) —
+   `getClientIp` ne retombe plus sur `x-forwarded-for` (falsifiable) en
+   production quand `cf-connecting-ip` est absent ; ces requêtes partagent
+   désormais une clé fixe (`no-cf-connecting-ip`) au lieu de laisser un
+   attaquant choisir la sienne. Le repli sur `x-forwarded-for` reste actif
+   hors production. Le risque résiduel (accès direct à l'origine Railway)
+   reste une vérification d'infra, déjà traitée au §45/§46 (domaine
+   `*.up.railway.app` supprimé) — à revérifier périodiquement.
+2. **Panne Upstash Redis invisible** — comportement fail-open (anti-spam) /
+   fail-closed (PIN Mimi) **non modifié** (c'est le correctif voulu de
+   l'audit du 19 oct, §45 ; l'affaiblir réintroduirait la faille). Ajout de
+   `lib/redisAlert.ts` (+ test) : e-mail best-effort à l'admin à chaque
+   échec de `checkWindowLimit` ou `consumeAttempt`, débounce 1/15 min par
+   type de panne pour ne pas noyer la boîte pendant une panne prolongée.
+   Log `[ALERTE REDIS]` toujours écrit, grep-able dans Railway.
+3. **Client `supabaseAdmin` partagé** (`lib/supabaseAdmin.ts`) —
+   avertissement explicite au point d'usage : ce client contourne RLS et
+   sert routes publiques et admin ; un garde d'auth manquant sur une
+   future route exposerait toute la base. Documentation uniquement, aucun
+   comportement changé.
+4. **Upload galerie bufferisé avant contrôle de taille**
+   (`app/api/gallery/route.ts`) — rejet (`413`) si `Content-Length`
+   dépasse le plafond, avant `request.formData()`. Défense en profondeur
+   seulement : la vraie limite reste le proxy Railway
+   (`client_max_body_size`), un client pouvant omettre cet en-tête.
+
+**Écarté sciemment, à la demande** :
+
+- PIN unique partagé de la PWA Mimi (pas de compte individuel) — rempart
+  réel = robustesse du PIN, cf. rotation du 23 oct (§46).
+- E-mail de `/api/contact` envoyé avec `from: ...@atlas-swincar.com` (le
+  domaine de l'autre projet du compte) — toujours en l'état, contredit la
+  note de `CLAUDE.md` sur l'absence de lien entre les deux sites.
+
+**Vérifications faites** : `npx tsc --noEmit` propre et `npm run test:unit`
+vert (80/80, dont 5 nouveaux tests pour `redisAlert.ts`) à chaque étape,
+avant chaque push. **Pas de CI configurée sur ce dépôt** (aucun workflow
+GitHub Actions). Revue : aucune revue humaine ni commentaire bloquant sur
+la PR — seuls des commentaires automatiques neutres d'un bot externe
+(`ecc-tools`), sans rapport avec le code modifié.
+
+**PAS vérifié en prod** : la session agent qui a fait ces changements n'a
+pas d'accès réseau sortant vers `mimi-coiffure.com` (politique réseau de
+l'environnement cloud) — impossible de confirmer après déploiement que les
+formulaires, le PIN Mimi et l'upload galerie fonctionnent toujours. Voir
+checklist dans l'index (§0, « Ouvert après la session du 27 oct »).
+
+**Fichiers touchés** :
+
+```
+lib/rateLimit.ts            — getClientIp (fallback x-forwarded-for retiré en prod) + alertes
+lib/redisAlert.ts           — créé (alerte e-mail best-effort, débounce 15 min)
+lib/redisAlert.test.ts      — créé (5 tests)
+lib/supabaseAdmin.ts        — avertissement en commentaire, aucun changement de comportement
+app/api/gallery/route.ts    — contrôle Content-Length avant formData()
+```
 
 ---
 
