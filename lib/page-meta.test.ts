@@ -138,3 +138,11 @@ test("pageMetadata : image de partage présente, langue inconnue -> français", 
   const images = m.openGraph?.images as { url: string }[];
   assert.ok(images[0].url.endsWith("/fr/opengraph-image"));
 });
+
+test("meta description Services : prix minimum annoncé = 65 MAD (3 langues)", () => {
+  for (const l of LOCALES) {
+    const d = PAGE_META.services.descriptions[l];
+    assert.match(d, /\b65 MAD/, l);
+    assert.doesNotMatch(d, /\b150 MAD/, l);
+  }
+});

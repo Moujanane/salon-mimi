@@ -22,7 +22,7 @@ function toLocale(locale: string): ContentLocale {
 }
 
 const all = [...services, ...packages];
-const MIN = Math.min(...all.map((i) => i.priceMad));
+const MIN = SALON.priceRange.min;
 const MAX = Math.max(...all.map((i) => i.priceMad));
 const N = all.length;
 

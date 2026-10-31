@@ -18,7 +18,7 @@ function hoursLabel(hhmm: string): string {
 export function llmsTxt(): string {
   const base = SALON.url;
   const all = [...services, ...packages];
-  const min = Math.min(...all.map((i) => i.priceMad));
+  const min = SALON.priceRange.min;
   const max = Math.max(...all.map((i) => i.priceMad));
 
   const tarifs = all.map(

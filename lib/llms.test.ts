@@ -62,3 +62,7 @@ test("uniquement des URLs https du domaine du salon, taille raisonnable", () => 
   }
   assert.ok(txt.length < 6000, `${txt.length} caractères`);
 });
+
+test("le résumé annonce le minimum réel (65 MAD, cheveux attachés) et le maximum du catalogue", () => {
+  assert.match(txt, /Tarifs de 65 à 950 MAD/);
+});

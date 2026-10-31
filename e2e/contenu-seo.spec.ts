@@ -221,3 +221,28 @@ test.describe("Page Services : tableau de tarifs en HTML", () => {
     });
   }
 });
+
+test.describe("Prix minimum annoncé : 65 MAD partout (coiffure seulement)", () => {
+  // Choix de Mouj le 31 oct 2026 : « Cheveux attachés dès 65 MAD » est le prix
+  // d'entrée annoncé. Meta description, JSON-LD et llms.txt doivent concorder
+  // avec la ligne du tableau de tarifs.
+  test("meta description Services, JSON-LD priceRange et llms.txt", async ({
+    request,
+    page,
+  }) => {
+    await page.goto("/fr/services");
+    const meta = await page
+      .locator('meta[name="description"]')
+      .getAttribute("content");
+    expect(meta).toMatch(/Dès 65 MAD/);
+
+    await page.goto("/fr");
+    const blocs = await page
+      .locator('script[type="application/ld+json"]')
+      .evaluateAll((els) => els.map((e) => e.textContent ?? ""));
+    expect(blocs.join(" ")).toContain('"priceRange":"65–950 MAD"');
+
+    const llms = await (await request.get("/llms.txt")).text();
+    expect(llms).toContain("Tarifs de 65 à 950 MAD");
+  });
+});

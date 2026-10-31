@@ -10,6 +10,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { getFaq, faqJsonLd, FAQ_TITLE } from "./faq";
 import { services, packages } from "./services-data";
+import { SALON } from "./salon-info";
 
 const LOCALES = ["fr", "en", "es"] as const;
 
@@ -38,7 +39,11 @@ test("la réponse tarifs cite les prix du catalogue dans chaque langue", () => {
     ]) {
       assert.ok(tarifs.includes(`${price(id)} MAD`), `${l} : ${id}`);
     }
-    assert.ok(tarifs.includes(`${Math.min(...all)} MAD`), `${l} : minimum`);
+    assert.match(
+      tarifs,
+      new RegExp(`\\b${SALON.priceRange.min} MAD`),
+      `${l} : minimum`,
+    );
     assert.ok(tarifs.includes(`${Math.max(...all)} MAD`), `${l} : maximum`);
     assert.doesNotMatch(tarifs, /\b550\b/, `${l} : ancien prix`);
   }

@@ -46,13 +46,18 @@ export const SALON = {
   },
 
   /**
-   * Fourchette de prix réelle, dérivée de `lib/services-data.ts` :
-   *  - min : soin argan seul (150 MAD)
-   *  - max : package Faux Locks + bijoux perles (950 MAD)
-   * À garder synchronisée si les prix de `services-data.ts` changent.
+   * Fourchette de prix annoncée (meta description, JSON-LD, FAQ, llms.txt,
+   * intro de l'accueil : tout dérive d'ici) :
+   *  - min : « Cheveux attachés dès 65 MAD », le prix d'entrée le plus bas en
+   *    coiffure (choix de Mouj le 31 oct 2026 ; les ongles dès 55 MAD ne sont
+   *    pas comptés). Ce prix vient de `settings.price_cheveux_attaches` (admin,
+   *    page Services) : si Mimi le change, mettre à jour ici.
+   *  - max : package Faux Locks + bijoux perles (950 MAD), catalogue
+   *    `lib/services-data.ts`.
    */
   priceRange: {
-    min: 150,
+    min: 65,
+    minLabel: { fr: "cheveux attachés", en: "updos", es: "recogidos" },
     max: 950,
     currency: "MAD",
   },
@@ -127,7 +132,7 @@ export function priceRangeLabel(): string {
  */
 export function faqTarifsAnswer(locale: string): string {
   const all = [...services, ...packages];
-  const cheapest = all.reduce((a, b) => (b.priceMad < a.priceMad ? b : a));
+  const minPrice = SALON.priceRange.min;
   const priciest = all.reduce((a, b) => (b.priceMad > a.priceMad ? b : a));
   const price = (id: string) => {
     const item = services.find((s) => s.id === id);
@@ -141,18 +146,18 @@ export function faqTarifsAnswer(locale: string): string {
 
   if (locale === "en") {
     return (
-      `Prices range from ${cheapest.priceMad} MAD (${cheapest.nameEn}) to ${priciest.priceMad} MAD (${priciest.nameEn}). ` +
+      `Prices range from ${minPrice} MAD (${SALON.priceRange.minLabel.en}) to ${priciest.priceMad} MAD (${priciest.nameEn}). ` +
       `Medium box braids are ${box} MAD, knotless braids ${knotless} MAD, full-head cornrows ${cornrows} MAD and starter locs ${locks} MAD.`
     );
   }
   if (locale === "es") {
     return (
-      `Los precios van de ${cheapest.priceMad} MAD (${cheapest.nameEs}) a ${priciest.priceMad} MAD (${priciest.nameEs}). ` +
+      `Los precios van de ${minPrice} MAD (${SALON.priceRange.minLabel.es}) a ${priciest.priceMad} MAD (${priciest.nameEs}). ` +
       `Las box braids medianas cuestan ${box} MAD, las knotless braids ${knotless} MAD, los cornrows de cabeza completa ${cornrows} MAD y el inicio de rastas ${locks} MAD.`
     );
   }
   return (
-    `Les tarifs vont de ${cheapest.priceMad} MAD (${cheapest.nameFr}) à ${priciest.priceMad} MAD (${priciest.nameFr}). ` +
+    `Les tarifs vont de ${minPrice} MAD (${SALON.priceRange.minLabel.fr}) à ${priciest.priceMad} MAD (${priciest.nameFr}). ` +
     `Les box braids medium sont à ${box} MAD, les knotless braids à ${knotless} MAD, ` +
     `les cornrows tête entière à ${cornrows} MAD, le départ de locks à ${locks} MAD.`
   );

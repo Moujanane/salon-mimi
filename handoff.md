@@ -104,10 +104,13 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
   « dès » de la page Services (table `settings`, ex. Box braids dès 105) sont de
   VRAIS prix pratiqués ; c'est le catalogue (`lib/services-data.ts`, ex. Box
   Braids medium 500) qui ne couvre pas ces prestations d'entrée. Tableau HTML
-  « Tarifs : à partir de » ajouté sur `/xx/services` (§47bis). OUVERT : le
-  « dès 150 MAD » (meta description, JSON-LD `priceRange` 150–950, llms.txt, FAQ)
-  est faux si le vrai minimum est 55 (ongles) ou 65 (cheveux attachés) ; à
-  trancher avec Mouj avant de toucher à ces textes.
+  « Tarifs : à partir de » ajouté sur `/xx/services` (§47bis). Prix minimum
+  annoncé TRANCHÉ par Mouj le 31 oct : **65 MAD (coiffure seulement, cheveux
+  attachés ; les ongles dès 55 ne comptent pas)**, source unique
+  `SALON.priceRange.min` (`lib/salon-info.ts`) d'où dérivent meta description
+  Services, JSON-LD `priceRange` (65–950 MAD), FAQ, llms.txt et intro de
+  l'accueil. Si Mimi change `price_cheveux_attaches` dans l'admin, mettre à jour
+  cette constante.
 - Dev, besoin du nom complet de Mimi : `sameAs`/`url` sur le bloc Person
 - Dev : **intro de l'accueil resserrée et pages légales sur `pageMetadata()` —
   FAIT le 19 oct (§44, complément)**
@@ -317,6 +320,14 @@ app/api/gallery/route.ts    — contrôle Content-Length avant formData()
   dans le site (c'est `price_tresses_africaines`), je l'avais dit disparu.
   Un échec e2e isolé en local (nom non relevé) ne s'est pas reproduit sur 2
   passages complets (294 verts).
+
+- **Minimum 65 MAD (31 oct)** : « Dès 150 MAD » (soin argan du catalogue)
+  remplacé partout par 65 MAD. Tests unitaires `pricing`, `faq`, `llms`,
+  `page-meta`, `page-content` + e2e « Prix minimum annoncé ». Le catalogue
+  (`services-data.ts`) garde ses prix exacts (min 150), il n'est pas modifié.
+  Test e2e intermittent noté : `/fr/services a des H2` (assertion « un seul H1 »)
+  a échoué 2 fois sur 5 passages complets en LOCAL (serveur de dev sous charge,
+  non reproduit seul ×18 ni sur 6 passages contre la prod) ; à surveiller.
 
 ---
 

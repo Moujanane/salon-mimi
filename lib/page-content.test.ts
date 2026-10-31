@@ -20,7 +20,7 @@ import { SALON } from "./salon-info";
 
 const LOCALES = ["fr", "en", "es"] as const;
 const all = [...services, ...packages];
-const min = Math.min(...all.map((i) => i.priceMad));
+const min = SALON.priceRange.min;
 const max = Math.max(...all.map((i) => i.priceMad));
 const price = (id: string) => services.find((s) => s.id === id)!.priceMad;
 
@@ -31,7 +31,7 @@ test("introduction de l'accueil : réponse directe avec prix du catalogue (3 lan
     assert.match(text, /Marrakech/, l);
     assert.match(text, /Jamaa El Fna/, l);
     assert.ok(
-      text.includes(`${min} `) && text.includes(`${max} MAD`),
+      new RegExp(`\\b${min}\\b`).test(text) && text.includes(`${max} MAD`),
       `${l} fourchette`,
     );
     for (const id of ["box-braids-medium", "knotless-braids", "cornrows"]) {
