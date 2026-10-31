@@ -100,9 +100,14 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
   (+212600000001) dans l'admin, créées par un test e2e lancé en local
 - Search Console : demander l'indexation de /fr, /fr/services, /fr/a-propos
   et renvoyer le sitemap
-- Décision : prix « dès » de la page Services (système `settings.price_*`,
-  ex. Box braids dès 200) vs catalogue (Box braids 450-500) — incohérence
-  visible ; bloque le tableau de prix HTML
+- ~~Décision prix « dès » vs catalogue~~ TRANCHÉ le 31 oct par Mouj : les
+  « dès » de la page Services (table `settings`, ex. Box braids dès 105) sont de
+  VRAIS prix pratiqués ; c'est le catalogue (`lib/services-data.ts`, ex. Box
+  Braids medium 500) qui ne couvre pas ces prestations d'entrée. Tableau HTML
+  « Tarifs : à partir de » ajouté sur `/xx/services` (§47bis). OUVERT : le
+  « dès 150 MAD » (meta description, JSON-LD `priceRange` 150–950, llms.txt, FAQ)
+  est faux si le vrai minimum est 55 (ongles) ou 65 (cheveux attachés) ; à
+  trancher avec Mouj avant de toucher à ces textes.
 - Dev, besoin du nom complet de Mimi : `sameAs`/`url` sur le bloc Person
 - Dev : **intro de l'accueil resserrée et pages légales sur `pageMetadata()` —
   FAIT le 19 oct (§44, complément)**
@@ -302,6 +307,16 @@ app/api/gallery/route.ts    — contrôle Content-Length avant formData()
   par `&` ou `%26` redirige en 308 vers `/fr` ; tests dans
   `e2e/seo-canonical.spec.ts`. Les vraies URLs inconnues restent en 404. À faire
   côté Mouj : chercher un lien « mimi-coiffure.com/& » dans les bios et annuaires.
+
+- **Tableau de tarifs (31 oct)** : `app/[locale]/services/page.tsx` rend un
+  `<table>` côté serveur (10 familles, prix = table `settings` avec les mêmes
+  valeurs de repli que le JSON-LD ItemList), titre H2 « Tarifs : à partir de »,
+  fr/en/es. Avant, ces prix n'arrivaient que par JavaScript. Tests dans
+  `e2e/contenu-seo.spec.ts` (« tableau de tarifs en HTML », comparés à
+  `/api/settings`). Correction d'une erreur d'audit : « 125 MAD » existe bien
+  dans le site (c'est `price_tresses_africaines`), je l'avais dit disparu.
+  Un échec e2e isolé en local (nom non relevé) ne s'est pas reproduit sur 2
+  passages complets (294 verts).
 
 ---
 

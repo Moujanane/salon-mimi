@@ -174,3 +174,50 @@ test.describe("Page Services : titres H2 (structure H1 > H2)", () => {
     });
   }
 });
+
+test.describe("Page Services : tableau de tarifs en HTML", () => {
+  // Les « à partir de » viennent de la table settings (modifiable dans l'admin).
+  // Le tableau doit être dans le HTML envoyé par le serveur (pas chargé après
+  // coup en JavaScript), pour que Google le lise au premier passage.
+  const FAMILLES: [string, string][] = [
+    ["Tresses africaines", "price_tresses_africaines"],
+    ["Tresses et nattes", "price_tresses_et_nattes"],
+    ["Box braids", "price_box_braids"],
+    ["Tresses Fulani", "price_tresses_fulani"],
+    ["Tresses Boho", "price_tresses_boho"],
+    ["Locks & dreads", "price_locks_dreads"],
+    ["Cheveux attachés", "price_cheveux_attaches"],
+    ["Perruques et tissage", "price_perruques_tissage"],
+    ["Colorations capillaires", "price_colorations"],
+    ["Ongles, soins & épilation", "price_ongles_soins_epilation"],
+  ];
+
+  test("le HTML du serveur contient un tableau avec les 10 familles et leurs prix", async ({
+    request,
+  }) => {
+    const settings = await (await request.get("/api/settings")).json();
+    const html = await (await request.get("/fr/services")).text();
+    const tableau = html.match(/<table[\s\S]*?<\/table>/)?.[0] ?? "";
+    expect(tableau).not.toBe("");
+    expect(tableau).toContain("<caption");
+    expect(tableau).toContain("<th");
+    for (const [nom, cle] of FAMILLES) {
+      const nomHtml = nom.replace("&", "&amp;");
+      const ligne = tableau
+        .split("</tr>")
+        .find((l) => l.includes(nomHtml));
+      expect(ligne, `ligne manquante : ${nom}`).toBeTruthy();
+      expect(ligne).toContain(`${settings[cle]}`);
+      expect(ligne).toContain("MAD");
+    }
+  });
+
+  for (const locale of ["en", "es"]) {
+    test(`/${locale}/services a aussi son tableau (10 lignes de données)`, async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}/services`);
+      await expect(page.locator("table tbody tr")).toHaveCount(10);
+    });
+  }
+});
