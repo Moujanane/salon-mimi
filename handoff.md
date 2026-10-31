@@ -278,6 +278,22 @@ app/api/gallery/route.ts    — contrôle Content-Length avant formData()
   catalogue), Cloudflare 403 robots IA, produits fiche Google, avis, contraste
   (design), title accueil 64 car. (mesure mi-nov).
 
+- **Rapport « Pourquoi des pages ne sont pas indexées » du 31 oct** (32
+  redirection, 23 canonique correcte, 4 explorées non indexées, 4 en 403, 3 en
+  404, 1 doublon). Diagnostic : les 24 URLs du sitemap répondent 200 sans
+  redirection ; sur 76 liens internes un seul n'est pas en 200 :
+  `/cdn-cgi/l/email-protection` (lien fabriqué par Cloudflare pour masquer
+  l'e-mail des mentions légales, 404 pour les robots) = source probable des 404
+  et d'une partie des 403. Corrigé dans le code : `Disallow: /cdn-cgi/` dans
+  `app/robots.ts` (groupe `*`), test dans `e2e/seo-fichiers.spec.ts`. Les
+  redirections (anciennes URLs sans langue et variantes avec barre finale en 308)
+  et les `?service=` (canonique vers `/xx/reservation`) sont voulues : pas des
+  erreurs, inutile de cliquer « Valider » dessus (l'échec de validation est
+  normal). `/en/a-propos` : crawlée une seule fois le 24 sept, 287 mots, canonical
+  correct, rien à corriger dans le code : demander l'indexation dans GSC. RESTE
+  côté Mouj : Cloudflare > Scrape Shield > désactiver « Email Address
+  Obfuscation », puis « Valider la correction » sur 404 et 403 seulement.
+
 ---
 
 ## 46bis. Audit SEO public — 27 oct 2026

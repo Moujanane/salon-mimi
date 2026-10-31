@@ -44,3 +44,21 @@ test.describe("sitemap.xml", () => {
     }
   });
 });
+
+test.describe("robots.txt", () => {
+  // Cloudflare transforme l'e-mail des mentions légales en lien
+  // /cdn-cgi/l/email-protection, qui répond 404 aux robots. Google le suit et
+  // le signale dans « Pourquoi des pages ne sont pas indexées ». Il n'a rien à
+  // faire dans l'index.
+  test("interdit /cdn-cgi/ aux robots génériques, sans bloquer le site", async ({
+    request,
+  }) => {
+    const res = await request.get("/robots.txt");
+    expect(res.status()).toBe(200);
+    const body = await res.text();
+    const groupeEtoile = body.split(/\n\s*\n/).find((g) => /User-Agent:\s*\*/i.test(g)) ?? "";
+    expect(groupeEtoile).toMatch(/Disallow:\s*\/cdn-cgi\//i);
+    expect(groupeEtoile).toMatch(/Allow:\s*\/\s*$/m);
+    expect(body).toContain("Sitemap: https://mimi-coiffure.com/sitemap.xml");
+  });
+});
