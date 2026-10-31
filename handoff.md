@@ -90,8 +90,8 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
 
 - ~~Horaires contradictoires~~ TRANCHÉ le 31 oct par Mouj : **tous les jours
   9h-23h**. Code corrigé (JSON-LD, llms.txt, source unique `SALON.hours` dans
-  `lib/salon-info.ts`, §47bis). RESTE côté Mouj : mettre les mêmes horaires sur
-  la fiche Google Business Profile.
+  `lib/salon-info.ts`, §47bis). Fiche Google Business Profile : déjà à 9h-23h tous les jours
+  (confirmé par Mouj le 31 oct). Horaires cohérents partout.
 - Mouj : Cloudflare renvoie 403 à ClaudeBot / anthropic-ai / Bytespider /
   cohere-ai / Amazonbot alors que robots.txt les autorise
 - Mouj : GBP produits (ajoutés en juin) avec d'anciens prix (Cornrows 370,
