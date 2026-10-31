@@ -6,7 +6,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 0. Index des tâches ouvertes (mis à jour le 19 oct 2026)
+## 0. Index des tâches ouvertes (mis à jour le 27 oct 2026)
 
 Ce fichier grossit vite — avant de re-parcourir tout le handoff en début de
 session, regarder ici d'abord. Mis à jour manuellement, peut dater un peu ;
@@ -86,10 +86,11 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
   fonctionnement normal (sinon Upstash a un problème indépendant de cette
   session)
 
-**Ouvert après la session du 17-18 oct (§44)**
+**Ouvert après l'audit SEO du 27 oct (§46bis)**
 
 - Mouj : confirmer les VRAIS horaires (JSON-LD Lun-Sam 9h-19h vs texte
-  visible « tous les jours 9h-23h »), puis corriger le côté faux
+  visible « tous les jours 9h-23h »), puis corriger le côté faux. Contradiction
+  reconfirmée en prod le 27 oct (§46bis) ; ne pas choisir arbitrairement.
 - Mouj : Cloudflare renvoie 403 à ClaudeBot / anthropic-ai / Bytespider /
   cohere-ai / Amazonbot alors que robots.txt les autorise
 - Mouj : GBP produits (ajoutés en juin) avec d'anciens prix (Cornrows 370,
@@ -108,6 +109,13 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
   forfaits, de 150 à 950 MAD ») — budget de mots très serré (ES finit au mot
   149 sur 150) ; toute modif du hero ou de l'intro doit repasser le test e2e
   « se termine avant le mot 150 »
+- ~~Dev, quick win SEO (§46bis) : séparateur dans le H1 de l'accueil~~ FAIT le
+  31 oct (§47bis), commit `ba2a742`
+- ~~PageSpeed Insights : relancer une mesure~~ FAIT le 31 oct via Lighthouse
+  local (§47bis). Reste optionnel : contraste du bouton ocre et des textes 10 px
+  (Lighthouse accessibilité 96)
+- Search Console : l'audit du 27 oct n'avait pas accès aux rapports ; indexation,
+  clics, impressions et CTR restent à vérifier dans GSC.
 
 **Pour mémoire — déjà réglé, ne pas rouvrir sans nouveau signal**
 
@@ -229,6 +237,72 @@ app/api/gallery/route.ts    — contrôle Content-Length avant formData()
 ```
 
 ---
+## 47bis. Session 31 oct 2026 — H1, mesures, audit RLS
+
+- **H1 de l'accueil (commit `ba2a742`)** :
+  espace `{" "}` ajouté entre les deux lignes dans `components/sections/HeroHome.tsx`
+  (rendu visuel inchangé, le texte extrait n'est plus « RastaMarrakech »).
+  Test ajouté : `e2e/contenu-seo.spec.ts`, « le H1 sépare ses deux lignes par un
+  espace » (fr/en/es). Rouge contre la prod avant correction, vert après.
+  Local : `tsc` OK, 75 tests unitaires OK, 268 tests e2e OK (2 ignorés, test de
+  réservation exclu).
+- **Mesures (prod, 31 oct)** : l'API PageSpeed refuse sans clé (quota 429). Mesure
+  faite avec Lighthouse local : mobile Accessibilité 96, Bonnes pratiques 100,
+  SEO 100 ; trace mobile (4G rapide, CPU x4) LCP 538 ms, CLS 0.00. Seul échec
+  Lighthouse : contraste insuffisant (bouton ocre/blanc 11 px = 3.4 ; textes
+  `text-white/35` et `/40` de 10 px = 3.2 à 3.8, attendu 4.5). Pas de données
+  CrUX (trafic trop faible).
+- **Audit RLS (code uniquement)** : `npm run audit:security` = 10/10. Toutes les
+  routes d'écriture (`gallery`, `gallery/[id]` PATCH/DELETE, `gallery/order`,
+  `settings`, `reservations/[id]` PATCH/DELETE) passent par `getAuthUser()`
+  (session + ADMIN_EMAILS) ; push, mimi, mimi-settings par `checkMimiPin`.
+  `GET /api/settings` filtre sur `PUBLIC_KEYS`. NON vérifié (pas d'accès à la
+  base, MCP Supabase refusé) : état réel de `pg_policies` et `storage.objects`,
+  liste `auth.users`. Écart documentaire : la migration cite `heure_souhaitee` et
+  `nombre_personnes`, absents de `supabase-schema.sql`.
+- **GSC (28 j au 31 oct, 1er relevé, trop tôt pour conclure)** : « salon mimi
+  marrakech » 7 clics / 29 impr. / pos. 1.31 ; « coiffeur afro marrakech » 1/12/
+  pos. 3.33 ; « tresse africaine marrakech » 1/13/pos. 3.38. Volumes très faibles.
+  Vraie mesure à faire entre le 16 nov et le 2 déc.
+
+---
+
+## 46bis. Audit SEO public — 27 oct 2026
+
+Audit en lecture seule du site public `https://mimi-coiffure.com`, recoupé avec
+le code local. Aucun fichier applicatif modifié pendant cet audit.
+
+### Vérifications en production
+
+- `robots.txt` accessible et sitemap déclaré ; `sitemap.xml` contient 24 URL
+  (8 pages × FR/EN/ES).
+- Les 24 URL du sitemap répondent HTTP 200 sans redirection. Canonical
+  auto-référent, `hreflang` réciproques `fr`/`en`/`es`/`x-default` et
+  attribut `<html lang>` cohérents vérifiés sur les 24 pages.
+- Titres, descriptions, Open Graph et Twitter sont générés par
+  `lib/page-meta.ts`. Le test ciblé
+  `node --import tsx --test lib/page-meta.test.ts` passe (8/8).
+- JSON-LD `HairSalon` et `FAQPage` présents sur l'accueil ; `/admin/login`
+  contient bien `noindex, nofollow`.
+
+### Constats et suivi
+
+- **À confirmer avant correction : horaires contradictoires.** Le texte visible
+  annonce tous les jours 9h–23h ; le JSON-LD de `app/[locale]/layout.tsx`
+  déclare lundi–samedi 9h–19h. La même divergence est décrite dans
+  `lib/page-content.ts`. Mouj doit confirmer les vrais horaires avant
+  d'harmoniser le texte, le balisage structuré et la fiche Google Business
+  Profile.
+- **H1 d'accueil :** le `<h1>` est visuellement sur deux lignes, mais son texte
+  extrait peut concaténer « Tresses africaines & Rasta » et « Marrakech » en
+  « Tresses africaines & RastaMarrakech ». Séparateur textuel recommandé dans
+  `components/sections/HeroHome.tsx` ; amélioration optionnelle, pas un blocage.
+- **Title de l'accueil :** 64 caractères dans le HTML public, exception déjà
+  suivie et volontaire (`lib/page-meta.ts`, mesure du changement §42). Ne pas
+  le raccourcir sans résultat GSC concluant.
+- PageSpeed Insights n'a pas fourni de mesures : API limitée par HTTP 429.
+  Core Web Vitals non vérifiés dans cet audit. Search Console indisponible :
+  indexation et performances organiques non vérifiées.
 
 ## 45. Session 19 oct 2026 — audit sécurité (5 points) et corrections, branche `fix/security-hardening`
 
