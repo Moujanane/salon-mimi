@@ -16,6 +16,12 @@ export default function middleware(request: NextRequest) {
     return NextResponse.redirect(`https://${nonWwwHost}${p}${search}`, 301);
   }
 
+  // Lien mal copié du type « mimi-coiffure.com/&utm... » (signalé en 404 par
+  // Search Console) : on l'envoie à l'accueil au lieu de /fr/& qui n'existe pas.
+  if (/^\/(&|%26)/i.test(pathname)) {
+    return NextResponse.redirect(new URL("/fr", request.url), 308);
+  }
+
   if (pathname.startsWith("/mimi")) {
     return;
   }

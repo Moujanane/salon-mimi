@@ -294,6 +294,15 @@ app/api/gallery/route.ts    — contrôle Content-Length avant formData()
   côté Mouj : Cloudflare > Scrape Shield > désactiver « Email Address
   Obfuscation », puis « Valider la correction » sur 404 et 403 seulement.
 
+- **404 signalés par GSC (3 exemples, 31 oct)** : deux `?service=` (22 août et
+  ancien) répondent 200 avec canonical correct (traces de l'incident Railway du
+  22 août, rien à faire). `https://mimi-coiffure.com/&` (crawlée le 18 oct)
+  allait vers `/fr/&` en 404 : lien mal copié quelque part (bio Instagram/TikTok,
+  fiche Google, annuaire ?). Corrigé dans `middleware.ts` : tout chemin commençant
+  par `&` ou `%26` redirige en 308 vers `/fr` ; tests dans
+  `e2e/seo-canonical.spec.ts`. Les vraies URLs inconnues restent en 404. À faire
+  côté Mouj : chercher un lien « mimi-coiffure.com/& » dans les bios et annuaires.
+
 ---
 
 ## 46bis. Audit SEO public — 27 oct 2026

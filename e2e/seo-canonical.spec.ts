@@ -205,3 +205,22 @@ test.describe("SEO — routing [locale] strict", () => {
     });
   }
 });
+
+test.describe("SEO — liens cassés commençant par « & »", () => {
+  // Search Console a signalé https://mimi-coiffure.com/& en 404 (lien mal copié,
+  // type « mimi-coiffure.com/&utm... »). Ces URLs vont à l'accueil au lieu de
+  // /fr/& qui n'existe pas. Les vraies URLs inconnues restent en 404 (test
+  // « répond 404 direct » plus haut).
+  for (const chemin of ["/&", "/&utm_source=instagram", "/%26"]) {
+    test(`${chemin} redirige (308) vers l'accueil`, async ({ request }) => {
+      const res = await request.get(chemin, { maxRedirects: 0 });
+      expect(res.status()).toBe(308);
+      expect(new URL(res.headers()["location"], "https://mimi-coiffure.com").pathname).toBe("/fr");
+    });
+  }
+
+  test("une URL inconnue reste en 404", async ({ request }) => {
+    const res = await request.get("/fr/n-existe-pas");
+    expect(res.status()).toBe(404);
+  });
+});
