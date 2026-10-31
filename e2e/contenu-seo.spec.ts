@@ -126,3 +126,51 @@ test.describe("Réponse directe dans les 150 premiers mots (critère GEO)", () =
     });
   }
 });
+
+test.describe("Horaires : tous les jours 9h-23h partout", () => {
+  // Horaires confirmés par Mouj le 31 oct 2026. Le balisage JSON-LD (lu par
+  // Google) doit dire la même chose que le texte visible.
+  test("le JSON-LD HairSalon annonce 7 jours sur 7, 09:00 à 23:00", async ({
+    page,
+  }) => {
+    await page.goto("/fr");
+    const blocs = await page
+      .locator('script[type="application/ld+json"]')
+      .evaluateAll((els) => els.map((e) => e.textContent ?? ""));
+    const salon = blocs
+      .flatMap((b) => {
+        const j = JSON.parse(b);
+        return Array.isArray(j) ? j : (j["@graph"] ?? [j]);
+      })
+      .find((n) => n["@type"] === "HairSalon");
+    expect(salon).toBeTruthy();
+    const specs = salon.openingHoursSpecification;
+    const jours = new Set(specs.flatMap((s: { dayOfWeek: string[] }) => s.dayOfWeek));
+    expect(jours.size).toBe(7);
+    for (const s of specs) {
+      expect(s.opens).toBe("09:00");
+      expect(s.closes).toBe("23:00");
+    }
+  });
+
+  test("la page Contact affiche les mêmes horaires", async ({ page }) => {
+    await page.goto("/fr/contact");
+    await expect(page.locator("main")).toContainText(/9h\s*–\s*23h/);
+  });
+});
+
+test.describe("Page Services : titres H2 (structure H1 > H2)", () => {
+  for (const locale of ["fr", "en", "es"]) {
+    test(`/${locale}/services a des H2 (un par prestation + vidéos)`, async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}/services`);
+      await expect(page.locator("h1")).toHaveCount(1);
+      expect(await page.locator("h2").count()).toBeGreaterThanOrEqual(5);
+      // Aucun H2 vide
+      for (const t of await page.locator("h2").allTextContents()) {
+        expect(t.trim().length).toBeGreaterThan(2);
+      }
+    });
+  }
+});

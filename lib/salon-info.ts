@@ -74,13 +74,46 @@ export const SALON = {
   languages: ["fr", "en", "es"],
 
   /**
+   * Horaires d'ouverture : tous les jours de 9h à 23h (confirmé par Mouj le
+   * 31 oct 2026). Source unique du JSON-LD et de llms.txt ; le texte visible
+   * (Contact, section Localisation) dit la même chose. Si les horaires
+   * changent : modifier ici, puis les textes de app/[locale]/contact/page.tsx
+   * et components/sections/LocationSection.tsx, puis la fiche Google.
+   */
+  hours: {
+    days: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ],
+    opens: "09:00",
+    closes: "23:00",
+  },
+
+  /**
    * Date de la dernière révision des informations du salon (adresse, horaires,
    * prestations, tarifs). Alimente `dateModified` dans le JSON-LD — signal de
    * fraîcheur pour les moteurs génératifs.
    * À bumper à la main quand une de ces infos change. Format YYYY-MM-DD.
    */
-  lastReviewed: "2026-10-17",
+  lastReviewed: "2026-10-31",
 } as const;
+
+/** Bloc `openingHoursSpecification` de schema.org, calculé depuis SALON.hours. */
+export function openingHoursLd() {
+  return [
+    {
+      "@type": "OpeningHoursSpecification" as const,
+      dayOfWeek: [...SALON.hours.days],
+      opens: SALON.hours.opens,
+      closes: SALON.hours.closes,
+    },
+  ];
+}
 
 /** Fourchette de prix formatée pour le champ `priceRange` de schema.org. */
 export function priceRangeLabel(): string {

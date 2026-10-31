@@ -424,7 +424,7 @@ export default function ServicesPageClient({
                     zIndex: 10,
                   }}
                 >
-                  <span
+                  <h2
                     style={{
                       display: "inline-block",
                       background: "rgba(255,255,255,0.12)",
@@ -439,7 +439,7 @@ export default function ServicesPageClient({
                     }}
                   >
                     {getLabel(s, locale)}
-                  </span>
+                  </h2>
                   <p
                     style={{
                       fontFamily: "Georgia, serif",
@@ -556,9 +556,9 @@ export default function ServicesPageClient({
                   }}
                 />
                 <div className="absolute bottom-0 left-0 right-0 p-7 z-10">
-                  <span className="inline-block bg-brun/80 border border-ocre/30 text-white text-[11px] tracking-[2px] uppercase px-3 py-1.5 rounded-full mb-3">
+                  <h2 className="inline-block bg-brun/80 border border-ocre/30 text-white text-[11px] tracking-[2px] uppercase px-3 py-1.5 rounded-full mb-3">
                     {getLabel(s, locale)}
-                  </span>
+                  </h2>
                   <p className="font-georgia text-[15px] text-white leading-relaxed mb-2">
                     {getSubServices(s, locale)}
                   </p>
@@ -584,9 +584,9 @@ export default function ServicesPageClient({
       )}
       {/* Section vidéos Pomelli */}
       <div className="border-t border-ocre/10 mt-8 pt-10 px-6 md:px-12 pb-16">
-        <p className="text-ocre text-[11px] tracking-[3px] uppercase font-inter mb-3 text-center">
+        <h2 className="text-ocre text-[11px] tracking-[3px] uppercase font-inter mb-3 text-center">
           {tx.videoTitle}
-        </p>
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {[
             {

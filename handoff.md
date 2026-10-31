@@ -88,9 +88,10 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
 
 **Ouvert après l'audit SEO du 27 oct (§46bis)**
 
-- Mouj : confirmer les VRAIS horaires (JSON-LD Lun-Sam 9h-19h vs texte
-  visible « tous les jours 9h-23h »), puis corriger le côté faux. Contradiction
-  reconfirmée en prod le 27 oct (§46bis) ; ne pas choisir arbitrairement.
+- ~~Horaires contradictoires~~ TRANCHÉ le 31 oct par Mouj : **tous les jours
+  9h-23h**. Code corrigé (JSON-LD, llms.txt, source unique `SALON.hours` dans
+  `lib/salon-info.ts`, §47bis). RESTE côté Mouj : mettre les mêmes horaires sur
+  la fiche Google Business Profile.
 - Mouj : Cloudflare renvoie 403 à ClaudeBot / anthropic-ai / Bytespider /
   cohere-ai / Amazonbot alors que robots.txt les autorise
 - Mouj : GBP produits (ajoutés en juin) avec d'anciens prix (Cornrows 370,
@@ -264,6 +265,18 @@ app/api/gallery/route.ts    — contrôle Content-Length avant formData()
   marrakech » 7 clics / 29 impr. / pos. 1.31 ; « coiffeur afro marrakech » 1/12/
   pos. 3.33 ; « tresse africaine marrakech » 1/13/pos. 3.38. Volumes très faibles.
   Vraie mesure à faire entre le 16 nov et le 2 déc.
+
+- **Suite du 31 oct (audit SEO 90/100, PDF `docs/audit-seo-2026-10-31.pdf`)** :
+  horaires = tous les jours 9h-23h (décision Mouj). JSON-LD corrigé (il disait
+  lun-sam 9h-19h), `llms.txt` annonce les horaires, `SALON.lastReviewed` =
+  2026-10-31. Page Services : `/fr|en|es/services` n'avait AUCUN titre sous le
+  H1 (pas de H2 ni H3) ; les libellés de prestation et le titre vidéos sont
+  maintenant des `<h2>` (apparence identique, vérifié par captures desktop et
+  mobile). Tests : `lib/salon-info.test.ts`, `e2e/contenu-seo.spec.ts` (blocs
+  « Horaires » et « Page Services »). Local : tsc OK, 83 unitaires, 278 e2e.
+  Non faisable sans décision ou accès : tableau de tarifs (prix « dès » vs
+  catalogue), Cloudflare 403 robots IA, produits fiche Google, avis, contraste
+  (design), title accueil 64 car. (mesure mi-nov).
 
 ---
 

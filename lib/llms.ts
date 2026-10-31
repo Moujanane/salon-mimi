@@ -3,11 +3,17 @@
 // Contenu de /llms.txt (résumé du site pour les moteurs IA). Généré depuis le
 // catalogue (lib/services-data.ts) et les constantes du salon
 // (lib/salon-info.ts) : aucun prix ni coordonnée n'est écrit en dur ici.
-// Les horaires n'y figurent volontairement pas tant qu'ils ne sont pas
-// confirmés (le balisage et le texte visible du site ne concordent pas).
+// Les horaires viennent de SALON.hours (tous les jours de 9h à 23h, confirmé
+// par Mouj le 31 oct 2026), comme le JSON-LD.
 
 import { services, packages } from "./services-data";
 import { SALON } from "./salon-info";
+
+/** « 09:00 » devient « 9h », « 23:00 » devient « 23h ». */
+function hoursLabel(hhmm: string): string {
+  const [h, m] = hhmm.split(":");
+  return `${Number(h)}h${m === "00" ? "" : m}`;
+}
 
 export function llmsTxt(): string {
   const base = SALON.url;
@@ -42,6 +48,7 @@ export function llmsTxt(): string {
     "",
     `- Adresse : ${SALON.address.streetAddress}, ${SALON.address.neighborhood} de ${SALON.address.addressLocality}, ${SALON.address.postalCode}, Maroc`,
     `- Téléphone et WhatsApp : ${SALON.telephone}`,
+    `- Horaires : tous les jours de ${hoursLabel(SALON.hours.opens)} à ${hoursLabel(SALON.hours.closes)}`,
     `- Langues du site : français, anglais, espagnol`,
     "",
     "## Autres langues",

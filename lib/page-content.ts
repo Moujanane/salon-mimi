@@ -6,8 +6,8 @@
 // Règle : tout est calculé depuis le catalogue (lib/services-data.ts) et les
 // constantes du salon (lib/salon-info.ts). Aucun prix ni coordonnée n'est écrit
 // en dur ici, donc rien ne peut diverger du reste du site.
-// Les horaires n'y figurent volontairement pas tant qu'ils ne sont pas
-// confirmés (le balisage Lun-Sam 9h-19h et le texte visible 9h-23h divergent).
+// Les horaires (tous les jours 9h-23h, SALON.hours) n'y sont pas répétés : ils
+// sont déjà affichés sur la page Contact et dans le JSON-LD.
 //
 // Seuls les faits déjà publiés sur le site sont repris (ex. "plus de 10 ans à
 // Marrakech", page À propos). Rien n'est inventé.

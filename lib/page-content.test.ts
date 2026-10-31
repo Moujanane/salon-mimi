@@ -71,7 +71,7 @@ test("À propos et Contact : coordonnées = constantes du salon", () => {
   }
 });
 
-test("pas d'horaires dans les contenus générés (non confirmés)", () => {
+test("pas d horaires répétés dans les contenus générés (déjà sur Contact et JSON-LD)", () => {
   for (const l of LOCALES) {
     const all = [
       homeIntro(l).text,
