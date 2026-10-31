@@ -79,6 +79,25 @@ test.describe("Structure : un seul H1 par page", () => {
   }
 });
 
+test.describe("H1 de l'accueil : texte extrait lisible", () => {
+  // Le H1 est affiché sur deux lignes (<em> en bloc). Sans espace dans le HTML,
+  // un extracteur de texte lit « RastaMarrakech » collé.
+  for (const locale of ["fr", "en", "es"]) {
+    test(`le H1 sépare ses deux lignes par un espace (${locale})`, async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}`);
+      const h1 = page.locator("h1");
+      const texte = (await h1.evaluate((el) => el.textContent)) ?? "";
+      const ligne2 =
+        (await h1.locator("em").evaluate((el) => el.textContent)) ?? "";
+      expect(ligne2.length).toBeGreaterThan(0);
+      const avant = texte.slice(0, texte.indexOf(ligne2));
+      expect(avant).toMatch(/\S\s$/);
+    });
+  }
+});
+
 test.describe("Réponse directe dans les 150 premiers mots (critère GEO)", () => {
   // Convention de comptage : contenu principal (<main>), sans le menu de
   // navigation du header ni le footer, comme le font les extracteurs de
