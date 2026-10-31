@@ -110,7 +110,7 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
   149 sur 150) ; toute modif du hero ou de l'intro doit repasser le test e2e
   « se termine avant le mot 150 »
 - ~~Dev, quick win SEO (§46bis) : séparateur dans le H1 de l'accueil~~ FAIT le
-  31 oct (§47bis), commit `ba2a742`
+  31 oct (§47bis), commit `13cbf19`
 - ~~PageSpeed Insights : relancer une mesure~~ FAIT le 31 oct via Lighthouse
   local (§47bis). Reste optionnel : contraste du bouton ocre et des textes 10 px
   (Lighthouse accessibilité 96)
@@ -239,7 +239,7 @@ app/api/gallery/route.ts    — contrôle Content-Length avant formData()
 ---
 ## 47bis. Session 31 oct 2026 — H1, mesures, audit RLS
 
-- **H1 de l'accueil (commit `ba2a742`)** :
+- **H1 de l'accueil (commit `13cbf19`)** :
   espace `{" "}` ajouté entre les deux lignes dans `components/sections/HeroHome.tsx`
   (rendu visuel inchangé, le texte extrait n'est plus « RastaMarrakech »).
   Test ajouté : `e2e/contenu-seo.spec.ts`, « le H1 sépare ses deux lignes par un
