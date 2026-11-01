@@ -149,6 +149,31 @@ export default async function ServicesPage({
     })),
   };
 
+  const tarifsTx =
+    locale === "en"
+      ? {
+          title: "Prices: starting from",
+          caption: "Starting prices in Moroccan dirhams (MAD)",
+          colService: "Service",
+          colFrom: "From",
+          note: "Book online or by WhatsApp to confirm the price of your hairstyle.",
+        }
+      : locale === "es"
+        ? {
+            title: "Precios: desde",
+            caption: "Precios desde, en dirhams marroquíes (MAD)",
+            colService: "Servicio",
+            colFrom: "Desde",
+            note: "Reserva online o por WhatsApp para confirmar el precio de tu peinado.",
+          }
+        : {
+            title: "Tarifs : à partir de",
+            caption: "Prix à partir de, en dirhams marocains (MAD)",
+            colService: "Prestation",
+            colFrom: "À partir de",
+            note: "Réservez en ligne ou par WhatsApp pour confirmer le tarif de votre coiffure.",
+          };
+
   return (
     <>
       {/* <script> natif (rendu côté serveur dans le HTML initial) plutôt que
@@ -158,6 +183,62 @@ export default async function ServicesPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <ServicesPageClient locale={locale} prices={prices} />
+
+      {/* Tableau des tarifs « à partir de » : même source que le carrousel
+          (table settings), mais dans le HTML du serveur pour que Google le
+          lise au premier passage. */}
+      <section
+        aria-labelledby="tarifs-title"
+        className="bg-nuit px-6 md:px-12 pb-16 pt-4"
+      >
+        <div className="max-w-3xl mx-auto">
+          <h2
+            id="tarifs-title"
+            className="font-georgia text-[clamp(20px,2.5vw,28px)] font-bold text-white text-center mb-6"
+          >
+            {tarifsTx.title}
+          </h2>
+          <div className="overflow-x-auto rounded-2xl border border-ocre/20 bg-panneau">
+            <table className="w-full text-left text-[14px] text-white/85 font-inter">
+              <caption className="text-white/70 text-[12px] px-4 py-3 text-left">
+                {tarifsTx.caption}
+              </caption>
+              <thead>
+                <tr className="border-b border-ocre/20 text-ocre text-[11px] tracking-[2px] uppercase">
+                  <th scope="col" className="px-4 py-3 font-normal">
+                    {tarifsTx.colService}
+                  </th>
+                  <th scope="col" className="px-4 py-3 font-normal text-right">
+                    {tarifsTx.colFrom}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {servicesList.map((s) => (
+                  <tr
+                    key={s.name}
+                    className="border-b border-ocre/10 last:border-0"
+                  >
+                    <th scope="row" className="px-4 py-3 font-normal">
+                      {locale === "en"
+                        ? s.nameEn
+                        : locale === "es"
+                          ? s.nameEs
+                          : s.name}
+                    </th>
+                    <td className="px-4 py-3 text-right font-bold text-or whitespace-nowrap">
+                      {s.price} MAD
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-white/70 text-[12px] text-center mt-4">
+            {tarifsTx.note}
+          </p>
+        </div>
+      </section>
     </>
   );
 }

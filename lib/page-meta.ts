@@ -11,6 +11,7 @@
 // Seule la fin "| Jamaa El Fna" est tronquée. À revoir après le rapport.
 
 import type { Metadata } from "next";
+import { SALON } from "./salon-info";
 
 export type MetaLocale = "fr" | "en" | "es";
 export type PageKey =
@@ -48,9 +49,9 @@ export const PAGE_META: Record<PageKey, Meta> = {
       es: "Trenzas africanas Marrakech — Box braids, Knotless, Locks",
     },
     descriptions: {
-      fr: "Tous les services du Salon Mimi : tresses africaines, knotless, box braids, locks, fulani. Dès 150 MAD. Réservation en ligne, Place Jamaa El Fna, Marrakech.",
-      en: "All Salon Mimi services: African braids, knotless, box braids, locks, fulani. From 150 MAD. Book online, Jamaa El Fna Square, Marrakech.",
-      es: "Todos los servicios de Salon Mimi: trenzas africanas, knotless, box braids, locks, fulani. Desde 150 MAD. Reserva online, Plaza Jamaa El Fna, Marrakech.",
+      fr: `Tous les services du Salon Mimi : tresses africaines, knotless, box braids, locks, fulani. Dès ${SALON.priceRange.min} MAD. Réservation en ligne, Place Jamaa El Fna, Marrakech.`,
+      en: `All Salon Mimi services: African braids, knotless, box braids, locks, fulani. From ${SALON.priceRange.min} MAD. Book online, Jamaa El Fna Square, Marrakech.`,
+      es: `Todos los servicios de Salon Mimi: trenzas africanas, knotless, box braids, locks, fulani. Desde ${SALON.priceRange.min} MAD. Reserva online, Plaza Jamaa El Fna, Marrakech.`,
     },
   },
   reservation: {

@@ -124,7 +124,7 @@ export default function HeroHome({
         </div>
 
         <h1 className="font-georgia text-[clamp(38px,4.5vw,68px)] font-bold uppercase leading-[0.9] text-white mb-4">
-          {h1Line1 ?? "Tresses africaines & Rasta"}
+          {h1Line1 ?? "Tresses africaines & Rasta"}{" "}
           <em className="block not-italic text-ocre italic">
             {h1Line2 ?? "Marrakech"}
           </em>

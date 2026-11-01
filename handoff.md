@@ -6,7 +6,7 @@ Refaire entièrement le site du Salon Mimi (coiffure afro, Marrakech) avec un de
 
 ---
 
-## 0. Index des tâches ouvertes (mis à jour le 19 oct 2026)
+## 0. Index des tâches ouvertes (mis à jour le 27 oct 2026)
 
 Ce fichier grossit vite — avant de re-parcourir tout le handoff en début de
 session, regarder ici d'abord. Mis à jour manuellement, peut dater un peu ;
@@ -86,10 +86,12 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
   fonctionnement normal (sinon Upstash a un problème indépendant de cette
   session)
 
-**Ouvert après la session du 17-18 oct (§44)**
+**Ouvert après l'audit SEO du 27 oct (§46bis)**
 
-- Mouj : confirmer les VRAIS horaires (JSON-LD Lun-Sam 9h-19h vs texte
-  visible « tous les jours 9h-23h »), puis corriger le côté faux
+- ~~Horaires contradictoires~~ TRANCHÉ le 31 oct par Mouj : **tous les jours
+  9h-23h**. Code corrigé (JSON-LD, llms.txt, source unique `SALON.hours` dans
+  `lib/salon-info.ts`, §47bis). Fiche Google Business Profile : déjà à 9h-23h tous les jours
+  (confirmé par Mouj le 31 oct). Horaires cohérents partout.
 - Mouj : Cloudflare renvoie 403 à ClaudeBot / anthropic-ai / Bytespider /
   cohere-ai / Amazonbot alors que robots.txt les autorise
 - Mouj : GBP produits (ajoutés en juin) avec d'anciens prix (Cornrows 370,
@@ -98,9 +100,17 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
   (+212600000001) dans l'admin, créées par un test e2e lancé en local
 - Search Console : demander l'indexation de /fr, /fr/services, /fr/a-propos
   et renvoyer le sitemap
-- Décision : prix « dès » de la page Services (système `settings.price_*`,
-  ex. Box braids dès 200) vs catalogue (Box braids 450-500) — incohérence
-  visible ; bloque le tableau de prix HTML
+- ~~Décision prix « dès » vs catalogue~~ TRANCHÉ le 31 oct par Mouj : les
+  « dès » de la page Services (table `settings`, ex. Box braids dès 105) sont de
+  VRAIS prix pratiqués ; c'est le catalogue (`lib/services-data.ts`, ex. Box
+  Braids medium 500) qui ne couvre pas ces prestations d'entrée. Tableau HTML
+  « Tarifs : à partir de » ajouté sur `/xx/services` (§47bis). Prix minimum
+  annoncé TRANCHÉ par Mouj le 31 oct : **65 MAD (coiffure seulement, cheveux
+  attachés ; les ongles dès 55 ne comptent pas)**, source unique
+  `SALON.priceRange.min` (`lib/salon-info.ts`) d'où dérivent meta description
+  Services, JSON-LD `priceRange` (65–950 MAD), FAQ, llms.txt et intro de
+  l'accueil. Si Mimi change `price_cheveux_attaches` dans l'admin, mettre à jour
+  cette constante.
 - Dev, besoin du nom complet de Mimi : `sameAs`/`url` sur le bloc Person
 - Dev : **intro de l'accueil resserrée et pages légales sur `pageMetadata()` —
   FAIT le 19 oct (§44, complément)**
@@ -108,6 +118,13 @@ tant que les étapes 4 et 5 ne sont pas faites. (Toutes les étapes sont faites 
   forfaits, de 150 à 950 MAD ») — budget de mots très serré (ES finit au mot
   149 sur 150) ; toute modif du hero ou de l'intro doit repasser le test e2e
   « se termine avant le mot 150 »
+- ~~Dev, quick win SEO (§46bis) : séparateur dans le H1 de l'accueil~~ FAIT le
+  31 oct (§47bis), commit `13cbf19`
+- ~~PageSpeed Insights : relancer une mesure~~ FAIT le 31 oct via Lighthouse
+  local (§47bis). Reste optionnel : contraste du bouton ocre et des textes 10 px
+  (Lighthouse accessibilité 96)
+- Search Console : l'audit du 27 oct n'avait pas accès aux rapports ; indexation,
+  clics, impressions et CTR restent à vérifier dans GSC.
 
 **Pour mémoire — déjà réglé, ne pas rouvrir sans nouveau signal**
 
@@ -229,6 +246,127 @@ app/api/gallery/route.ts    — contrôle Content-Length avant formData()
 ```
 
 ---
+## 47bis. Session 31 oct 2026 — H1, mesures, audit RLS
+
+- **H1 de l'accueil (commit `13cbf19`)** :
+  espace `{" "}` ajouté entre les deux lignes dans `components/sections/HeroHome.tsx`
+  (rendu visuel inchangé, le texte extrait n'est plus « RastaMarrakech »).
+  Test ajouté : `e2e/contenu-seo.spec.ts`, « le H1 sépare ses deux lignes par un
+  espace » (fr/en/es). Rouge contre la prod avant correction, vert après.
+  Local : `tsc` OK, 75 tests unitaires OK, 268 tests e2e OK (2 ignorés, test de
+  réservation exclu).
+- **Mesures (prod, 31 oct)** : l'API PageSpeed refuse sans clé (quota 429). Mesure
+  faite avec Lighthouse local : mobile Accessibilité 96, Bonnes pratiques 100,
+  SEO 100 ; trace mobile (4G rapide, CPU x4) LCP 538 ms, CLS 0.00. Seul échec
+  Lighthouse : contraste insuffisant (bouton ocre/blanc 11 px = 3.4 ; textes
+  `text-white/35` et `/40` de 10 px = 3.2 à 3.8, attendu 4.5). Pas de données
+  CrUX (trafic trop faible).
+- **Audit RLS (code uniquement)** : `npm run audit:security` = 10/10. Toutes les
+  routes d'écriture (`gallery`, `gallery/[id]` PATCH/DELETE, `gallery/order`,
+  `settings`, `reservations/[id]` PATCH/DELETE) passent par `getAuthUser()`
+  (session + ADMIN_EMAILS) ; push, mimi, mimi-settings par `checkMimiPin`.
+  `GET /api/settings` filtre sur `PUBLIC_KEYS`. NON vérifié (pas d'accès à la
+  base, MCP Supabase refusé) : état réel de `pg_policies` et `storage.objects`,
+  liste `auth.users`. Écart documentaire : la migration cite `heure_souhaitee` et
+  `nombre_personnes`, absents de `supabase-schema.sql`.
+- **GSC (28 j au 31 oct, 1er relevé, trop tôt pour conclure)** : « salon mimi
+  marrakech » 7 clics / 29 impr. / pos. 1.31 ; « coiffeur afro marrakech » 1/12/
+  pos. 3.33 ; « tresse africaine marrakech » 1/13/pos. 3.38. Volumes très faibles.
+  Vraie mesure à faire entre le 16 nov et le 2 déc.
+
+- **Suite du 31 oct (audit SEO 90/100, PDF `docs/audit-seo-2026-10-31.pdf`)** :
+  horaires = tous les jours 9h-23h (décision Mouj). JSON-LD corrigé (il disait
+  lun-sam 9h-19h), `llms.txt` annonce les horaires, `SALON.lastReviewed` =
+  2026-10-31. Page Services : `/fr|en|es/services` n'avait AUCUN titre sous le
+  H1 (pas de H2 ni H3) ; les libellés de prestation et le titre vidéos sont
+  maintenant des `<h2>` (apparence identique, vérifié par captures desktop et
+  mobile). Tests : `lib/salon-info.test.ts`, `e2e/contenu-seo.spec.ts` (blocs
+  « Horaires » et « Page Services »). Local : tsc OK, 83 unitaires, 278 e2e.
+  Non faisable sans décision ou accès : tableau de tarifs (prix « dès » vs
+  catalogue), Cloudflare 403 robots IA, produits fiche Google, avis, contraste
+  (design), title accueil 64 car. (mesure mi-nov).
+
+- **Rapport « Pourquoi des pages ne sont pas indexées » du 31 oct** (32
+  redirection, 23 canonique correcte, 4 explorées non indexées, 4 en 403, 3 en
+  404, 1 doublon). Diagnostic : les 24 URLs du sitemap répondent 200 sans
+  redirection ; sur 76 liens internes un seul n'est pas en 200 :
+  `/cdn-cgi/l/email-protection` (lien fabriqué par Cloudflare pour masquer
+  l'e-mail des mentions légales, 404 pour les robots) = source probable des 404
+  et d'une partie des 403. Corrigé dans le code : `Disallow: /cdn-cgi/` dans
+  `app/robots.ts` (groupe `*`), test dans `e2e/seo-fichiers.spec.ts`. Les
+  redirections (anciennes URLs sans langue et variantes avec barre finale en 308)
+  et les `?service=` (canonique vers `/xx/reservation`) sont voulues : pas des
+  erreurs, inutile de cliquer « Valider » dessus (l'échec de validation est
+  normal). `/en/a-propos` : crawlée une seule fois le 24 sept, 287 mots, canonical
+  correct, rien à corriger dans le code : demander l'indexation dans GSC. RESTE
+  côté Mouj : Cloudflare > Scrape Shield > désactiver « Email Address
+  Obfuscation », puis « Valider la correction » sur 404 et 403 seulement.
+
+- **404 signalés par GSC (3 exemples, 31 oct)** : deux `?service=` (22 août et
+  ancien) répondent 200 avec canonical correct (traces de l'incident Railway du
+  22 août, rien à faire). `https://mimi-coiffure.com/&` (crawlée le 18 oct)
+  allait vers `/fr/&` en 404 : lien mal copié quelque part (bio Instagram/TikTok,
+  fiche Google, annuaire ?). Corrigé dans `middleware.ts` : tout chemin commençant
+  par `&` ou `%26` redirige en 308 vers `/fr` ; tests dans
+  `e2e/seo-canonical.spec.ts`. Les vraies URLs inconnues restent en 404. À faire
+  côté Mouj : chercher un lien « mimi-coiffure.com/& » dans les bios et annuaires.
+
+- **Tableau de tarifs (31 oct)** : `app/[locale]/services/page.tsx` rend un
+  `<table>` côté serveur (10 familles, prix = table `settings` avec les mêmes
+  valeurs de repli que le JSON-LD ItemList), titre H2 « Tarifs : à partir de »,
+  fr/en/es. Avant, ces prix n'arrivaient que par JavaScript. Tests dans
+  `e2e/contenu-seo.spec.ts` (« tableau de tarifs en HTML », comparés à
+  `/api/settings`). Correction d'une erreur d'audit : « 125 MAD » existe bien
+  dans le site (c'est `price_tresses_africaines`), je l'avais dit disparu.
+  Un échec e2e isolé en local (nom non relevé) ne s'est pas reproduit sur 2
+  passages complets (294 verts).
+
+- **Minimum 65 MAD (31 oct)** : « Dès 150 MAD » (soin argan du catalogue)
+  remplacé partout par 65 MAD. Tests unitaires `pricing`, `faq`, `llms`,
+  `page-meta`, `page-content` + e2e « Prix minimum annoncé ». Le catalogue
+  (`services-data.ts`) garde ses prix exacts (min 150), il n'est pas modifié.
+  Test e2e intermittent noté : `/fr/services a des H2` (assertion « un seul H1 »)
+  a échoué 2 fois sur 5 passages complets en LOCAL (serveur de dev sous charge,
+  non reproduit seul ×18 ni sur 6 passages contre la prod) ; à surveiller.
+
+---
+
+## 46bis. Audit SEO public — 27 oct 2026
+
+Audit en lecture seule du site public `https://mimi-coiffure.com`, recoupé avec
+le code local. Aucun fichier applicatif modifié pendant cet audit.
+
+### Vérifications en production
+
+- `robots.txt` accessible et sitemap déclaré ; `sitemap.xml` contient 24 URL
+  (8 pages × FR/EN/ES).
+- Les 24 URL du sitemap répondent HTTP 200 sans redirection. Canonical
+  auto-référent, `hreflang` réciproques `fr`/`en`/`es`/`x-default` et
+  attribut `<html lang>` cohérents vérifiés sur les 24 pages.
+- Titres, descriptions, Open Graph et Twitter sont générés par
+  `lib/page-meta.ts`. Le test ciblé
+  `node --import tsx --test lib/page-meta.test.ts` passe (8/8).
+- JSON-LD `HairSalon` et `FAQPage` présents sur l'accueil ; `/admin/login`
+  contient bien `noindex, nofollow`.
+
+### Constats et suivi
+
+- **À confirmer avant correction : horaires contradictoires.** Le texte visible
+  annonce tous les jours 9h–23h ; le JSON-LD de `app/[locale]/layout.tsx`
+  déclare lundi–samedi 9h–19h. La même divergence est décrite dans
+  `lib/page-content.ts`. Mouj doit confirmer les vrais horaires avant
+  d'harmoniser le texte, le balisage structuré et la fiche Google Business
+  Profile.
+- **H1 d'accueil :** le `<h1>` est visuellement sur deux lignes, mais son texte
+  extrait peut concaténer « Tresses africaines & Rasta » et « Marrakech » en
+  « Tresses africaines & RastaMarrakech ». Séparateur textuel recommandé dans
+  `components/sections/HeroHome.tsx` ; amélioration optionnelle, pas un blocage.
+- **Title de l'accueil :** 64 caractères dans le HTML public, exception déjà
+  suivie et volontaire (`lib/page-meta.ts`, mesure du changement §42). Ne pas
+  le raccourcir sans résultat GSC concluant.
+- PageSpeed Insights n'a pas fourni de mesures : API limitée par HTTP 429.
+  Core Web Vitals non vérifiés dans cet audit. Search Console indisponible :
+  indexation et performances organiques non vérifiées.
 
 ## 45. Session 19 oct 2026 — audit sécurité (5 points) et corrections, branche `fix/security-hardening`
 

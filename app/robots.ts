@@ -7,6 +7,10 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
+        // Cloudflare fabrique /cdn-cgi/l/email-protection (masquage des
+        // e-mails, mentions légales) : lien en 404 pour les robots, signalé par
+        // Search Console. Les robots IA ci-dessous ont leur propre groupe.
+        disallow: "/cdn-cgi/",
       },
       // Crawlers IA autorisés — pour apparaître dans les résultats AI Search
       // (ChatGPT, Perplexity, Claude, Google AI Overviews)

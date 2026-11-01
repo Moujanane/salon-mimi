@@ -17,6 +17,7 @@ import {
   offerCatalogLd,
   areaServedLd,
   reserveActionLd,
+  openingHoursLd,
 } from "@/lib/salon-info";
 import { getGoogleReviews } from "@/lib/google-reviews";
 import "../globals.css";
@@ -136,21 +137,7 @@ const jsonLd = {
   // sameAs : profils publics stables uniquement (Google ignore les liens de
   // partage raccourcis type share.google).
   sameAs: [MAPS_URL, GBP_URL, INSTAGRAM_URL, TIKTOK_URL],
-  openingHoursSpecification: [
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-      ],
-      opens: "09:00",
-      closes: "19:00",
-    },
-  ],
+  openingHoursSpecification: openingHoursLd(),
   priceRange: priceRangeLabel(),
   hasOfferCatalog: offerCatalogLd(),
   areaServed: areaServedLd(),

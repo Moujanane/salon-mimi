@@ -37,9 +37,10 @@ test("chaque prix en euros correspond au prix en MAD (arrondi, écart <= 0,75 EU
   }
 });
 
-test("priceRange du schéma = min et max réels du catalogue", () => {
+test("priceRange du schéma : min annoncé = 65 (cheveux attachés dès 65, confirmé le 31/10/2026), max = catalogue", () => {
   const prices = [...services, ...packages].map((i) => i.priceMad);
-  assert.equal(SALON.priceRange.min, Math.min(...prices));
+  assert.equal(SALON.priceRange.min, 65);
+  assert.ok(SALON.priceRange.min <= Math.min(...prices));
   assert.equal(SALON.priceRange.max, Math.max(...prices));
 });
 
@@ -58,7 +59,7 @@ test("réponse FAQ tarifs : dérivée du catalogue, sans ancien prix", () => {
   assert.match(text, /knotless braids à 700 MAD/);
   assert.match(text, /cornrows tête entière à 300 MAD/);
   assert.match(text, /départ de locks à 900 MAD/);
-  assert.match(text, /de 150 MAD/);
+  assert.match(text, /de 65 MAD \(cheveux attachés\)/);
   assert.match(text, /à 950 MAD/);
   assert.doesNotMatch(text, /\b550\b/);
 });
