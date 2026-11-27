@@ -20,6 +20,7 @@ import {
   openingHoursLd,
 } from "@/lib/salon-info";
 import { getGoogleReviews } from "@/lib/google-reviews";
+import { ogLocale } from "@/lib/page-meta";
 import "../globals.css";
 
 // Seules /fr, /en, /es sont des routes valides. Toute autre valeur de [locale]
@@ -96,7 +97,7 @@ export async function generateMetadata({
       title: titles[locale] ?? titles.fr,
       description: descriptions[locale] ?? descriptions.fr,
       siteName: "Salon Mimi",
-      locale,
+      ...ogLocale(locale),
       type: "website",
       url: `${BASE_URL}/${locale}`,
       images: [

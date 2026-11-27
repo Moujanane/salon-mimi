@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { pageMetadata } from "@/lib/page-meta";
+import EmailNonMasque from "@/components/ui/EmailNonMasque";
 
 export const revalidate = 86400;
 
@@ -153,7 +154,7 @@ function PrivacyFr() {
           </h2>
           <p>
             Pour toute question relative à vos données personnelles :{" "}
-            <span className="text-white">contact@mimi-coiffure.com</span>
+            <EmailNonMasque className="text-white" />
           </p>
         </section>
       </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { pageMetadata } from "@/lib/page-meta";
+import EmailNonMasque from "@/components/ui/EmailNonMasque";
 
 export const revalidate = 86400;
 
@@ -51,7 +52,7 @@ function LegalFr() {
             <br />
             Téléphone : +212 7 10 38 82 04
             <br />
-            Email : contact@mimi-coiffure.com
+            Email : <EmailNonMasque />
             <br />
             <br />
             Responsable de publication :{" "}
@@ -132,7 +133,7 @@ function LegalEn() {
             <br />
             Phone: +212 7 10 38 82 04
             <br />
-            Email: contact@mimi-coiffure.com
+            Email: <EmailNonMasque />
             <br />
             <br />
             Publication manager:{" "}
@@ -201,7 +202,7 @@ function LegalEs() {
             <br />
             Teléfono: +212 7 10 38 82 04
             <br />
-            Email: contact@mimi-coiffure.com
+            Email: <EmailNonMasque />
             <br />
             <br />
             Responsable de publicación:{" "}

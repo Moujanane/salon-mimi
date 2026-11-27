@@ -7,6 +7,20 @@
       "sourceType": "github",
       "skillPath": "skills/find-skills/SKILL.md",
       "computedHash": "7bc223e2aafbdbf6e50ea243ba6ef67fe432bb069ab439fea0390795dac0bf7f"
+    },
+    "nextjs-seo": {
+      "source": "laguagu/claude-code-nextjs-skills",
+      "commit": "5ca7f4a53bca1084af62502e3caa83f89d563134",
+      "sourceType": "github",
+      "skillPath": "skills/nextjs-seo/SKILL.md",
+      "computedHash": "b69988f63a7a22d0fa1bcb461a366c035027fe0c4261a57ab27a33d00490d49d"
+    },
+    "seo-audit": {
+      "source": "coreyhaines31/marketingskills",
+      "commit": "2bf95edb4ebd37198ab7fd18b99ba95c2145ec64",
+      "sourceType": "github",
+      "skillPath": "skills/seo-audit/SKILL.md",
+      "computedHash": "537ccf84d4a257cb1b6a9a3643fe56738632989768e1823ffe206ad1c64cd68a"
     }
   }
 }

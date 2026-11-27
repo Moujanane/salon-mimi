@@ -62,3 +62,27 @@ test.describe("robots.txt", () => {
     expect(body).toContain("Sitemap: https://mimi-coiffure.com/sitemap.xml");
   });
 });
+
+// Cloudflare remplace les adresses e-mail en clair par un lien
+// /cdn-cgi/l/email-protection (404 pour les robots, signalé par Search
+// Console). Les pages légales entourent l'adresse de <!--email_off-->.
+// Le test vérifie le résultat (adresse lisible, aucun lien /cdn-cgi/), pas
+// la présence des commentaires, que Cloudflare peut retirer.
+test.describe("e-mail non masqué par Cloudflare", () => {
+  for (const path of [
+    "/fr/mentions-legales",
+    "/en/mentions-legales",
+    "/es/mentions-legales",
+    "/fr/politique-de-confidentialite",
+  ]) {
+    test(`${path} : adresse en clair, sans lien /cdn-cgi/`, async ({
+      request,
+    }) => {
+      const res = await request.get(path);
+      expect(res.status()).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("contact@mimi-coiffure.com");
+      expect(html).not.toContain("/cdn-cgi/l/email-protection");
+    });
+  }
+});

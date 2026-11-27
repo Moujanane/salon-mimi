@@ -131,6 +131,30 @@ export const PAGE_META: Record<PageKey, Meta> = {
 const SITE_URL = "https://mimi-coiffure.com";
 
 /**
+ * og:locale au format Open Graph « langue_TERRITOIRE » (ogp.me). Avant, le
+ * site émettait « fr », « en », « es », format non conforme.
+ */
+export const OG_LOCALES: Record<MetaLocale, string> = {
+  fr: "fr_FR",
+  en: "en_US",
+  es: "es_ES",
+};
+
+/** Open Graph : locale de la page + les deux autres langues en alternatives. */
+export function ogLocale(locale: string): {
+  locale: string;
+  alternateLocale: string[];
+} {
+  const l: MetaLocale = locale === "en" || locale === "es" ? locale : "fr";
+  return {
+    locale: OG_LOCALES[l],
+    alternateLocale: (Object.keys(OG_LOCALES) as MetaLocale[])
+      .filter((x) => x !== l)
+      .map((x) => OG_LOCALES[x]),
+  };
+}
+
+/**
  * Métadonnées complètes d'une page : title, description, canonical, hreflang,
  * Open Graph et Twitter propres à la page. Sans cela, les pages héritaient de
  * l'Open Graph de l'accueil (même titre de partage partout).
@@ -161,7 +185,7 @@ export function pageMetadata(
       title,
       description,
       siteName: "Salon Mimi",
-      locale: l,
+      ...ogLocale(l),
       type: "website",
       url,
       images: [

@@ -146,3 +146,28 @@ test("meta description Services : prix minimum annoncé = 65 MAD (3 langues)", (
     assert.doesNotMatch(d, /\b150 MAD/, l);
   }
 });
+
+test("og:locale au format Open Graph langue_TERRITOIRE + alternatives", () => {
+  const attendu: Record<MetaLocale, string> = {
+    fr: "fr_FR",
+    en: "en_US",
+    es: "es_ES",
+  };
+  for (const page of PAGES) {
+    for (const l of LOCALES) {
+      const og = pageMetadata(page, l, "").openGraph as {
+        locale?: string;
+        alternateLocale?: string[];
+      };
+      assert.equal(og.locale, attendu[l], `${page}/${l}`);
+      assert.match(og.locale ?? "", /^[a-z]{2}_[A-Z]{2}$/);
+      assert.deepEqual(
+        [...(og.alternateLocale ?? [])].sort(),
+        LOCALES.filter((x) => x !== l)
+          .map((x) => attendu[x])
+          .sort(),
+        `${page}/${l} : alternateLocale`,
+      );
+    }
+  }
+});

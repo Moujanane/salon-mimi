@@ -246,6 +246,48 @@ app/api/gallery/route.ts    — contrôle Content-Length avant formData()
 ```
 
 ---
+## 48. Session 27 nov 2026 — audit SEO live (skill nextjs-seo) + 2 correctifs
+
+Skills installés dans le repo (`.agents/skills/`, liens dans `.claude/skills/`) :
+`find-skills`, `nextjs-seo` (laguagu), `seo-audit` (coreyhaines31).
+Environnement cloud perso `salon-mimi` créé : hosts autorisés `skills.sh`,
+`mimi-coiffure.com`, `www.mimi-coiffure.com`, `ogp.me`,
+`developers.cloudflare.com` (l'agent peut désormais vérifier la prod).
+
+**Audit live (27 nov, prod = commit `ef38d95`)** : 24 URL du sitemap en 200,
+titles/descriptions uniques (34-64 car. / 120-156 car.), 1 H1 par page,
+canonical auto-référent, 4 hreflang par page, 0 image sans alt, og:image 200,
+JSON-LD HairSalon (horaires 9h-23h, priceRange 65–950) + FAQPage + ItemList +
+Person. `www` → apex en 301, `/` → `/fr` en 308. Sur 83 liens internes, seul
+non-200 : `/cdn-cgi/l/email-protection` (404).
+
+**Correctifs (branche `claude/festive-hamilton-qcnknm`, NON MERGÉS)** :
+- E-mail des pages légales entouré de `<!--email_off-->…<!--/email_off-->`
+  (`components/ui/EmailNonMasque.tsx`) : Cloudflare ne doit plus fabriquer le
+  lien `/cdn-cgi/l/email-protection` en 404. Remplace l'action manuelle
+  « désactiver Email Address Obfuscation » (§47bis). Syntaxe officielle :
+  developers.cloudflare.com/waf/tools/scrape-shield/email-address-obfuscation/
+  (fermeture `<!--/email_off-->`, PAS `<!--email_on-->`). Test e2e
+  `seo-fichiers.spec.ts` « e-mail non masqué par Cloudflare » (à valider
+  contre la prod APRÈS déploiement : c'est Cloudflare qui réécrit).
+- `og:locale` = `fr_FR` / `en_US` / `es_ES` + `og:locale:alternate` (avant :
+  `fr`, non conforme au format `language_TERRITORY` d'ogp.me). Source unique
+  `ogLocale()` dans `lib/page-meta.ts`, utilisée aussi par le layout. Test
+  unitaire dans `lib/page-meta.test.ts`.
+
+Vérifs locales : `tsc` OK, 86 tests unitaires OK, build OK (env Supabase
+factice), HTML rendu vérifié. e2e SEO (4 fichiers) : 186 OK, 4 KO propres à
+l'environnement (URL prod en dur hors proxy ; tarifs comparés à
+`/api/settings` vide avec Supabase factice). Piège : Playwright du projet ≠
+navigateur préinstallé → config temporaire avec
+`executablePath: /opt/pw-browsers/chromium`.
+
+Non fait / hors code : title accueil 64 car. (mesure GSC prévue 16 nov-2 déc,
+pas d'accès GSC dans cette session) ; Cloudflare 403 sur robots IA ; avis
+Google ; produits GBP ; contraste (design).
+
+---
+
 ## 47bis. Session 31 oct 2026 — H1, mesures, audit RLS
 
 - **H1 de l'accueil (commit `13cbf19`)** :
